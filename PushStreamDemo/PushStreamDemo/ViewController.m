@@ -6,6 +6,7 @@
 //  Copyright © 2019 luowailin. All rights reserved.
 //
 // 测试视频地址:https://www.jianshu.com/p/5fab7968f76a
+// 网络接口:http:/api.m.mtime.cn/PageSubArea/TrailerList.api
 
 #import "ViewController.h"
 #include <libavcodec/avcodec.h>
@@ -40,8 +41,12 @@
     
     
     if (self.addType == 0) {
-        //NSString *input_str = [NSString stringWithFormat:@"resource.bundle/%@", self.fileField.text];
         NSString *input_nsstr = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:self.fileField.text];
+        sprintf(input_str_full, "%s", [input_nsstr UTF8String]);
+    }
+    
+    if (self.addType == 1) { 
+        NSString *input_nsstr = self.fileField.text;
         sprintf(input_str_full, "%s", [input_nsstr UTF8String]);
     }
     
