@@ -33,16 +33,15 @@
     self.addType = sender.selectedSegmentIndex;
 }
 
-
+//推流
 - (IBAction)pushButtonAction:(UIButton *)sender {
-    
+    //地址
     char input_str_full[500] = {0};
     char output_str_full[500] = {0};
     
-    
     if (self.addType == 0) {
         NSString *input_nsstr = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:self.fileField.text];
-        sprintf(input_str_full, "%s", [input_nsstr UTF8String]);
+        sprintf(input_str_full, "%s", [input_nsstr UTF8String]); //sprintf 字符串格式化   需要溢出的可能性 可以考虑使用snprintf()
     }
     
     if (self.addType == 1) { 
@@ -113,9 +112,10 @@
             ret = AVERROR_UNKNOWN;
             goto end;
         }
-    
+        
+        
+  /* 老版
         ret = avcodec_copy_context(out_stream->codec, in_stream->codec);
-        //ret = avcodec_parameters_copy(out_stream->codecpar, in_stream->codecpar);
         if (ret < 0) {
             printf("Failed to copy context from input to output stream codec context\n");
             goto end;
@@ -125,9 +125,26 @@
         if (ofmt_ctx->oformat->flags & AVFMT_GLOBALHEADER) {
             out_stream->codec->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;    // a|=b 等价于 a=a|b;
         }
+*/
         
+        AVCodecContext *pCodecCtx = avcodec_alloc_context3(codec);
+        ret = avcodec_parameters_to_context(pCodecCtx, in_stream->codecpar);
+        if (ret < 0) {
+            printf("Failed to copy context input to output stream codec context");
+            goto end;
+        }
+        
+        pCodecCtx->codec_tag = 0;
+        if (ofmt_ctx->oformat->flags & AVFMT_GLOBALHEADER) {
+            pCodecCtx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+        }
+        
+        ret = avcodec_parameters_from_context(out_stream->codecpar, pCodecCtx);
+        if (ret < 0) {
+            printf("Failed to copy context input to output stream codec context");
+            goto end;
+        }
     }
-    
     av_dump_format(ofmt_ctx, 0, out_filename, 1);
     
     //open output url
