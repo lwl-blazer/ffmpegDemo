@@ -249,11 +249,15 @@
     
     while (1) {
         AVStream *in_stream , *out_stream;
+        /**
+         * av_read_frame()的作用是读取码流中的音频若干帧或者视频一帧。例如解码视频的时候，每解码一个视频帆，需要先调用av_read_frame()获得一帧视频的压缩数据。然后才能对该数据进行解码
+         */
         ret = av_read_frame(ifmt_ctx, &pkt);
         if (ret < 0) {
             break;
         }
         
+        //存数据: 视频 每个结构一般是存一帧  音频可能有好几帧  解码前数据: AVPacket 解码后数据:AVFrame
         if (pkt.pts == AV_NOPTS_VALUE) {
             AVRational time_base1 = ifmt_ctx->streams[videoindex]->time_base;
             
@@ -290,7 +294,11 @@
                 frame_index ++;
             }
             
-            ret = av_interleaved_write_frame(ofmt_ctx, &pkt);
+            /**
+             av_write_frame 直接将包写进Mux,没有缓存和重新排序，一切都需要自己设置
+             av_interleaved_write_frame  将对packet进行缓存和pts检查
+             */
+            ret = av_interleaved_write_frame(ofmt_ctx, &pkt); //写入
             
             if (ret < 0) {
                 printf("Error muxing packet\n");
@@ -299,7 +307,7 @@
         }
         av_packet_unref(&pkt);
     }
-    av_write_trailer(ofmt_ctx);
+    av_write_trailer(ofmt_ctx); //写尾
 end:
     avformat_close_input(&ifmt_ctx);
     
@@ -326,4 +334,34 @@ end:
  *  unsigned char *buf_ptr;  当前指针读取到的位置
  *  unsigned char *buf_end;  缓存结束的位置
  *  void *opaque; URLContext结构体
+ */
+
+
+/** AVStream
+ * AVStream是存储每个视频/音频流信息的结构体
+ * 重要的变量:
+ *
+ * int index 标识该视频、音频流
+ * AVCodecContext *codec  指向该视频/音频流的AVCodecContext 它们是一一对应的关系
+ * AVRational time_base  时基    通过该值可以把PTS,DTS转化为真正的时间
+      FFmpeg其他结构体中也有这个字段，只有AVStream中的time_base是可用的。 PTS * time_base = 真正的时间
+ 
+ * int64_t duration 该视频/音频流长度
+ * AVDictionary *metadata  元数据信息
+ * AVRational avg_frame_rate 帧率 (对视频来说，这个很重要)
+ * AVPacket attacted_pic 附带的图片 比如说一些MP3、AAC音频文件附带的专辑封面
+ *
+ */
+
+
+/** AVPacket
+ * AVPacket是存储压缩编码数据相关信息的结构体，
+ *
+ * 重要的变量:
+ * uint8_t *data 压缩编码的数据
+ *    例如对于H.264来说，1个AVPacket的data通常对应一个NAL   注意:在这里只是对应，而不是一模一样，他们之间有微小的差别：使用FFmpeg类库分离出多媒体文件中的H.264码流，因此在使用FFmpeg进行音视频处理的时候，常常可以将得到的AVPacket的data数据直接写成文件，从而得到音视频的码流文件
+ * int size data的大小
+ * int64_t pts   显示时间戳
+ * int64_t dts   解码时间戳
+ * int stream_index 标识该AVPacket所属的视频/音频流
  */
