@@ -28,6 +28,7 @@
 		251D4681224B6AE200F3D02E /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 251D4680224B6AE200F3D02E /* libiconv.tbd */; };
 		251D4683224B6AF400F3D02E /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 251D4682224B6AF400F3D02E /* libbz2.tbd */; };
 		251D4685224B6AFA00F3D02E /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 251D4684224B6AFA00F3D02E /* libz.tbd */; };
+		251D4687224B79A500F3D02E /* testVideo-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 251D4686224B79A500F3D02E /* testVideo-1.mp4 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -77,6 +78,7 @@
 		251D4680224B6AE200F3D02E /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
 		251D4682224B6AF400F3D02E /* libbz2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbz2.tbd; path = usr/lib/libbz2.tbd; sourceTree = SDKROOT; };
 		251D4684224B6AFA00F3D02E /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		251D4686224B79A500F3D02E /* testVideo-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "testVideo-1.mp4"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -141,6 +143,7 @@
 		251D4638224B6A7F00F3D02E /* FFmpegDecoder */ = {
 			isa = PBXGroup;
 			children = (
+				251D4686224B79A500F3D02E /* testVideo-1.mp4 */,
 				251D4639224B6A7F00F3D02E /* AppDelegate.h */,
 				251D463A224B6A7F00F3D02E /* AppDelegate.m */,
 				251D463C224B6A7F00F3D02E /* ViewController.h */,
@@ -298,6 +301,7 @@
 				251D4646224B6A8100F3D02E /* LaunchScreen.storyboard in Resources */,
 				251D4643224B6A8100F3D02E /* Assets.xcassets in Resources */,
 				251D4641224B6A7F00F3D02E /* Main.storyboard in Resources */,
+				251D4687224B79A500F3D02E /* testVideo-1.mp4 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
