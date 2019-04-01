@@ -28,10 +28,12 @@
 
 - (IBAction)decodecAction:(id)sender {
     
-    AVFormatContext *pFormatCtx;
+    AVFormatContext *pFormatCtx; //AVFormatContext 主要是存储音视频格式中包含的信息
     
     int i, videoIndex;
     AVCodecContext *pCodecCtx;
+    
+    //AVCodec是存储编解码器信息的结构体    每一个编解码器对应一个结构体
     AVCodec *pCodec;
     AVFrame *pFrame, *pFrameYUV;
     
@@ -51,6 +53,7 @@
     char output_str_full[500] = {0};
     char info[1000] = {0};
     
+    
     NSString *input_str = self.inputFile.text;
     NSString *output_str = self.outfile.text;
     
@@ -67,16 +70,17 @@
     
     avformat_network_init();
     pFormatCtx = avformat_alloc_context();
-    if (avformat_open_input(&pFormatCtx, input_str_full, NULL, NULL)) {
+    if (avformat_open_input(&pFormatCtx, input_str_full, NULL, NULL)) { //打开媒体文件
         printf("Couldn't open input stream.\n");
         return;
     }
-    
+    //读取一部分音视频数据并且获得一些相关信息   avformat_find_stream_info()主要用于给每个媒体流(音频/视频)的AVStream赋值
     if (avformat_find_stream_info(pFormatCtx, NULL) < 0) {
         printf("Couldn't find stream information.\n");
         return;
     }
     
+    //获取视频流下标
     videoIndex = -1;
     for (i = 0; i < pFormatCtx->nb_streams; i ++) {
         if (pFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
@@ -94,7 +98,7 @@
     pCodec = avcodec_find_decoder(in_stream->codecpar->codec_id);
     
     pCodecCtx = avcodec_alloc_context3(pCodec);
-    ret = avcodec_parameters_to_context(pCodecCtx, in_stream->codecpar); //把parameters放到AVCodecContext中
+    ret = avcodec_parameters_to_context(pCodecCtx, in_stream->codecpar); //把parameters放到AVCodecContext中 在解码器中主要的作用是配置
     if (ret < 0) {
         printf("Failed to copy context input to output stream codec context");
         return;
@@ -109,19 +113,20 @@
         return;
     }
     
-    if (avcodec_open2(pCodecCtx, pCodec, NULL) < 0) {
+    if (avcodec_open2(pCodecCtx, pCodec, NULL) < 0) { //avcodec_open2  该函数用于初始化一个音视频编码器的AVCodecContext，如果在编码器中检查输入的参数是否符合编码器要求，(注：解码器的参数大部分都是由系统自动设定而不是由用户设定)
         printf("Couldn't open codec.\n");
         return;
     }
     
-    
     pFrame = av_frame_alloc();
     pFrameYUV = av_frame_alloc();
     
+    //分配内存空间，用来保存原始数据     av_image_get_buffer_size获取AV_PIX_FMT_YUV420P需要的存储空间
     out_buffer = (unsigned char *)av_malloc(av_image_get_buffer_size(AV_PIX_FMT_YUV420P,
                                                                      pCodecCtx->width,
                                                                      pCodecCtx->height,
                                                                      1));
+    //关联frame 和 刚分配的内存(out_buffer)
     av_image_fill_arrays(pFrameYUV->data,
                          pFrameYUV->linesize,
                          out_buffer,
@@ -132,6 +137,20 @@
     
     packet = (AVPacket *)av_malloc(sizeof(AVPacket));
     
+    /** libswscale 是一个主要用于处理图片像素数据的类库。可以完成图片像素格式的转换，图片的拉伸等工作
+     *
+     * SwsContext是使用libswscale时候一个贯穿始终的结构体。
+     *
+     * sws_getContext()是初始化SwsContext的函数
+     参数:
+     srcW: 源图像的宽
+     srcH: 源图像的高
+     srcFormat: 源图像的像素格式
+     dstW: 目标图像的宽
+     dstH: 目标图像的高
+     dstFormat: 目标图像的像素格式
+     flags: 设定图像拉伸使用的算法
+     */
     img_convert_ctx = sws_getContext(pCodecCtx->width,
                                      pCodecCtx->height,
                                      pCodecCtx->pix_fmt,
@@ -161,13 +180,14 @@
             ret = avcodec_decode_video2(pCodecCtx,
                                         pFrame,
                                         &got_picture,
-                                        packet);
+                                        packet);   //avcodec_decode_video2 解码一帧的视频数据
             if (ret < 0) {
                 printf("Decode Error.\n");
                 return;
             }
             
             if (got_picture) {
+                //sws_scale 用于转换像素的函数
                 sws_scale(img_convert_ctx,
                           (const uint8_t * const *)pFrame->data,
                           pFrame->linesize,
