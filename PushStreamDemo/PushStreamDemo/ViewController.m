@@ -155,6 +155,7 @@
         
         //avformat_new_stream 创建流通道
         AVStream *out_stream = avformat_new_stream(ofmt_ctx, codec);
+        
         if (!out_stream) {
             printf("Faile allocation output stream\n");
             ret = AVERROR_UNKNOWN;
@@ -250,7 +251,7 @@
     while (1) {
         AVStream *in_stream , *out_stream;
         /**
-         * av_read_frame()的作用是读取码流中的音频若干帧或者视频一帧。例如解码视频的时候，每解码一个视频帆，需要先调用av_read_frame()获得一帧视频的压缩数据。然后才能对该数据进行解码
+         * av_read_frame()的作用是读取码流中的音频若干帧或者视频一帧。例如解码视频的时候，每解码一个视频帧，需要先调用av_read_frame()获得一帧视频的压缩数据。然后才能对该数据进行解码
          */
         ret = av_read_frame(ifmt_ctx, &pkt);
         if (ret < 0) {
@@ -283,6 +284,7 @@
             in_stream = ifmt_ctx->streams[pkt.stream_index];
             out_stream = ofmt_ctx->streams[pkt.stream_index];
             
+            //时间基转换
             pkt.pts = av_rescale_q_rnd(pkt.pts, in_stream->time_base, out_stream->time_base, (AV_ROUND_NEAR_INF|AV_ROUND_PASS_MINMAX));
             pkt.dts = av_rescale_q_rnd(pkt.dts, in_stream->time_base, out_stream->time_base, (AV_ROUND_NEAR_INF|AV_ROUND_PASS_MINMAX));
             pkt.duration = av_rescale_q(pkt.duration, in_stream->time_base, out_stream->time_base);
@@ -298,7 +300,7 @@
              av_write_frame 直接将包写进Mux,没有缓存和重新排序，一切都需要自己设置
              av_interleaved_write_frame  将对packet进行缓存和pts检查
              */
-            ret = av_interleaved_write_frame(ofmt_ctx, &pkt); //写入
+            ret = av_interleaved_write_frame(ofmt_ctx, &pkt); //写入  这句代码集成了封装
             
             if (ret < 0) {
                 printf("Error muxing packet\n");
