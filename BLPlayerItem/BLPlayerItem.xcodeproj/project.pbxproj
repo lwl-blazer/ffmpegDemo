@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		25957AA92269A59E002532C0 /* XDecode.m in Sources */ = {isa = PBXBuildFile; fileRef = 25957AA82269A59E002532C0 /* XDecode.m */; };
+		25AA5B5A2269ADCD0007DCA8 /* testVideo-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 25AA5B592269ADCC0007DCA8 /* testVideo-1.mp4 */; };
+		25AA5B5D2269B0370007DCA8 /* PlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 25AA5B5C2269B0370007DCA8 /* PlayView.m */; };
+		25AA5B5F2269B45F0007DCA8 /* shader.vs in Resources */ = {isa = PBXBuildFile; fileRef = 25AA5B5E2269B45F0007DCA8 /* shader.vs */; };
+		25AA5B612269B4750007DCA8 /* shader.fs in Resources */ = {isa = PBXBuildFile; fileRef = 25AA5B602269B4750007DCA8 /* shader.fs */; };
 		25E1C5022269929A00EDCDAE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 25E1C5012269929A00EDCDAE /* AppDelegate.m */; };
 		25E1C5052269929A00EDCDAE /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 25E1C5042269929A00EDCDAE /* ViewController.m */; };
 		25E1C5082269929A00EDCDAE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 25E1C5062269929A00EDCDAE /* Main.storyboard */; };
@@ -49,6 +54,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		25957AA72269A59E002532C0 /* XDecode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XDecode.h; sourceTree = "<group>"; };
+		25957AA82269A59E002532C0 /* XDecode.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XDecode.m; sourceTree = "<group>"; };
+		25AA5B592269ADCC0007DCA8 /* testVideo-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "testVideo-1.mp4"; sourceTree = "<group>"; };
+		25AA5B5B2269B0370007DCA8 /* PlayView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlayView.h; sourceTree = "<group>"; };
+		25AA5B5C2269B0370007DCA8 /* PlayView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PlayView.m; sourceTree = "<group>"; };
+		25AA5B5E2269B45F0007DCA8 /* shader.vs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader.vs; sourceTree = "<group>"; };
+		25AA5B602269B4750007DCA8 /* shader.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader.fs; sourceTree = "<group>"; };
 		25E1C4FD2269929A00EDCDAE /* BLPlayerItem.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BLPlayerItem.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		25E1C5002269929A00EDCDAE /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		25E1C5012269929A00EDCDAE /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -144,12 +156,19 @@
 		25E1C4FF2269929A00EDCDAE /* BLPlayerItem */ = {
 			isa = PBXGroup;
 			children = (
+				25AA5B592269ADCC0007DCA8 /* testVideo-1.mp4 */,
 				25E1C5002269929A00EDCDAE /* AppDelegate.h */,
 				25E1C5012269929A00EDCDAE /* AppDelegate.m */,
 				25E1C5032269929A00EDCDAE /* ViewController.h */,
 				25E1C5042269929A00EDCDAE /* ViewController.m */,
+				25957AA72269A59E002532C0 /* XDecode.h */,
+				25957AA82269A59E002532C0 /* XDecode.m */,
 				25E1C5572269994B00EDCDAE /* XDemux.h */,
 				25E1C5582269994B00EDCDAE /* XDemux.m */,
+				25AA5B5B2269B0370007DCA8 /* PlayView.h */,
+				25AA5B5C2269B0370007DCA8 /* PlayView.m */,
+				25AA5B5E2269B45F0007DCA8 /* shader.vs */,
+				25AA5B602269B4750007DCA8 /* shader.fs */,
 				25E1C5062269929A00EDCDAE /* Main.storyboard */,
 				25E1C5092269929D00EDCDAE /* Assets.xcassets */,
 				25E1C50B2269929D00EDCDAE /* LaunchScreen.storyboard */,
@@ -301,8 +320,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				25E1C50D2269929D00EDCDAE /* LaunchScreen.storyboard in Resources */,
+				25AA5B612269B4750007DCA8 /* shader.fs in Resources */,
+				25AA5B5F2269B45F0007DCA8 /* shader.vs in Resources */,
 				25E1C50A2269929D00EDCDAE /* Assets.xcassets in Resources */,
 				25E1C5082269929A00EDCDAE /* Main.storyboard in Resources */,
+				25AA5B5A2269ADCD0007DCA8 /* testVideo-1.mp4 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -330,6 +352,8 @@
 				25E1C5052269929A00EDCDAE /* ViewController.m in Sources */,
 				25E1C5102269929D00EDCDAE /* main.m in Sources */,
 				25E1C5592269994B00EDCDAE /* XDemux.m in Sources */,
+				25957AA92269A59E002532C0 /* XDecode.m in Sources */,
+				25AA5B5D2269B0370007DCA8 /* PlayView.m in Sources */,
 				25E1C5022269929A00EDCDAE /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -505,6 +529,7 @@
 				DEVELOPMENT_TEAM = ME92NL5RP7;
 				HEADER_SEARCH_PATHS = "/Users/luowailin/Documents/Code/ffmpegDemo/FFmpeg-iOS/include";
 				INFOPLIST_FILE = BLPlayerItem/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -512,7 +537,7 @@
 				LIBRARY_SEARCH_PATHS = "/Users/luowailin/Documents/Code/ffmpegDemo/FFmpeg-iOS/lib";
 				PRODUCT_BUNDLE_IDENTIFIER = bee2c.com.BLPlayerItem;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -524,6 +549,7 @@
 				DEVELOPMENT_TEAM = ME92NL5RP7;
 				HEADER_SEARCH_PATHS = "/Users/luowailin/Documents/Code/ffmpegDemo/FFmpeg-iOS/include";
 				INFOPLIST_FILE = BLPlayerItem/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -531,7 +557,7 @@
 				LIBRARY_SEARCH_PATHS = "/Users/luowailin/Documents/Code/ffmpegDemo/FFmpeg-iOS/lib";
 				PRODUCT_BUNDLE_IDENTIFIER = bee2c.com.BLPlayerItem;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
