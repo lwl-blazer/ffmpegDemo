@@ -11,7 +11,8 @@
 #import "XDecode.h"
 #import "PlayView.h"
 
-@interface ViewController ()
+@interface ViewController ()<GLKViewDelegate>
+
 @property (weak, nonatomic) IBOutlet UITextField *urlField;
 @property (weak, nonatomic) IBOutlet UISlider *progressSlide;
 @property (weak, nonatomic) IBOutlet PlayView *playView;
@@ -55,6 +56,7 @@
     }
     
     NSLog(@"end");
+    self.playView.delegate = self;
 }
 
 - (IBAction)runButtonAction:(id)sender {
@@ -65,5 +67,12 @@
 - (IBAction)slideAction:(id)sender {
     
 }
+
+- (void)glkView:(GLKView *)view drawInRect:(CGRect)rect{
+    NSLog(@"draw");
+}
+
+
+
 
 @end

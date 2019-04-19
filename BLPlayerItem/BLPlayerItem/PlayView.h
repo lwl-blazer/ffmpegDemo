@@ -6,11 +6,11 @@
 //  Copyright © 2019 luowailin. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import <GLKit/GLKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PlayView : UIView
+@interface PlayView : GLKView
 
 @end
 

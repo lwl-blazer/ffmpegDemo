@@ -10,8 +10,12 @@
 		25957AA92269A59E002532C0 /* XDecode.m in Sources */ = {isa = PBXBuildFile; fileRef = 25957AA82269A59E002532C0 /* XDecode.m */; };
 		25AA5B5A2269ADCD0007DCA8 /* testVideo-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 25AA5B592269ADCC0007DCA8 /* testVideo-1.mp4 */; };
 		25AA5B5D2269B0370007DCA8 /* PlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 25AA5B5C2269B0370007DCA8 /* PlayView.m */; };
-		25AA5B5F2269B45F0007DCA8 /* shader.vs in Resources */ = {isa = PBXBuildFile; fileRef = 25AA5B5E2269B45F0007DCA8 /* shader.vs */; };
-		25AA5B612269B4750007DCA8 /* shader.fs in Resources */ = {isa = PBXBuildFile; fileRef = 25AA5B602269B4750007DCA8 /* shader.fs */; };
+		25AA5B5F2269B45F0007DCA8 /* shader.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 25AA5B5E2269B45F0007DCA8 /* shader.vsh */; };
+		25AA5B612269B4750007DCA8 /* shader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 25AA5B602269B4750007DCA8 /* shader.fsh */; };
+		25AA5B632269BDE70007DCA8 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25AA5B622269BDE70007DCA8 /* GLKit.framework */; };
+		25AA5B652269BDF00007DCA8 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25AA5B642269BDEF0007DCA8 /* OpenGLES.framework */; };
+		25AA5B672269BE010007DCA8 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25AA5B662269BE010007DCA8 /* CoreGraphics.framework */; };
+		25AA5B6B2269C8090007DCA8 /* ShaderProgram.m in Sources */ = {isa = PBXBuildFile; fileRef = 25AA5B6A2269C8090007DCA8 /* ShaderProgram.m */; };
 		25E1C5022269929A00EDCDAE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 25E1C5012269929A00EDCDAE /* AppDelegate.m */; };
 		25E1C5052269929A00EDCDAE /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 25E1C5042269929A00EDCDAE /* ViewController.m */; };
 		25E1C5082269929A00EDCDAE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 25E1C5062269929A00EDCDAE /* Main.storyboard */; };
@@ -59,8 +63,13 @@
 		25AA5B592269ADCC0007DCA8 /* testVideo-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "testVideo-1.mp4"; sourceTree = "<group>"; };
 		25AA5B5B2269B0370007DCA8 /* PlayView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlayView.h; sourceTree = "<group>"; };
 		25AA5B5C2269B0370007DCA8 /* PlayView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PlayView.m; sourceTree = "<group>"; };
-		25AA5B5E2269B45F0007DCA8 /* shader.vs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader.vs; sourceTree = "<group>"; };
-		25AA5B602269B4750007DCA8 /* shader.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader.fs; sourceTree = "<group>"; };
+		25AA5B5E2269B45F0007DCA8 /* shader.vsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader.vsh; sourceTree = "<group>"; };
+		25AA5B602269B4750007DCA8 /* shader.fsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader.fsh; sourceTree = "<group>"; };
+		25AA5B622269BDE70007DCA8 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
+		25AA5B642269BDEF0007DCA8 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
+		25AA5B662269BE010007DCA8 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		25AA5B692269C8090007DCA8 /* ShaderProgram.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderProgram.h; sourceTree = "<group>"; };
+		25AA5B6A2269C8090007DCA8 /* ShaderProgram.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ShaderProgram.m; sourceTree = "<group>"; };
 		25E1C4FD2269929A00EDCDAE /* BLPlayerItem.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BLPlayerItem.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		25E1C5002269929A00EDCDAE /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		25E1C5012269929A00EDCDAE /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -99,6 +108,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				25AA5B672269BE010007DCA8 /* CoreGraphics.framework in Frameworks */,
+				25AA5B652269BDF00007DCA8 /* OpenGLES.framework in Frameworks */,
+				25AA5B632269BDE70007DCA8 /* GLKit.framework in Frameworks */,
 				25E1C54C2269931B00EDCDAE /* CoreMedia.framework in Frameworks */,
 				25E1C54A2269931300EDCDAE /* VideoToolbox.framework in Frameworks */,
 				25E1C5482269930900EDCDAE /* AudioToolbox.framework in Frameworks */,
@@ -165,10 +177,12 @@
 				25957AA82269A59E002532C0 /* XDecode.m */,
 				25E1C5572269994B00EDCDAE /* XDemux.h */,
 				25E1C5582269994B00EDCDAE /* XDemux.m */,
+				25AA5B692269C8090007DCA8 /* ShaderProgram.h */,
+				25AA5B6A2269C8090007DCA8 /* ShaderProgram.m */,
 				25AA5B5B2269B0370007DCA8 /* PlayView.h */,
 				25AA5B5C2269B0370007DCA8 /* PlayView.m */,
-				25AA5B5E2269B45F0007DCA8 /* shader.vs */,
-				25AA5B602269B4750007DCA8 /* shader.fs */,
+				25AA5B5E2269B45F0007DCA8 /* shader.vsh */,
+				25AA5B602269B4750007DCA8 /* shader.fsh */,
 				25E1C5062269929A00EDCDAE /* Main.storyboard */,
 				25E1C5092269929D00EDCDAE /* Assets.xcassets */,
 				25E1C50B2269929D00EDCDAE /* LaunchScreen.storyboard */,
@@ -199,6 +213,9 @@
 		25E1C532226992CB00EDCDAE /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				25AA5B662269BE010007DCA8 /* CoreGraphics.framework */,
+				25AA5B642269BDEF0007DCA8 /* OpenGLES.framework */,
+				25AA5B622269BDE70007DCA8 /* GLKit.framework */,
 				25E1C54B2269931B00EDCDAE /* CoreMedia.framework */,
 				25E1C5492269931300EDCDAE /* VideoToolbox.framework */,
 				25E1C5472269930900EDCDAE /* AudioToolbox.framework */,
@@ -320,8 +337,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				25E1C50D2269929D00EDCDAE /* LaunchScreen.storyboard in Resources */,
-				25AA5B612269B4750007DCA8 /* shader.fs in Resources */,
-				25AA5B5F2269B45F0007DCA8 /* shader.vs in Resources */,
+				25AA5B612269B4750007DCA8 /* shader.fsh in Resources */,
+				25AA5B5F2269B45F0007DCA8 /* shader.vsh in Resources */,
 				25E1C50A2269929D00EDCDAE /* Assets.xcassets in Resources */,
 				25E1C5082269929A00EDCDAE /* Main.storyboard in Resources */,
 				25AA5B5A2269ADCD0007DCA8 /* testVideo-1.mp4 in Resources */,
@@ -352,6 +369,7 @@
 				25E1C5052269929A00EDCDAE /* ViewController.m in Sources */,
 				25E1C5102269929D00EDCDAE /* main.m in Sources */,
 				25E1C5592269994B00EDCDAE /* XDemux.m in Sources */,
+				25AA5B6B2269C8090007DCA8 /* ShaderProgram.m in Sources */,
 				25957AA92269A59E002532C0 /* XDecode.m in Sources */,
 				25AA5B5D2269B0370007DCA8 /* PlayView.m in Sources */,
 				25E1C5022269929A00EDCDAE /* AppDelegate.m in Sources */,
