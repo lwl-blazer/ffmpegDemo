@@ -1,39 +1,27 @@
 //
-//  PlayView.m
+//  RootViewController.m
 //  BLPlayerItem
 //
-//  Created by luowailin on 2019/4/19.
+//  Created by luowailin on 2019/4/24.
 //  Copyright © 2019 luowailin. All rights reserved.
 //
 
-#import "PlayView.h"
+#import "RootViewController.h"
 
-@interface PlayView ()<GLKViewDelegate>
+@interface RootViewController ()
 
 @property(nonatomic, strong) EAGLContext *mContext;  //OpenGL ES上下文
 @property(nonatomic, strong) GLKBaseEffect *effect;
 
 @end
 
+@implementation RootViewController
 
-@implementation PlayView
-
-- (void)awakeFromNib{
-    [super awakeFromNib];
+- (void)viewDidLoad {
+    [super viewDidLoad];
     [self setupGL];
     [self uploadVertexArray];
     [self uploadTexture];
-}
-
-- (instancetype)initWithFrame:(CGRect)frame
-{
-    self = [super initWithFrame:frame];
-    if (self) {
-        [self setupGL];
-        [self uploadVertexArray];
-        [self uploadTexture];
-    }
-    return self;
 }
 
 - (void)setupGL{
@@ -42,10 +30,10 @@
     if (!self.mContext) {
         NSLog(@"Failed to create ES context");
     }
-    
-    self.context = self.mContext;
-    self.drawableDepthFormat = GLKViewDrawableDepthFormat24;
-    self.drawableColorFormat = GLKViewDrawableColorFormatRGBA8888;
+    GLKView *kView = (GLKView *)self.view;
+    kView.context = self.mContext;
+    kView.drawableDepthFormat = GLKViewDrawableDepthFormat24;
+    kView.drawableColorFormat = GLKViewDrawableColorFormatRGBA8888;
     [EAGLContext setCurrentContext:self.mContext];
     
     self.effect = [[GLKBaseEffect alloc] init];
@@ -53,6 +41,8 @@
 
 
 - (void)uploadVertexArray{
+    glViewport(0, 0, 328, 328);
+    
     GLfloat vertexData[] =
     {
         0.5, -0.5, 0.0f,    1.0f, 0.0f, //右下
@@ -70,10 +60,10 @@
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW);
     
     glEnableVertexAttribArray(GLKVertexAttribPosition);
-    glVertexAttribPointer(GLKVertexAttribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 3, (void *)0);
+    glVertexAttribPointer(GLKVertexAttribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 5, (void *)0);
     
     glEnableVertexAttribArray(GLKVertexAttribTexCoord0);
-    glVertexAttribPointer(GLKVertexAttribTexCoord0, 2, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 2, (GLfloat *)NULL + 3);
+    glVertexAttribPointer(GLKVertexAttribTexCoord0, 2, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 5, (GLfloat *)NULL + 3);
 }
 
 - (void)uploadTexture{
@@ -89,26 +79,14 @@
 }
 
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect{
-    NSLog(@"draw");
     glClearColor(0.3f, 0.6f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    NSLog(@"draw");
     
     //启动
     [self.effect prepareToDraw];
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
-
-+ (Class)layerClass{
-    return [CAEAGLLayer class];
-}
-
-- (void)dealloc{
-    if (self.mContext == [EAGLContext currentContext]) {
-        [EAGLContext setCurrentContext:nil];
-        self.mContext = nil;
-    }
-}
-
-
 
 @end

@@ -15,8 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithWidth:(int)width height:(int)height;
 - (void)repaint:(AVFrame *)frame;
-- (void)initializelGL();
-- (void)paintGL();
+- (void)initializelGL;
+- (void)paintGL;
 - (void)resizeGLWidth:(int)width height:(int)height;
 
 @end

@@ -16,6 +16,8 @@
 		25AA5B652269BDF00007DCA8 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25AA5B642269BDEF0007DCA8 /* OpenGLES.framework */; };
 		25AA5B672269BE010007DCA8 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25AA5B662269BE010007DCA8 /* CoreGraphics.framework */; };
 		25AA5B6B2269C8090007DCA8 /* ShaderProgram.m in Sources */ = {isa = PBXBuildFile; fileRef = 25AA5B6A2269C8090007DCA8 /* ShaderProgram.m */; };
+		25B4306722702B4E00761798 /* for_test.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 25B4306622702B4E00761798 /* for_test.jpg */; };
+		25B4306A22702CC200761798 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 25B4306922702CC200761798 /* RootViewController.m */; };
 		25BBCFE22269D734006B7C09 /* VideoWidgt.m in Sources */ = {isa = PBXBuildFile; fileRef = 25BBCFE12269D734006B7C09 /* VideoWidgt.m */; };
 		25E1C5022269929A00EDCDAE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 25E1C5012269929A00EDCDAE /* AppDelegate.m */; };
 		25E1C5052269929A00EDCDAE /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 25E1C5042269929A00EDCDAE /* ViewController.m */; };
@@ -71,6 +73,9 @@
 		25AA5B662269BE010007DCA8 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		25AA5B692269C8090007DCA8 /* ShaderProgram.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderProgram.h; sourceTree = "<group>"; };
 		25AA5B6A2269C8090007DCA8 /* ShaderProgram.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ShaderProgram.m; sourceTree = "<group>"; };
+		25B4306622702B4E00761798 /* for_test.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = for_test.jpg; sourceTree = "<group>"; };
+		25B4306822702CC200761798 /* RootViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
+		25B4306922702CC200761798 /* RootViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
 		25BBCFE02269D734006B7C09 /* VideoWidgt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VideoWidgt.h; sourceTree = "<group>"; };
 		25BBCFE12269D734006B7C09 /* VideoWidgt.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VideoWidgt.m; sourceTree = "<group>"; };
 		25E1C4FD2269929A00EDCDAE /* BLPlayerItem.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BLPlayerItem.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -189,10 +194,13 @@
 				25AA5B5E2269B45F0007DCA8 /* shader.vsh */,
 				25AA5B602269B4750007DCA8 /* shader.fsh */,
 				25E1C5062269929A00EDCDAE /* Main.storyboard */,
+				25B4306622702B4E00761798 /* for_test.jpg */,
 				25E1C5092269929D00EDCDAE /* Assets.xcassets */,
 				25E1C50B2269929D00EDCDAE /* LaunchScreen.storyboard */,
 				25E1C50E2269929D00EDCDAE /* Info.plist */,
 				25E1C50F2269929D00EDCDAE /* main.m */,
+				25B4306822702CC200761798 /* RootViewController.h */,
+				25B4306922702CC200761798 /* RootViewController.m */,
 			);
 			path = BLPlayerItem;
 			sourceTree = "<group>";
@@ -341,6 +349,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				25B4306722702B4E00761798 /* for_test.jpg in Resources */,
 				25E1C50D2269929D00EDCDAE /* LaunchScreen.storyboard in Resources */,
 				25AA5B612269B4750007DCA8 /* shader.fsh in Resources */,
 				25AA5B5F2269B45F0007DCA8 /* shader.vsh in Resources */,
@@ -376,6 +385,7 @@
 				25E1C5592269994B00EDCDAE /* XDemux.m in Sources */,
 				25AA5B6B2269C8090007DCA8 /* ShaderProgram.m in Sources */,
 				25957AA92269A59E002532C0 /* XDecode.m in Sources */,
+				25B4306A22702CC200761798 /* RootViewController.m in Sources */,
 				25BBCFE22269D734006B7C09 /* VideoWidgt.m in Sources */,
 				25AA5B5D2269B0370007DCA8 /* PlayView.m in Sources */,
 				25E1C5022269929A00EDCDAE /* AppDelegate.m in Sources */,

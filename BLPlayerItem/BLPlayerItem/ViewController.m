@@ -54,9 +54,6 @@
             break;
         }
     }
-    
-    NSLog(@"end");
-    self.playView.delegate = self;
 }
 
 - (IBAction)runButtonAction:(id)sender {
@@ -68,9 +65,7 @@
     
 }
 
-- (void)glkView:(GLKView *)view drawInRect:(CGRect)rect{
-    NSLog(@"draw");
-}
+
 
 
 

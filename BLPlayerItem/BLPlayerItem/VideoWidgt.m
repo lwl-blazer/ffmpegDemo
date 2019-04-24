@@ -31,9 +31,7 @@
         self.width = width;
         self.height = height;
         
-        datas[0] = char[width * height];
-        datas[1] = char[width * height / 4];
-        datas[2] = char[width * height / 4];
+       
         
         
     }
