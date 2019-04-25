@@ -85,8 +85,8 @@
     NSLog(@"draw");
     
     //启动
-    [self.effect prepareToDraw];
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    //[self.effect prepareToDraw];
+    //glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 @end
