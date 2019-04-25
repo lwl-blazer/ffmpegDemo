@@ -63,6 +63,7 @@ enum {
     return glGetUniformLocation(_shaderProgram, [uniform UTF8String]);
 }
 
+
 - (BOOL)linkProgram{
     
     GLint status;

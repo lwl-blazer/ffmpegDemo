@@ -13,11 +13,15 @@ NS_ASSUME_NONNULL_BEGIN
 @interface ShaderProgram : NSObject
 
 - (instancetype)initWithShaderName:(NSString *)name;
+
+//编译program之前 link program之后 进行调用
 - (void)addVertexAttribute:(GLKVertexAttrib)attribute
                      named:(NSString *)name;
 
 - (GLuint)uniformIndex:(NSString *)uniform;
+
 - (BOOL)linkProgram;
+
 - (void)useProgram;
 
 @end

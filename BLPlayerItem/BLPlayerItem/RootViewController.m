@@ -7,11 +7,14 @@
 //
 
 #import "RootViewController.h"
+#import "ShaderProgram.h"
 
 @interface RootViewController ()
 
 @property(nonatomic, strong) EAGLContext *mContext;  //OpenGL ES上下文
 @property(nonatomic, strong) GLKBaseEffect *effect;
+
+@property(nonatomic, strong) ShaderProgram *program;
 
 @end
 
@@ -77,6 +80,8 @@
     self.effect.texture2d0.enabled = GL_TRUE;
     self.effect.texture2d0.name = textureInfo.name;
 }
+
+
 
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect{
     glClearColor(0.3f, 0.6f, 1.0f, 1.0f);
