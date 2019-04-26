@@ -29,7 +29,6 @@
 		25494CC4224218CE00EB273B /* VideoToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25494CC3224218CE00EB273B /* VideoToolbox.framework */; };
 		25494CC6224218D400EB273B /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25494CC5224218D300EB273B /* CoreMedia.framework */; };
 		25494CC822422A9500EB273B /* testVideo-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 25494CC722422A9500EB273B /* testVideo-1.mp4 */; };
-		25903D08226461AD00DBBCC8 /* Muxer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25903D06226461AD00DBBCC8 /* Muxer.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -334,7 +333,6 @@
 				25494C7F2242181D00EB273B /* ViewController.m in Sources */,
 				25494C8A2242181E00EB273B /* main.m in Sources */,
 				25494C7C2242181D00EB273B /* AppDelegate.m in Sources */,
-				25903D08226461AD00DBBCC8 /* Muxer.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

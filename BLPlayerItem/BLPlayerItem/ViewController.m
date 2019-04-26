@@ -28,9 +28,6 @@
     [demux open:@"http://vfx.mtime.cn/Video/2019/04/10/mp4/190410081607863991.mp4"];
     //[demux open:@"testVideo-1.mp4"];
     
-    [demux copyVideoParameters];
-    [demux copyAudioParameters];
-    
     XDecode *vdecode = [[XDecode alloc] init];
     [vdecode open:[demux copyVideoParameters]];
     
@@ -45,10 +42,11 @@
             
             NSLog(@"audio:%f", frame->pkt_dts);
         } else {
-            [vdecode send:pkt];
-            AVFrame *frame = [vdecode recv];
+            if ([vdecode send:pkt]) {
+                AVFrame *frame = [vdecode recv];
+                NSLog(@"video:%lld", frame->pkt_dts);
+            }
             
-            //NSLog(@"video:%lld", frame->pkt_dts);
         }
         
         if (!pkt) {

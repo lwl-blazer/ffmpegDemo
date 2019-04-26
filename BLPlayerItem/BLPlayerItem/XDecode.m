@@ -21,10 +21,12 @@
 }
 
 - (BOOL)open:(AVCodecParameters *)para{
-    [self close];
+    
     if (!para) {
         return NO;
     }
+    [self close];
+    
     AVCodec *vcodec = avcodec_find_decoder(para->codec_id);
     if (!vcodec) {
         avcodec_parameters_free(&para);
@@ -78,7 +80,7 @@
     }
     int ret = avcodec_send_packet(codec, pkt);
     av_packet_free(&pkt);
-    return ret != 0 ? NO : true;
+    return ret != 0 ? NO : YES;
 }
 
 
@@ -105,7 +107,6 @@
         avcodec_flush_buffers(codec);
     }
 }
-
 
 - (void)close{
     if (codec) {

@@ -34,7 +34,7 @@ void Muxer::openUrl(char *url) {
     fmt = oc->oformat;
     
     AVStream *st;
-    AVCodecContext *c;
+    AVCodecContext *c = nullptr;
     
     //申请一个将要写入的AVStream流， AVStream流主要作为存放音频、视频、字幕数据流使用
     st = avformat_new_stream(oc, nullptr);
