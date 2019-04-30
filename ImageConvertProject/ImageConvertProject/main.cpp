@@ -14,8 +14,12 @@ int main(int argc, const char * argv[]) {
     std::cout << "Hello, World!\n";
     
     ImageConvertObject object;
-    object.simplest_yuv420_gray("/Users/luowailin/Documents/Code/ffmpegDemo/ImageConvertProject/ImageConvertProject/lena_256x256_yuv420p.yuv", 256, 256, 1);
+    //object.simplest_yuv420_gray("/Users/luowailin/Documents/Code/ffmpegDemo/ImageConvertProject/ImageConvertProject/lena_256x256_yuv420p.yuv", 256, 256, 1);
    
-    object.simplest_aac_parser("/Users/luowailin/Downloads/simplest_mediadata_test-master/simplest_mediadata_test/nocturne.aac");
+   // object.simplest_aac_parser("/Users/luowailin/Downloads/simplest_mediadata_test-master/simplest_mediadata_test/nocturne.aac");
+    
+    
+    object.simplest_pcm16le_split("/Users/luowailin/Downloads/simplest_mediadata_test-master/simplest_mediadata_test/NocturneNo2inEflat_44.1k_s16le.pcm");
+    
     return 0;
 }

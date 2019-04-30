@@ -154,7 +154,7 @@ int ImageConvertObject::simplest_aac_parser(const char *url) {
     cout << "-----+---------+----------+------+" << endl;
     
     while (!feof(ifile)) {
-        data_size = fread(aacbuffer + offset, 1, 1024 * 1024 - offset, ifile);
+        data_size = (int)fread(aacbuffer + offset, 1, 1024 * 1024 - offset, ifile);
         
         unsigned char * input_data = aacbuffer;
         
@@ -285,5 +285,31 @@ int ImageConvertObject::getADTSframe(unsigned char *buffer, int buf_size, unsign
     
     memcpy(data, buffer, size);
     *data_size = size;
+    return 0;
+}
+
+//将一个音频文件 分出左右声道
+int ImageConvertObject::simplest_pcm16le_split(const char *url){
+    
+    FILE *fp = fopen(url, "rb+");
+    FILE *fp1 = fopen("/Users/luowailin/Downloads/output_l.pcm", "wb+");
+    FILE *fp2 = fopen("/Users/luowailin/Downloads/output_r.pcm", "wb+");
+    
+    unsigned char *sample = (unsigned char *)malloc(4);
+    
+    while (!feof(fp)) {
+        fread(sample, 1, 4, fp);
+        printf("src:%s\n", sample);
+        fwrite(sample, 1, 2, fp1);
+        printf("fp1:%s\n", sample);
+        fwrite(sample + 2, 1, 2, fp2);
+        printf("fp2:%s\n", sample);
+    }
+    
+    free(sample);
+    fclose(fp);
+    fclose(fp1);
+    fclose(fp2);
+    
     return 0;
 }
