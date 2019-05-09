@@ -78,7 +78,11 @@
 		25494CC1224218C700EB273B /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		25494CC3224218CE00EB273B /* VideoToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VideoToolbox.framework; path = System/Library/Frameworks/VideoToolbox.framework; sourceTree = SDKROOT; };
 		25494CC5224218D300EB273B /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
-		25494CC722422A9500EB273B /* testVideo.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = testVideo.mp4; sourceTree = "<group>"; };
+
+		25494CC722422A9500EB273B /* testVideo-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "testVideo-1.mp4"; sourceTree = "<group>"; };
+		25903D06226461AD00DBBCC8 /* Muxer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Muxer.cpp; sourceTree = "<group>"; };
+		25903D07226461AD00DBBCC8 /* Muxer.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Muxer.hpp; sourceTree = "<group>"; };
+
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -153,6 +157,8 @@
 				25494C852242181E00EB273B /* LaunchScreen.storyboard */,
 				25494C882242181E00EB273B /* Info.plist */,
 				25494C892242181E00EB273B /* main.m */,
+				25903D06226461AD00DBBCC8 /* Muxer.cpp */,
+				25903D07226461AD00DBBCC8 /* Muxer.hpp */,
 			);
 			path = PushStreamDemo;
 			sourceTree = "<group>";
