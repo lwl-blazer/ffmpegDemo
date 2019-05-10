@@ -16,6 +16,9 @@ NS_ASSUME_NONNULL_BEGIN
     AVCodecContext *codec; //视频解码的上下文 包含解码器
 }
 
+@property(nonatomic, assign) int width;
+@property(nonatomic, assign) int height;
+
 @property(nonatomic, assign) BOOL isAudio;
 
 //函数内部负责释放AVCodecParameters
@@ -26,6 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)close;
 - (void)clear;
+
 
 @end
 

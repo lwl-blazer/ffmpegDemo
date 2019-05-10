@@ -39,6 +39,7 @@
     //根据找到的对应Decodec 申请一个AVCodecContext 然后将Decodec挂在AVCodecContext下
     codec = avcodec_alloc_context3(vcodec);
     
+    
     //把AVCodecParameters参数同步至AVCodecContext中
     avcodec_parameters_to_context(codec, para);
     avcodec_parameters_free(&para);
@@ -72,13 +73,15 @@
 - (BOOL)send:(AVPacket *)pkt{
     
     if (!pkt || pkt->size <= 0 || !pkt->data) {
-        av_packet_free(&pkt);
         return NO;
     }
     
     if (!codec) {
         return NO;
     }
+    self.width = codec->width;
+    self.height = codec->height;
+
     int ret = avcodec_send_packet(codec, pkt);
     av_packet_free(&pkt);
     return ret != 0 ? NO : YES;
