@@ -102,7 +102,7 @@
     NSLog(@"==================end================");*/
     
     DecodeObject *object = [[DecodeObject alloc] init];
-    [object decodeWithUrl:@"destinationfile.flv"];
+    [object decodeWithTwoUrl:@"521.flv"];
 }
 
 
