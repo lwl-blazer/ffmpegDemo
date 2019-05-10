@@ -15,7 +15,12 @@ TEMPLATE = app
 # any feature of Qt which has been marked as deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
+# 指定库
 DEFINES += QT_DEPRECATED_WARNINGS
+
+# 指定库文件路径
+# (Win32) LIBS += D:/QT/.....
+# (Liunx) LIBS += -L/usr/local/.....  或 LIBS += -l .lib    -L指定一个库目录 -l指定一个具体的库
 
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -24,6 +29,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 CONFIG += c++11
 
+#指定头文件和源文件   \表示换行
 SOURCES += \
         main.cpp \
         widget.cpp
@@ -31,7 +37,10 @@ SOURCES += \
 HEADERS += \
         widget.h
 
-# Default rules for deployment.
+# Default rules for deployment(部署).
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    shader.qrc

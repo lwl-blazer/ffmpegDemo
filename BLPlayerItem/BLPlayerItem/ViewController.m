@@ -9,13 +9,11 @@
 #import "ViewController.h"
 #import "XDemux.h"
 #import "XDecode.h"
-#import "PlayView.h"
 
-@interface ViewController ()<GLKViewDelegate>
+@interface ViewController ()
 
 @property (weak, nonatomic) IBOutlet UITextField *urlField;
 @property (weak, nonatomic) IBOutlet UISlider *progressSlide;
-@property (weak, nonatomic) IBOutlet PlayView *playView;
 
 @end
 
@@ -23,10 +21,12 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+}
+
+- (IBAction)runButtonAction:(id)sender {
     XDemux *demux = [[XDemux alloc] init];
-    [demux open:@"http://vfx.mtime.cn/Video/2019/04/10/mp4/190410081607863991.mp4"];
-    //[demux open:@"testVideo-1.mp4"];
+    //[demux open:@"http://vfx.mtime.cn/Video/2019/04/10/mp4/190410081607863991.mp4"];
+    [demux open:[[NSBundle mainBundle] pathForResource:@"testVideo-1" ofType:@"mp4"]];
     
     XDecode *vdecode = [[XDecode alloc] init];
     [vdecode open:[demux copyVideoParameters]];
@@ -39,24 +39,29 @@
         if ([demux isAudio:pkt]) {
             [adecode send:pkt];
             AVFrame *frame = [adecode recv];
-            
-            NSLog(@"audio:%f", frame->pkt_dts);
+            if (frame) {
+                NSLog(@"audio:%lld", frame->pkt_dts);
+                av_frame_free(&frame);
+            } else {
+                NSLog(@"audio ------");
+            }
         } else {
             if ([vdecode send:pkt]) {
                 AVFrame *frame = [vdecode recv];
-                NSLog(@"video:%lld", frame->pkt_dts);
+                if (frame) {
+                    NSLog(@"video:%lld", frame->pkt_dts);
+                    av_frame_free(&frame);
+                } else {
+                    NSLog(@"video ------");
+                }
             }
-            
         }
         
         if (!pkt) {
             break;
         }
     }
-}
-
-- (IBAction)runButtonAction:(id)sender {
-    
+    NSLog(@"==================end================");
 }
 
 

@@ -72,6 +72,7 @@
 - (BOOL)send:(AVPacket *)pkt{
     
     if (!pkt || pkt->size <= 0 || !pkt->data) {
+        av_packet_free(&pkt);
         return NO;
     }
     

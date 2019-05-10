@@ -12,7 +12,7 @@ class Widget : public QOpenGLWidget, protected QOpenGLFunctions
 
 public:
     explicit Widget(QWidget *parent = nullptr);
-    ~Widget();
+    ~Widget() override;
 
 protected:
     void initializeGL() override;

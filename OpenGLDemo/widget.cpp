@@ -16,29 +16,18 @@ Widget::~Widget()
 
 void Widget::initializeGL(){
     initializeOpenGLFunctions();
-    glClearColor(1.0, 0.0, 1.0, 1);
-
     initShader();
 }
 
 void Widget::initShader(){
     program = new QOpenGLShaderProgram;
-    const char *vsrc =
-            "attribute vec3 aPos; \n"
-            "void main() { \n"
-            "  gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0); \n"
-            "}\n";
 
     //compile
-   if(!program->addShaderFromSourceCode(QOpenGLShader::Vertex, vsrc)){
-       close();
-   }
+    if (!program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/vshader.vsh")){
+        close();
+    }
 
-    const char *fsrc =
-            "void main() { \n"
-            "  gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0); \n"
-            "}\n";
-    if(!program->addShaderFromSourceCode(QOpenGLShader::Fragment, fsrc)){
+    if (!program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/fshader.fsh")) {
         close();
     }
 
@@ -66,8 +55,12 @@ void Widget::initShader(){
 
 
 void Widget::paintGL(){
-    arrayBuf.bind();
+    glClearColor(1.0, 0.0, 1.0, 1);
+    glClear(GL_COLOR_BUFFER_BIT);
 
+
+    arrayBuf.bind();
+    //没有使用 glUseProgram()
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
