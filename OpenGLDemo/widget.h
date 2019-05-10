@@ -3,6 +3,7 @@
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
+#include <QOpenGLBuffer>
 
 class QOpenGLShaderProgram;
 class Widget : public QOpenGLWidget, protected QOpenGLFunctions
@@ -13,14 +14,15 @@ public:
     explicit Widget(QWidget *parent = nullptr);
     ~Widget();
 
-
 protected:
     void initializeGL() override;
     void resizeGL(int w, int h) override;
     void paintGL() override;
 
+    void initShader();
 private:
     QOpenGLShaderProgram *program;
+    QOpenGLBuffer arrayBuf;
 };
 
 #endif // WIDGET_H
