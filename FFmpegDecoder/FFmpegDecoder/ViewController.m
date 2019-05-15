@@ -126,6 +126,7 @@
                                                                      pCodecCtx->width,
                                                                      pCodecCtx->height,
                                                                      1));
+    
     //关联frame 和 刚分配的内存(out_buffer)
     av_image_fill_arrays(pFrameYUV->data,
                          pFrameYUV->linesize,
@@ -196,10 +197,25 @@
                           pFrameYUV->data,
                           pFrameYUV->linesize);
                 
-                y_size = pCodecCtx->width * pCodecCtx->height;
+                
+                /*y_size = pCodecCtx->width * pCodecCtx->height;
                 fwrite(pFrameYUV->data[0], 1, y_size, fp_yuv);
                 fwrite(pFrameYUV->data[1], 1, y_size/4, fp_yuv);
                 fwrite(pFrameYUV->data[2], 1, y_size/4, fp_yuv);
+                */
+
+                for (i = 0; i < pFrameYUV->height; i++) {
+                    fwrite(pFrameYUV->data[0] + i * pFrameYUV->linesize[0], 1, pFrameYUV->linesize[0], fp_yuv);
+                }
+
+
+                for (i = 0; i < pFrameYUV->height / 2; i++) {
+                    fwrite(pFrameYUV->data[1] + i * pFrameYUV->linesize[1], 1, pFrameYUV->linesize[1]/2, fp_yuv);
+                }
+
+                for (i = 0; i < pFrameYUV->height / 2; i ++) {
+                    fwrite(pFrameYUV->data[2] + i * pFrameYUV->linesize[2], 1, pFrameYUV->linesize[2]/2, fp_yuv);
+                }
                 
                 char pictype_str[10] = {0};
                 switch (pFrame->pict_type) {

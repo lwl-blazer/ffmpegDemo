@@ -38,52 +38,126 @@
     FILE *fp_yuv = fopen(output_str_full,"wb+");
     printf("Output Path:%s\n",output_str_full);
     
-    
     av_register_all();
     avformat_network_init();
+    
     pFormatCtx = avformat_alloc_context();
     
     
-    if(avformat_open_input(&pFormatCtx,path,NULL,NULL)!=0){
+    if(avformat_open_input(&pFormatCtx,path,NULL,NULL) !=0 ){
         printf("Couldn't open input stream.\n");
         return;
     }
+    
     if(avformat_find_stream_info(pFormatCtx,NULL)<0){
         printf("Couldn't find stream information.\n");
         return;
     }
-    videoindex=-1;
-    for(i=0; i<pFormatCtx->nb_streams; i++)
-        if(pFormatCtx->streams[i]->codec->codec_type==AVMEDIA_TYPE_VIDEO){
-            videoindex=i;
-            break;
-        }
     
+    av_find_best_stream(pFormatCtx, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
+    
+    videoindex = -1;
+    videoindex = av_find_best_stream(pFormatCtx, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
     if(videoindex==-1){
         printf("Didn't find a video stream.\n");
         return;
     }
     
-    pCodecCtx=pFormatCtx->streams[videoindex]->codec;
-    pCodec=avcodec_find_decoder(pCodecCtx->codec_id);
-    if(pCodec==NULL){
-        printf("Codec not found.\n");
+    AVCodecParameters *pa = avcodec_parameters_alloc();
+    avcodec_parameters_copy(pa, pFormatCtx->streams[videoindex]->codecpar);
+    
+    pCodec = avcodec_find_decoder(pa->codec_id);
+    if (!pCodec) {
+        avcodec_parameters_free(&pa);
+        printf("can't find the code_id\n");
         return;
     }
+
+    pCodecCtx = avcodec_alloc_context3(pCodec);
+    avcodec_parameters_to_context(pCodecCtx, pa);
+    avcodec_parameters_free(&pa);
+    
+
     if(avcodec_open2(pCodecCtx, pCodec,NULL)<0){
         printf("Could not open codec.\n");
         return;
     }
     
-    pFrame=av_frame_alloc();
-    pFrameYUV=av_frame_alloc();
-    out_buffer=(unsigned char *)av_malloc(av_image_get_buffer_size(AV_PIX_FMT_YUV420P,  pCodecCtx->width, pCodecCtx->height,1));
+    av_dump_format(pFormatCtx, 0, path, 0);
+    int frame_cnt = 0;
+    
+    
+    AVPacket *pkt = av_packet_alloc();
+    pFrame = av_frame_alloc();
+    while (1) {
+        ret = av_read_frame(pFormatCtx, pkt);
+        if (ret != 0) {
+            av_packet_free(&pkt);
+            break;
+        }
+        
+        if (pkt->stream_index == videoindex) { //视频
+            ret = avcodec_send_packet(pCodecCtx, pkt);
+            if (ret != 0) {
+                av_packet_free(&pkt);
+                break;
+            }
+            
+            while (1) {
+                ret = avcodec_receive_frame(pCodecCtx, pFrame);
+                if (ret == 0) {
+                    
+                    for (i = 0; i < pFrame->height; i++) {
+                        fwrite(pFrame->data[0] + i * pFrame->linesize[0], 1, pFrame->width, fp_yuv);
+                    }
+                    
+                    
+                    for (i = 0; i < pFrame->height / 2; i++) {
+                        fwrite(pFrame->data[1] + i * pFrame->linesize[1], 1, pFrame->width/2, fp_yuv);
+                    }
+                    
+                    for (i = 0; i < pFrame->height / 2; i ++) {
+                        fwrite(pFrame->data[2] + i * pFrame->linesize[2], 1, pFrame->width/2, fp_yuv);
+                    }
+                    
+                    
+                    //Output info
+                    char pictype_str[10]={0};
+                    switch(pFrame->pict_type){
+                        case AV_PICTURE_TYPE_I:sprintf(pictype_str,"I");break;
+                        case AV_PICTURE_TYPE_P:sprintf(pictype_str,"P");break;
+                        case AV_PICTURE_TYPE_B:sprintf(pictype_str,"B");break;
+                        default:sprintf(pictype_str,"Other");break;
+                    }
+                    frame_cnt ++;
+                    NSLog(@"解码序号%d,Type:%s", frame_cnt, pictype_str);
+                }
+            }
+            
+            
+        }
+        
+    }
+    av_packet_free(&pkt);
+    av_frame_free(&pFrame);
+    
+    
+    
+    
+    
+    
+    /*
+    
+    pFrame = av_frame_alloc();
+    pFrameYUV = av_frame_alloc();
+    //out_buffer = (unsigned char *)av_malloc(av_image_get_buffer_size(AV_PIX_FMT_YUV420P,  pCodecCtx->width, pCodecCtx->height,1));
+    out_buffer = (unsigned char *) av_malloc(avpicture_get_size(AV_PIX_FMT_YUV420P, pCodecCtx->width, pCodecCtx->height));
     av_image_fill_arrays(pFrameYUV->data, pFrameYUV->linesize,out_buffer,
                          AV_PIX_FMT_YUV420P,pCodecCtx->width, pCodecCtx->height,1);
     
     
     
-    packet=(AVPacket *)av_malloc(sizeof(AVPacket));
+    packet = (AVPacket *)av_malloc(sizeof(AVPacket));
     //Output Info-----------------------------
     printf("--------------- File Information ----------------\n");
     av_dump_format(pFormatCtx,0,path,0);
@@ -132,10 +206,11 @@
     }
     
     sws_freeContext(img_convert_ctx);
+    */
     
     fclose(fp_yuv);
     
-    av_frame_free(&pFrameYUV);
+    //av_frame_free(&pFrameYUV);
     av_frame_free(&pFrame);
     avcodec_close(pCodecCtx);
     avformat_close_input(&pFormatCtx);
