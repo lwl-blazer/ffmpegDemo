@@ -13,6 +13,8 @@
 
 @interface ViewController ()
 
+@property(nonatomic, strong) NSFileManager *fileManager;
+
 @end
 
 @implementation ViewController
@@ -47,6 +49,11 @@
     
     char output_str_full[500] = {0};
     NSString *path = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"receive.flv"];
+    if (![self.fileManager fileExistsAtPath:path]) {
+        [self.fileManager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+    
+    
     //把格式化的数据写入某个字符串中
     sprintf(output_str_full, "%s", [path UTF8String]);
     printf("output path: %s\n", output_str_full);
@@ -116,5 +123,10 @@
     [self readLiveStream];
 }
 
-
+- (NSFileManager *)fileManager{
+    if (!_fileManager) {
+        _fileManager = [[NSFileManager alloc] init];
+    }
+    return _fileManager;
+}
 @end
