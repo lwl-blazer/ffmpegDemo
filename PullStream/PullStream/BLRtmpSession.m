@@ -90,8 +90,7 @@ static const size_t kRtmpSignatureSize = 1536;
     [self sendBuffer:frame];
 }
 
-- (instancetype)init
-{
+- (instancetype)init{
     self = [super init];
     if (self) {
         _rtmpStatus = LLYRtmpSessionStatusNone;
@@ -131,12 +130,12 @@ static const size_t kRtmpSignatureSize = 1536;
 
 - (void)streamSession:(BLStreamSession *)session didChangeStatus:(BLStreamStatus)streamStatus{
 
-    if (streamStatus & NSStreamEventHasBytesAvailable) {
+    if (streamStatus & NSStreamEventHasBytesAvailable) { //收到数据
         [self didReceivedata];
         return;
     }
     
-    if (streamStatus & NSStreamEventHasSpaceAvailable) {
+    if (streamStatus & NSStreamEventHasSpaceAvailable) {  //可以写数据
         if (_rtmpStatus == LLYRtmpSessionStatusConnected) {
             [self handshake0];
         }
@@ -158,6 +157,8 @@ static const size_t kRtmpSignatureSize = 1536;
 }
 
 - (void)handshake0{
+    self.rtmpStatus = LLYRtmpSessionStatusHandshake0;
+    
     //c0
     char c0Byte = 0x03;  //rtmp版本号
     NSData *c0 = [NSData dataWithBytes:&c0Byte length:1];
@@ -170,6 +171,7 @@ static const size_t kRtmpSignatureSize = 1536;
     free(c1Bytes);
     [self writeData:c1];
 }
+
 
 - (void)handshake1{
     self.rtmpStatus = LLYRtmpSessionStatusHandshake2;
@@ -200,7 +202,7 @@ static const size_t kRtmpSignatureSize = 1536;
         [self.handShake appendData:data];
     }
     
-    NSLog(@"%zd", data.length);
+    NSLog(@"收到数据:%zd", data.length);
     
     switch (self.rtmpStatus) {
         case LLYRtmpSessionStatusHandshake0:{
@@ -222,7 +224,6 @@ static const size_t kRtmpSignatureSize = 1536;
         }
             
         case LLYRtmpSessionStatusHandshake1:{
-            
             if (self.handShake.length >= kRtmpSignatureSize) {
                 [self handshake1];
                 
@@ -274,7 +275,12 @@ static const size_t kRtmpSignatureSize = 1536;
         }
         
         const uint8_t buf0 = buffer[0];
-        int headType = (buffer[0] & 0xC0) >> 6;
+        if (buf0) {
+            
+        }else {
+            break;
+        }
+        int headType = (buf0 & 0xC0) >> 6;
         buffer ++;
         
         switch (headType) {
@@ -297,24 +303,333 @@ static const size_t kRtmpSignatureSize = 1536;
                 total -= chunk.msg_length.data;
             }
                 break;
+            case RTMP_HEADER_TYPE_NO_MSG_STREAM_ID:{
+                RTMPChunk_1 chunk;
+                memcpy(&chunk, buffer, sizeof(RTMPChunk_1));
                 
+                buffer += sizeof(RTMPChunk_1);
+                total += sizeof(RTMPChunk_1);
+                
+                chunk.msg_length.data = [NSMutableData getByte24:(uint8_t *)&chunk.msg_length];
+                BOOL isSuccess = [self handleMeesage:buffer type:chunk.msg_type_id length:chunk.msg_length.data];
+                if (!isSuccess) {
+                    total = 0;
+                    break;
+                }
+                
+                buffer += chunk.msg_length.data;
+                total -= chunk.msg_length.data;
+            }
+                break;
+                
+            case RTMP_HEADER_TYPE_TIMESTAMP:{
+                RTMPChunk_2 chunk;
+                memcpy(&chunk, buffer, sizeof(RTMPChunk_2));
+                buffer += sizeof(RTMPChunk_2) + MIN(total, _inChunkSize);
+                total -= sizeof(RTMPChunk_2) + MIN(total, _inChunkSize);
+            }
+                break;
+                
+            case RTMP_HEADER_TYPE_ONLY:{
+                buffer += MIN(total, _inChunkSize);
+                total -= MIN(total, _inChunkSize);
+            }
+                break;
             default:
                 break;
         }
     }
-    
-    
 }
 
 - (BOOL)handleMeesage:(uint8_t *)p type:(uint8_t)msgTypeId length:(int)length{
-    
+    BOOL handleSuccess = YES;
+    switch (msgTypeId) {
+        case LLYMSGTypeID_BYTES_READ:
+            break;
+            
+        case LLYMSGTypeID_CHUNK_SIZE:{
+            unsigned long newChunkSize = [NSMutableData getByte32:p];
+            NSLog(@"change incoming chunk size from %d to: %zu", _inChunkSize, newChunkSize);
+            _inChunkSize = (int)newChunkSize;
+        }
+            break;
+        case LLYMSGTypeID_PING:{
+            NSLog(@"received ping, sending pong.");
+            [self sendPong];
+        }
+            break;
+            
+        case LLYMSGTypeID_SERVER_WINDOW:
+            NSLog(@"received server window size: %d\n", [NSMutableData getByte32:p]);
+            break;
+            
+        case LLYMSGTypeID_PEER_BW:
+            NSLog(@"received peer bandwidth limit: %d type: %d\n", [NSMutableData getByte32:p], p[4]);
+            break;
+            
+        case LLYMSGTypeID_INVOKE:{
+            NSLog(@"Received invoke");
+            [self handleInvoke:p];
+        }
+            break;
+            
+        case LLYMSGTypeID_VIDEO:{
+            NSLog(@"received video");
+            [self handleVideoMessage:p length:length];
+        }
+        case LLYMSGTypeID_AUDIO:
+            NSLog(@"received audio");
+            break;
+        case LLYMSGTypeID_METADATA:
+            NSLog(@"received metadata");
+            break;
+            
+        case LLYMSGTypeID_NOTIFY:
+            NSLog(@"received notify");
+            break;
+        default:{
+            handleSuccess = NO;
+            NSLog(@"received unknown packet type: 0x%02X", msgTypeId);
+        }
+            break;
+    }
+    return handleSuccess;
 }
+
+- (void)sendPong{
+    dispatch_sync(_pacekageQueue, ^{
+        int streamId = 0;
+        NSMutableData *data = [NSMutableData data];
+        [data appendByte:2];
+        [data appendByte24:0];
+        [data appendByte24:6];
+        [data appendByte:LLYMSGTypeID_PING];
+        
+        [data appendBytes:(uint8_t *)&streamId length:sizeof(int32_t)];
+        [data appendByte16:7];
+        [data appendByte16:0];
+        [data appendByte16:0];
+        
+        [self writeData:data];
+    });
+}
+
 
 - (void)sendConnectPacket{
+    NSLog(@"sendConnectPacket");
     
+    
+    RTMPChunk_0 metadata = {0};
+    metadata.msg_stream_id = LLYStreamIDInvoke;
+    metadata.msg_type_id = LLYMSGTypeID_INVOKE;
+    
+    NSString *url = @"rtmp://192.168.1.148:1935/live/room";
+    NSMutableData *buff = [NSMutableData data];
+    /*if (_url.port > 0) {
+        url = [NSString stringWithFormat:@"%@://%@:%zd/%@",_url.scheme,_url.host,_url.port,_url.app];
+    }else{
+        url = [NSString stringWithFormat:@"%@://%@/%@",_url.scheme,_url.host,_url.app];
+    }*/
+    
+    [buff appendString:@"connect"];
+    [buff appendDouble:++_numOfInvokes];
+    
+    self.trackedCommands[@(_numOfInvokes)] = @"connect";
+    
+    [buff appendByte:kAMFObject];
+    [buff putKey:@"app" stringValue:@"live"];
+    [buff putKey:@"type" stringValue:@"nonprivate"];
+    [buff putKey:@"tcUrl" stringValue:url];
+    [buff putKey:@"fpad" boolValue:NO];  //是否使用代理
+    [buff putKey:@"capabilities" doubleValue:15.0];
+    [buff putKey:@"audioCodecs" doubleValue:10.0];
+    [buff putKey:@"videoCodecs" doubleValue:7.0];
+    [buff putKey:@"videoFunction" doubleValue:1.0];
+    
+    [buff appendByte16:0];
+    [buff appendByte:kAMFObjectEnd];
+    
+    metadata.msg_length.data = (int)buff.length;
+    [self sendPacket:buff :metadata];
 }
 
+- (void)handleInvoke:(uint8_t *)p{
+    int buflen = 0;
+    NSString *command = [NSMutableData getString:p :&buflen];
+    NSLog(@"received invoke %@\n", command);
+    
+    int pktId = (int)[NSMutableData getDouble:p + 11];
+    NSLog(@"pktId: %d\n", pktId);
+    
+    NSString *trackCommand = self.trackedCommands[@(pktId)];
+    
+    if ([command isEqualToString:@"_result"]) {
+        NSLog(@"tracked command: %@\n", trackCommand);
+        if ([trackCommand isEqualToString:@"connect"]) {
+            [self sendSetBufferTime:0];
+            [self sendCreateStream];
+            [self sendSubcribe];
+            self.rtmpStatus = LLYRtmpSessionStatusFCPublish;
+        } else if ([trackCommand isEqualToString:@"createStream"]) {
+            if (p[10] || p[19] != 0x05 || p[20]) {
+                NSLog(@"RTMP: Unexpected reply on connect()\n");
+            } else {
+                _streamID = [NSMutableData getDouble:p+21];
+            }
+            
+            [self sendPlay];
+            self.rtmpStatus = LLYRtmpSessionStatusReady;
+        }
+    } else if ([command isEqualToString:@"onStatus"]) {
+        NSString *code = [self parseStatusCode:p + 3 + command.length];
+        NSLog(@"code : %@", code);
+        
+        if ([code isEqualToString:@"NetStream.Publish.Start"]) {
+            
+        } else if ([code isEqualToString:@"NetStream.Play.Start"]) {
+            //重新设定了chunksize大小
+            //            [self sendSetChunkSize:getpagesize()];//16K
+            [self sendSetBufferTime:0];//设定时间
+            self.rtmpStatus = LLYRtmpSessionStatusSessionStarted;
+        }
+    }
+}
 
+- (void)handleVideoMessage:(uint8_t *)data length:(int)length{
+    if (self.delegate && [self.delegate respondsToSelector:@selector(rtmpSession:receiveVideoData:length:)]) {
+        [self.delegate rtmpSession:self receiveVideoData:data length:length];
+    }
+}
+
+- (NSString *)parseStatusCode:(uint8_t *)p{
+    NSMutableDictionary *props = [NSMutableDictionary dictionary];
+    
+    p += sizeof(double) + 1;
+    
+    bool foundObject = false;
+    while (!foundObject) {
+        if (p[0] == AMF_DATA_TYPE_OBJECT) {
+            p += 1;
+            foundObject = true;
+            continue;
+        } else {
+            p += [self amfPrimitiveObjectSize:p];
+        }
+    }
+    
+    uint16_t nameLen, valLen;
+    char propName[128], propVal[128];
+    
+    do {
+        nameLen = [NSMutableData getByte16:p];
+        p += sizeof(nameLen);
+        strncpy(propName, (char *)p, nameLen);
+        propName[nameLen] = '\0';
+        
+        p += nameLen;
+        NSString *key = [NSString stringWithUTF8String:propName];
+        NSLog(@"key----%@",key);
+        
+        if (p[0] == AMF_DATA_TYPE_STRING) {
+            valLen = [NSMutableData getByte16:p + 1];
+            p += sizeof(valLen) + 1;
+            
+            strncpy(propVal, (char *)p, valLen);
+            propVal[valLen] = '\0';
+            p += valLen;
+            NSString *value = [NSString stringWithUTF8String:propVal];
+            props[key] = value;
+        } else {
+            p += [self amfPrimitiveObjectSize:p];
+            props[key] = @"";
+        }
+    } while ([NSMutableData getByte24:p] != AMF_DATA_TYPE_OBJECT_END);
+    
+    return props[@"code"];
+}
+
+- (int)amfPrimitiveObjectSize:(uint8_t *)p{
+    switch (p[0]) {
+        case AMF_DATA_TYPE_NUMBER:
+            return 9;
+        case AMF_DATA_TYPE_BOOL:
+            return 2;
+        case AMF_DATA_TYPE_NULL:
+            return 1;
+        case AMF_DATA_TYPE_STRING:
+            return 3 + [NSMutableData getByte16:p];
+        case AMF_DATA_TYPE_LONG_STRING:
+            return 5 + [NSMutableData getByte32:p];
+    }
+    return -1;
+}
+
+- (void)sendSetBufferTime:(int)milliseconds{
+    dispatch_sync(_pacekageQueue, ^{
+        int streamId = 0;
+        
+        NSMutableData *data = [NSMutableData data];
+        [data appendByte:2];
+        [data appendByte24:0];
+        [data appendByte24:10];
+        [data appendByte:LLYMSGTypeID_PING];
+        [data appendBytes:(uint8_t *)&streamId length:sizeof(int32_t)];
+        
+        [data appendByte16:3];
+        [data appendByte32:self->_streamID];
+        [data appendByte32:milliseconds];
+        
+        [self writeData:data];
+    });
+}
+
+- (void)sendCreateStream{
+    RTMPChunk_0 metadata = {0};
+    metadata.msg_stream_id = LLYStreamIDInvoke;
+    metadata.msg_type_id = LLYMSGTypeID_INVOKE;
+    
+    NSMutableData *buff = [NSMutableData data];
+    [buff appendString:@"createStream"];
+    self.trackedCommands[@(++_numOfInvokes)] = @"createStream";
+    [buff appendDouble:_numOfInvokes];
+    [buff appendByte:kAMFNull];
+    
+    metadata.msg_length.data = (int)buff.length;
+    [self sendPacket:buff :metadata];
+}
+
+- (void)sendSubcribe{
+    RTMPChunk_0 metadata = {0};
+    metadata.msg_stream_id = LLYStreamIDInvoke;
+    metadata.msg_type_id = LLYMSGTypeID_INVOKE;
+    
+    NSMutableData *buff = [NSMutableData data];
+    [buff appendString:@"FCSubscribe"];
+    [buff appendDouble:(++_numOfInvokes)];
+    self.trackedCommands[@(_numOfInvokes)] = @"FCSubscribe";
+    [buff appendByte:kAMFNull];
+    [buff appendString:_url.playPath];
+    metadata.msg_length.data = (int)buff.length;
+    
+    [self sendPacket:buff :metadata];
+}
+
+- (void)sendPlay{
+    RTMPChunk_0 metadata = {0};
+    metadata.msg_stream_id = LLYStreamIDPlay;
+    metadata.msg_type_id = LLYMSGTypeID_INVOKE;
+    
+    NSMutableData *buff = [NSMutableData data];
+    [buff appendString:@"play"];
+    [buff appendDouble:(++_numOfInvokes)];
+    
+    self.trackedCommands[@(_numOfInvokes)] = @"play";
+    [buff appendByte:kAMFNull];
+    [buff appendString:_url.playPath];
+    
+    metadata.msg_length.data = (int)buff.length;
+    [self sendPacket:buff :metadata];
+}
 
 - (void)sendBuffer:(BLFrame *)frame{
     dispatch_sync(_pacekageQueue, ^{

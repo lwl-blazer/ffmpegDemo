@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		253827BA2294FB13005B32C4 /* AAPLEAGLLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 253827B82294FB12005B32C4 /* AAPLEAGLLayer.m */; };
 		2560546C2293DEE200DBB246 /* BLStreamSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 2560546B2293DEE200DBB246 /* BLStreamSession.m */; };
 		2560546F2293EB5E00DBB246 /* NSString+Url.m in Sources */ = {isa = PBXBuildFile; fileRef = 2560546E2293EB5E00DBB246 /* NSString+Url.m */; };
 		256054722293F3E600DBB246 /* BLRtmpSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 256054712293F3E600DBB246 /* BLRtmpSession.m */; };
@@ -45,6 +46,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		253827B82294FB12005B32C4 /* AAPLEAGLLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AAPLEAGLLayer.m; sourceTree = "<group>"; };
+		253827B92294FB13005B32C4 /* AAPLEAGLLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AAPLEAGLLayer.h; sourceTree = "<group>"; };
 		2560546A2293DEE200DBB246 /* BLStreamSession.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BLStreamSession.h; sourceTree = "<group>"; };
 		2560546B2293DEE200DBB246 /* BLStreamSession.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BLStreamSession.m; sourceTree = "<group>"; };
 		2560546D2293EB5E00DBB246 /* NSString+Url.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+Url.h"; sourceTree = "<group>"; };
@@ -163,6 +166,8 @@
 				256054762293F4BE00DBB246 /* BLTypeHeader.h */,
 				256054772293F57400DBB246 /* BLRtmpConfig.h */,
 				256054782293F57400DBB246 /* BLRtmpConfig.m */,
+				253827B92294FB13005B32C4 /* AAPLEAGLLayer.h */,
+				253827B82294FB12005B32C4 /* AAPLEAGLLayer.m */,
 			);
 			path = PullStream;
 			sourceTree = "<group>";
@@ -331,6 +336,7 @@
 				2560547C2293F6B700DBB246 /* NSMutableData+Buffer.m in Sources */,
 				25B6D179228D4DDA00ECFD7C /* ViewController.m in Sources */,
 				256054722293F3E600DBB246 /* BLRtmpSession.m in Sources */,
+				253827BA2294FB13005B32C4 /* AAPLEAGLLayer.m in Sources */,
 				25B6D184228D4DDB00ECFD7C /* main.m in Sources */,
 				256054752293F3FF00DBB246 /* BLFrame.m in Sources */,
 				2560546F2293EB5E00DBB246 /* NSString+Url.m in Sources */,

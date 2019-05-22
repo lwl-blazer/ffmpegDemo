@@ -28,6 +28,7 @@
     NSString *reu = [res componentsSeparatedByString:@"/"].lastObject;
     return [reu componentsSeparatedByString:@":"].firstObject;
 }
+
 - (UInt32)port{
     NSString *sep = [NSString stringWithFormat:@"%@/",self.host];
     NSString *res = [self componentsSeparatedByString:sep].lastObject;

@@ -9,17 +9,21 @@
 #import "ViewController.h"
 #include <librtmp/rtmp.h>
 #include <librtmp/log.h>
+#import "BLRtmpSession.h"
+#import "BLRtmpConfig.h"
+#import "AAPLEAGLLayer.h"
 
-@interface ViewController (){
+@interface ViewController ()<BLRtmpSessionDelegate>{
     
     uint8_t *packetBuffer;
     long packetSize;
 }
-@property (weak, nonatomic) IBOutlet UILabel *statusLabel;
+@property (strong, nonatomic) AAPLEAGLLayer *eaglLayer;
 
 @property(nonatomic, strong) NSFileManager *fileManager;
 @property(nonatomic, copy) NSString *path;
 
+@property(nonatomic, strong) BLRtmpSession *rtmpSession;
 
 @end
 
@@ -37,6 +41,11 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    self.eaglLayer = [[AAPLEAGLLayer alloc] initWithFrame:self.view.frame];
+    self.eaglLayer.backgroundColor = [UIColor blackColor].CGColor;
+    [self.view.layer addSublayer:self.eaglLayer];
+    self.eaglLayer.zPosition = -1;
     
     //创建空文件
     self.path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).lastObject;
@@ -84,7 +93,7 @@
     
     
     //设置会话的参数
-    if (!RTMP_SetupURL(rtmp, "rtmp://192.168.1.146:1935/live/room")) {
+    if (!RTMP_SetupURL(rtmp, "rtmp://192.168.1.148:1935/live/room")) {
         RTMP_Log(RTMP_LOGERROR, "SetupURL Err\n");
         RTMP_Free(rtmp);
         return;
@@ -113,23 +122,21 @@
         return;
     }
     
-    self.statusLabel.text = @"配置完成，链接中...";
-    
     while (YES) {
         //读取RTMP流的内容   当返回0字节的时候，代表流已经读取完毕
         nRead = RTMP_Read(rtmp, buf, bufsize);
         if (nRead) {
             
-            printf("%s", buf);
-            
+            NSData *data = [NSData dataWithBytes:buf length:nRead];
+            NSLog(@"%@", data);
             
             fwrite(buf, 1, nRead, fp);
             countbufsize += nRead;
             RTMP_LogPrintf("Receive: %5dByte, Total: %5.2fkB\n",nRead,countbufsize*1.0/1024);
             
             
-            packetBuffer = (uint8_t *)buf;
-            packetSize = (long)bufsize;
+            packetBuffer = (uint8_t *)data.bytes;
+            packetSize = (long)nRead;
             
             [self updateFrame];
             
@@ -148,12 +155,12 @@
     RTMP_Free(rtmp); //清理会话
     rtmp = NULL;
     RTMP_LogPrintf("End\n");
-    self.statusLabel.text = @"拉流..End......";
 }
 
 
 - (IBAction)send:(id)sender {
     //[self readLiveStream];
+    [self.rtmpSession connect];
 }
 
 - (NSFileManager *)fileManager{
@@ -171,20 +178,45 @@
     uint8_t avcType = packetBuffer[0];
     long totalLength = packetSize;
     
-    
     while (avcType == 0x17 || avcType == 0x27) {
         uint8_t type = packetBuffer[1];
         if (type == 0) {
             NSLog(@"type === 0");
+            break;
         } else if (type == 1) {
             NSLog(@"type === 1");
+            break;
         }
     }
 }
 
 
+- (void)rtmpSession:(BLRtmpSession *)rtmpSession didChangeStatus:(LLYRtmpSessionStatus)rtmpstatus{
+    
+}
+
+- (void)rtmpSession:(BLRtmpSession *)rtmpSession receiveVideoData:(uint8_t *)data length:(int)length{
+    packetBuffer = data;
+    packetSize = length;
+    [self updateFrame];
+}
 
 
-
+- (BLRtmpSession *)rtmpSession{
+    if (!_rtmpSession) {
+        _rtmpSession = [[BLRtmpSession alloc] init];
+        _rtmpSession.delegate = self;
+        
+        BLRtmpConfig *config = [[BLRtmpConfig alloc] init];
+        config.url = @"rtmp://192.168.1.148:1935/live/room";
+        config.width = 480;
+        config.height = 640;
+        config.frameDuration = 1.0 / 30;
+        config.videoBitrate = 512 *1024;
+        
+        _rtmpSession.config = config;
+    }
+    return _rtmpSession;
+}
 
 @end

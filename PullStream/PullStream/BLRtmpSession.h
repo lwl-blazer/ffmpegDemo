@@ -54,7 +54,6 @@ typedef NS_ENUM(NSUInteger, LLYRtmpSessionStatus){
 - (void)disConnect;
 - (void)sendBuffer:(BLFrame *)frame;
 
-
 @end
 
 NS_ASSUME_NONNULL_END
