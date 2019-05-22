@@ -260,7 +260,7 @@ static const size_t kRtmpSignatureSize = 1536;
     if (data.length == 0) {
         return;
     }
-    
+    NSLog(@"-------- %s ------", __func__);
     uint8_t *buffer = (uint8_t *)data.bytes;
     NSUInteger total = data.length;
     
