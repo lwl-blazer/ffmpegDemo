@@ -15,6 +15,8 @@
 #import "BLRtmpConfig.h"
 #import "AAPLEAGLLayer.h"
 
+#import "SimplePing.h"
+
 const uint8_t lyStartCode[4] = {0, 0, 0, 1};
 
 @interface ViewController ()<BLRtmpSessionDelegate>{

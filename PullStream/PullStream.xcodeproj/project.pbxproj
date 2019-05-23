@@ -17,6 +17,7 @@
 		25A1E33E22928A4700389D63 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 25A1E33B22928A4700389D63 /* libssl.a */; };
 		25A1E33F22928A4700389D63 /* librtmp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 25A1E33C22928A4700389D63 /* librtmp.a */; };
 		25A1E34022928A4700389D63 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 25A1E33D22928A4700389D63 /* libcrypto.a */; };
+		25ACC36122966D240019D53E /* SimplePing.m in Sources */ = {isa = PBXBuildFile; fileRef = 25ACC35F22966D240019D53E /* SimplePing.m */; };
 		25B6D176228D4DDA00ECFD7C /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 25B6D175228D4DDA00ECFD7C /* AppDelegate.m */; };
 		25B6D179228D4DDA00ECFD7C /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 25B6D178228D4DDA00ECFD7C /* ViewController.m */; };
 		25B6D17C228D4DDA00ECFD7C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 25B6D17A228D4DDA00ECFD7C /* Main.storyboard */; };
@@ -64,6 +65,8 @@
 		25A1E33B22928A4700389D63 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = ../../librtmp/lib/libssl.a; sourceTree = "<group>"; };
 		25A1E33C22928A4700389D63 /* librtmp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = librtmp.a; path = ../../librtmp/lib/librtmp.a; sourceTree = "<group>"; };
 		25A1E33D22928A4700389D63 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = ../../librtmp/lib/libcrypto.a; sourceTree = "<group>"; };
+		25ACC35F22966D240019D53E /* SimplePing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimplePing.m; sourceTree = "<group>"; };
+		25ACC36022966D240019D53E /* SimplePing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimplePing.h; sourceTree = "<group>"; };
 		25B6D171228D4DDA00ECFD7C /* PullStream.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PullStream.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		25B6D174228D4DDA00ECFD7C /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		25B6D175228D4DDA00ECFD7C /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -157,6 +160,8 @@
 				25B6D17F228D4DDB00ECFD7C /* LaunchScreen.storyboard */,
 				25B6D182228D4DDB00ECFD7C /* Info.plist */,
 				25B6D183228D4DDB00ECFD7C /* main.m */,
+				25ACC36022966D240019D53E /* SimplePing.h */,
+				25ACC35F22966D240019D53E /* SimplePing.m */,
 				2560546A2293DEE200DBB246 /* BLStreamSession.h */,
 				2560546B2293DEE200DBB246 /* BLStreamSession.m */,
 				256054702293F3E600DBB246 /* BLRtmpSession.h */,
@@ -339,6 +344,7 @@
 				253827BA2294FB13005B32C4 /* AAPLEAGLLayer.m in Sources */,
 				25B6D184228D4DDB00ECFD7C /* main.m in Sources */,
 				256054752293F3FF00DBB246 /* BLFrame.m in Sources */,
+				25ACC36122966D240019D53E /* SimplePing.m in Sources */,
 				2560546F2293EB5E00DBB246 /* NSString+Url.m in Sources */,
 				2560546C2293DEE200DBB246 /* BLStreamSession.m in Sources */,
 				25B6D176228D4DDA00ECFD7C /* AppDelegate.m in Sources */,
@@ -517,7 +523,7 @@
 				ENABLE_BITCODE = NO;
 				HEADER_SEARCH_PATHS = /Users/luowailin/Documents/Code/librtmp/include;
 				INFOPLIST_FILE = PullStream/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -541,7 +547,7 @@
 				ENABLE_BITCODE = NO;
 				HEADER_SEARCH_PATHS = /Users/luowailin/Documents/Code/librtmp/include;
 				INFOPLIST_FILE = PullStream/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
