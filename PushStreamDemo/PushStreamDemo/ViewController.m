@@ -19,6 +19,7 @@
 @property (weak, nonatomic) IBOutlet UITextField *fileField;
 @property (weak, nonatomic) IBOutlet UITextField *outUrlField;
 @property (nonatomic, assign) NSInteger addType;
+@property (weak, nonatomic) IBOutlet UILabel *markLabel;
 
 @end
 

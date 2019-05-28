@@ -15,7 +15,6 @@
 #import "BLRtmpConfig.h"
 #import "AAPLEAGLLayer.h"
 
-#import "SimplePing.h"
 
 const uint8_t lyStartCode[4] = {0, 0, 0, 1};
 
@@ -61,12 +60,11 @@ const uint8_t lyStartCode[4] = {0, 0, 0, 1};
     [super viewDidLoad];
     
     self.eaglLayer = [[AAPLEAGLLayer alloc] initWithFrame:self.view.frame];
-    self.eaglLayer.backgroundColor = [UIColor blackColor].CGColor;
+    self.eaglLayer.backgroundColor = [UIColor redColor].CGColor;
     [self.view.layer addSublayer:self.eaglLayer];
     self.eaglLayer.zPosition = -1;
     
     mDecodeQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-    
     
     //创建空文件
     self.path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).lastObject;
@@ -109,12 +107,8 @@ const uint8_t lyStartCode[4] = {0, 0, 0, 1};
     
     rtmp->Link.timeout = 20;
     
-    
-    
-    
-    
     //设置会话的参数
-    if (!RTMP_SetupURL(rtmp, "rtmp://192.168.1.148:1935/live/room")) {
+    if (!RTMP_SetupURL(rtmp, "rtmp://10.204.109.20:1935/live/room")) {
         RTMP_Log(RTMP_LOGERROR, "SetupURL Err\n");
         RTMP_Free(rtmp);
         return;
@@ -149,7 +143,6 @@ const uint8_t lyStartCode[4] = {0, 0, 0, 1};
         if (nRead) {
             
             NSData *data = [NSData dataWithBytes:buf length:nRead];
-            NSLog(@"%@", data);
             
             fwrite(buf, 1, nRead, fp);
             countbufsize += nRead;
@@ -180,7 +173,7 @@ const uint8_t lyStartCode[4] = {0, 0, 0, 1};
 
 
 - (IBAction)send:(id)sender {
-    //[self readLiveStream];
+   // [self readLiveStream];
     [self.rtmpSession connect];
 }
 
@@ -470,7 +463,7 @@ void didDecompress(void *decompressionOutputRefCon, void *sourceFrameRefCon, OSS
         _rtmpSession.delegate = self;
         
         BLRtmpConfig *config = [[BLRtmpConfig alloc] init];
-        config.url = @"rtmp://192.168.1.148:1935/live/room";
+        config.url = @"rtmp://10.204.109.20:1935/live/room";
         config.width = 480;
         config.height = 640;
         config.frameDuration = 1.0 / 30;

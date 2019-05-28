@@ -22,7 +22,7 @@ static const size_t kRtmpSignatureSize = 1536;
     
     
     int _outChunkSize;
-    int _inChunkSize;
+    uint64_t _inChunkSize;
     int _streamID;
     int _numOfInvokes;
 }
@@ -260,9 +260,8 @@ static const size_t kRtmpSignatureSize = 1536;
     if (data.length == 0) {
         return;
     }
-    NSLog(@"-------- %s ------", __func__);
     uint8_t *buffer = (uint8_t *)data.bytes;
-    NSUInteger total = data.length;
+    NSInteger total = data.length;
     
     int loopIndex = 0;
     while (total > 0) {
@@ -275,11 +274,6 @@ static const size_t kRtmpSignatureSize = 1536;
         }
         
         const uint8_t buf0 = buffer[0];
-        if (buf0) {
-            
-        }else {
-            break;
-        }
         int headType = (buf0 & 0xC0) >> 6;
         buffer ++;
         
@@ -349,8 +343,8 @@ static const size_t kRtmpSignatureSize = 1536;
             
         case LLYMSGTypeID_CHUNK_SIZE:{
             unsigned long newChunkSize = [NSMutableData getByte32:p];
-            NSLog(@"change incoming chunk size from %d to: %zu", _inChunkSize, newChunkSize);
-            _inChunkSize = (int)newChunkSize;
+            NSLog(@"change incoming chunk size from %llu to: %zu", _inChunkSize, newChunkSize);
+            _inChunkSize = (uint64_t)newChunkSize;
         }
             break;
         case LLYMSGTypeID_PING:{
@@ -380,6 +374,7 @@ static const size_t kRtmpSignatureSize = 1536;
         case LLYMSGTypeID_AUDIO:
             NSLog(@"received audio");
             break;
+            
         case LLYMSGTypeID_METADATA:
             NSLog(@"received metadata");
             break;
@@ -418,12 +413,11 @@ static const size_t kRtmpSignatureSize = 1536;
 - (void)sendConnectPacket{
     NSLog(@"sendConnectPacket");
     
-    
     RTMPChunk_0 metadata = {0};
     metadata.msg_stream_id = LLYStreamIDInvoke;
     metadata.msg_type_id = LLYMSGTypeID_INVOKE;
     
-    NSString *url = @"rtmp://192.168.1.148:1935/live/room";
+    NSString *url = @"rtmp://10.204.109.20:1935/live/room";
     NSMutableData *buff = [NSMutableData data];
     /*if (_url.port > 0) {
         url = [NSString stringWithFormat:@"%@://%@:%zd/%@",_url.scheme,_url.host,_url.port,_url.app];
@@ -754,8 +748,6 @@ static const size_t kRtmpSignatureSize = 1536;
 
 - (void)setRtmpStatus:(LLYRtmpSessionStatus)rtmpStatus{
     _rtmpStatus = rtmpStatus;
-    
-    NSLog(@"rtmpStatus-----%zd",rtmpStatus);
     if ([self.delegate respondsToSelector:@selector(rtmpSession:didChangeStatus:)]) {
         [self.delegate rtmpSession:self didChangeStatus:_rtmpStatus];
     }
