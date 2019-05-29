@@ -1,0 +1,44 @@
+RTMP协议
+
+
+RTMP协议是Real Time Message Protocol(实时信息传输协议)的缩写， 用来解决多媒体数据传输流的多路复用(Multiplexing)和分包(packetizing)的问题
+
+RTMP协议是应用层协议，是要靠底层可靠的传输层协议(通常是TCP)来保证信息传输可靠性。在基于传输层协议的链接建立完成后，RTMP协议也要进行'握手'来建立基于传输层链接之上的RTMP Connection链接；在Connection链接上会传输一些控制信息  setCunkSize, setACKWindowSize  其中CreateStream命令会创建一个stream链接,用于传输具体的音视频数据和控制这些信息传输的命令信息。
+
+RTMP协议传输时会对数据做自己的格式化，这种格式的消息我们称之为RTMP Message,而实际传输的时候为了更好地实现多路复用、分包和信息的公平性，发送端会把Message划分为带有Message ID的Chunk,每个Chunk可能是一个单独的Message,也可能是Message的一部分，在接受端会根据chunk中包含的data的长度，message id 和 message的长度把chunk还原成完整的Message，从而实现信息的收发
+
+
+RTMP握手
+一个RTMP连接以握手开始。这里的握手由三个固定大小的块组成。 客户端(发起连接的一方)和服务端各自发送三个相同的块。这些块如果是客户端发送的话记C0,C1和C2,如果服务端发送的话记为S0,S1,S2
+握手队列:
+1.握手开始于客户端发送C0、C1块
+2.在发送C2之前客户端必须等待接收S1
+3.服务端在发送S0和S1前必须等待接收C0,也可以等待接收C1
+4.服务端在发送S2之前必须等待接收C1
+5.服务端在发送任何数据之前必须等待接收C2
+
+
+RTMP Message ---- RTMP核心
+
+Message分块(Chunnking)
+RTMP在收发数据的时候并不是以Message为单位的，而是把Message拆分成Chunk发送，而且必须在一个Chunk发送完成之后才能开始发送下一个Chunk.每个Chunk中带有MessageID代表属于哪个Message,接受端也会按照这个id来将Chunk组装成message
+为什么要折分:
+可以避免优先级低的消息持续发送阻塞优先级高的数据，比如在视频的传输过程中，会包括视频帧，音频帧和RTMP控制信息，如果持续发送音频数据或者控制数据的话可能就会造成视频帧的阻塞，然后视频就会卡顿。同时对于数据较小的Message，可以通过对Chunk Header的字段来压缩信息，从而减少信息的传输量
+
+Chunk的默认大小是128字节，在传输过程中,通过Set Chunk Size的控制信息可以设置Chunk数据量的最大值，
+在发送端和接受端各自维护一个Chunk Size,可以分别设置这个值来改变自己这一方发送的Chunk的最大大小
+
+大一点的Chunk 减少了计算每个chunk的时间减少CPU占用率  占用更多的时间在发送上，特别是在低带宽的网络情况下，很可能会出现阻塞
+小一点的Chunk  减少阻塞  但是会引入过多的额外信息(Chunk中的Header), 少量多次不能充分利用高带宽的优势
+
+在实际发送时应对要发送的数据用不同的Chunk Size去尝试，通过抓包分析等手段得出合适的Chunk大小，并且在传输过程中可以根据当前的带宽信息和实际信息的大小动态调整Chunk的大小，从而尽量提高CPU的利用率并减少信息的阻塞机率
+
+
+
+
+
+
+
+
+
+http://llyblog.com/2017/03/20/RTMP%E5%8D%8F%E8%AE%AE%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		253827BA2294FB13005B32C4 /* AAPLEAGLLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 253827B82294FB12005B32C4 /* AAPLEAGLLayer.m */; };
+		2550363C229E355700141446 /* Remark in Resources */ = {isa = PBXBuildFile; fileRef = 2550363B229E355700141446 /* Remark */; };
 		2560546C2293DEE200DBB246 /* BLStreamSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 2560546B2293DEE200DBB246 /* BLStreamSession.m */; };
 		2560546F2293EB5E00DBB246 /* NSString+Url.m in Sources */ = {isa = PBXBuildFile; fileRef = 2560546E2293EB5E00DBB246 /* NSString+Url.m */; };
 		256054722293F3E600DBB246 /* BLRtmpSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 256054712293F3E600DBB246 /* BLRtmpSession.m */; };
@@ -48,6 +49,7 @@
 /* Begin PBXFileReference section */
 		253827B82294FB12005B32C4 /* AAPLEAGLLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AAPLEAGLLayer.m; sourceTree = "<group>"; };
 		253827B92294FB13005B32C4 /* AAPLEAGLLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AAPLEAGLLayer.h; sourceTree = "<group>"; };
+		2550363B229E355700141446 /* Remark */ = {isa = PBXFileReference; lastKnownFileType = text; path = Remark; sourceTree = "<group>"; };
 		2560546A2293DEE200DBB246 /* BLStreamSession.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BLStreamSession.h; sourceTree = "<group>"; };
 		2560546B2293DEE200DBB246 /* BLStreamSession.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BLStreamSession.m; sourceTree = "<group>"; };
 		2560546D2293EB5E00DBB246 /* NSString+Url.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+Url.h"; sourceTree = "<group>"; };
@@ -112,6 +114,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2550363A229E1FF500141446 /* session */ = {
+			isa = PBXGroup;
+			children = (
+				2560546A2293DEE200DBB246 /* BLStreamSession.h */,
+				2560546B2293DEE200DBB246 /* BLStreamSession.m */,
+				256054702293F3E600DBB246 /* BLRtmpSession.h */,
+				256054712293F3E600DBB246 /* BLRtmpSession.m */,
+			);
+			path = session;
+			sourceTree = "<group>";
+		};
 		25A1E334229245B900389D63 /* lib */ = {
 			isa = PBXGroup;
 			children = (
@@ -144,6 +157,7 @@
 		25B6D173228D4DDA00ECFD7C /* PullStream */ = {
 			isa = PBXGroup;
 			children = (
+				2550363A229E1FF500141446 /* session */,
 				2560546D2293EB5E00DBB246 /* NSString+Url.h */,
 				2560546E2293EB5E00DBB246 /* NSString+Url.m */,
 				2560547A2293F6B700DBB246 /* NSMutableData+Buffer.h */,
@@ -157,10 +171,6 @@
 				25B6D17F228D4DDB00ECFD7C /* LaunchScreen.storyboard */,
 				25B6D182228D4DDB00ECFD7C /* Info.plist */,
 				25B6D183228D4DDB00ECFD7C /* main.m */,
-				2560546A2293DEE200DBB246 /* BLStreamSession.h */,
-				2560546B2293DEE200DBB246 /* BLStreamSession.m */,
-				256054702293F3E600DBB246 /* BLRtmpSession.h */,
-				256054712293F3E600DBB246 /* BLRtmpSession.m */,
 				256054732293F3FF00DBB246 /* BLFrame.h */,
 				256054742293F3FF00DBB246 /* BLFrame.m */,
 				256054762293F4BE00DBB246 /* BLTypeHeader.h */,
@@ -168,6 +178,7 @@
 				256054782293F57400DBB246 /* BLRtmpConfig.m */,
 				253827B92294FB13005B32C4 /* AAPLEAGLLayer.h */,
 				253827B82294FB12005B32C4 /* AAPLEAGLLayer.m */,
+				2550363B229E355700141446 /* Remark */,
 			);
 			path = PullStream;
 			sourceTree = "<group>";
@@ -305,6 +316,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2550363C229E355700141446 /* Remark in Resources */,
 				25B6D181228D4DDB00ECFD7C /* LaunchScreen.storyboard in Resources */,
 				25B6D17E228D4DDB00ECFD7C /* Assets.xcassets in Resources */,
 				25B6D17C228D4DDA00ECFD7C /* Main.storyboard in Resources */,

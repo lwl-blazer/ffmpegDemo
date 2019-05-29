@@ -19,7 +19,7 @@ typedef NSStreamEvent BLStreamStatus;
 
 @end
 
-
+//主要封装了Stream
 @interface BLStreamSession : NSObject
 
 @property(nonatomic, weak) id<BLStreamSessionDelegate>delegate;
