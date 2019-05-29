@@ -95,7 +95,7 @@
 + (NSString *)getString:(uint8_t *)buf : (int *)bufsize{
     int len = 0;
     if(*buf++ == kAMFString) {
-        len =[self  getByte16:buf];
+        len = [self  getByte16:buf];
         buf+=2;
         *bufsize = 2 + len;
     } else {
@@ -106,6 +106,7 @@
     
     return [[NSString alloc] initWithBytes:buf length:len encoding:NSUTF8StringEncoding];
 }
+
 
 /**拼接double类型数据*/
 - (void)appendDouble:(double)val{

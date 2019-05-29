@@ -112,7 +112,6 @@ static const size_t kRtmpSignatureSize = 1536;
     if (self.rtmpStatus >= LLYRtmpSessionStatusConnected && self.rtmpStatus < LLYRtmpSessionStatusHandshakeComplete) { //在握手中(连接成功 & 未握手成功)，保存数据
         [self.handShake appendData:data];
     }
-    NSLog(@"%s", __func__);
     
     switch (self.rtmpStatus) {
         case LLYRtmpSessionStatusHandshake0:{ //收到服务器返回的S0+S1+S2
@@ -204,27 +203,22 @@ static const size_t kRtmpSignatureSize = 1536;
     [self.streamSession writeData:data];
 }
 
-//第三步 设置 Chunk Size  RTMP的核心  
+//第三步 发送Connect消息
 - (void)sendConnectPacket{
     NSLog(@"sendConnectPacket");
     
+    //Basic Header头信息
     RTMPChunk_0 metadata = {0};
     metadata.msg_stream_id = LLYStreamIDInvoke;
     metadata.msg_type_id = LLYMSGTypeID_INVOKE;
     
     NSString *url = @"rtmp://10.204.109.20:1935/live/room";
-    NSMutableData *buff = [NSMutableData data];
-    /*if (_url.port > 0) {
-     url = [NSString stringWithFormat:@"%@://%@:%zd/%@",_url.scheme,_url.host,_url.port,_url.app];
-     }else{
-     url = [NSString stringWithFormat:@"%@://%@/%@",_url.scheme,_url.host,_url.app];
-     }*/
     
+    //RTMP Body
+    NSMutableData *buff = [NSMutableData data];
     [buff appendString:@"connect"];
     [buff appendDouble:++_numOfInvokes];
-    
     self.trackedCommands[@(_numOfInvokes)] = @"connect";
-    
     [buff appendByte:kAMFObject];
     [buff putKey:@"app" stringValue:@"live"];
     [buff putKey:@"type" stringValue:@"nonprivate"];
@@ -244,7 +238,6 @@ static const size_t kRtmpSignatureSize = 1536;
 
 - (void)sendPacket:(NSData *)data :(RTMPChunk_0)metadata{
     BLFrame *frame = [[BLFrame alloc] init];
-    
     frame.data = data;
     frame.timestamp = metadata.timestamp.data;
     frame.msgLength = metadata.msg_length.data;
@@ -422,11 +415,11 @@ static const size_t kRtmpSignatureSize = 1536;
     switch (msgTypeId) {
         case LLYMSGTypeID_BYTES_READ:
             break;
-            
+            //Set Chunk Size
         case LLYMSGTypeID_CHUNK_SIZE:{
             unsigned long newChunkSize = [NSMutableData getByte32:p];
             NSLog(@"change incoming chunk size from %llu to: %zu", _inChunkSize, newChunkSize);
-            _inChunkSize = (uint64_t)newChunkSize;
+            _inChunkSize = (uint64_t)newChunkSize; //
         }
             break;
         case LLYMSGTypeID_PING:{
@@ -435,14 +428,16 @@ static const size_t kRtmpSignatureSize = 1536;
         }
             break;
             
+            // Window Acknowledgement Size 用于设置窗口确认大小  在会话开始时双方都要先对端发送
         case LLYMSGTypeID_SERVER_WINDOW:
             NSLog(@"received server window size: %d\n", [NSMutableData getByte32:p]);
             break;
             
+            //Set Peer BandWidth  设置对端输出的带宽
         case LLYMSGTypeID_PEER_BW:
             NSLog(@"received peer bandwidth limit: %d type: %d\n", [NSMutableData getByte32:p], p[4]);
             break;
-            
+            //__result(NetConnection.Connect.Success)
         case LLYMSGTypeID_INVOKE:{
             NSLog(@"Received invoke");
             [self handleInvoke:p];
@@ -491,8 +486,7 @@ static const size_t kRtmpSignatureSize = 1536;
     });
 }
 
-
-
+//RTMP MESSAGE
 - (void)handleInvoke:(uint8_t *)p{
     int buflen = 0;
     NSString *command = [NSMutableData getString:p :&buflen];
@@ -670,7 +664,6 @@ static const size_t kRtmpSignatureSize = 1536;
     metadata.msg_length.data = (int)buff.length;
     [self sendPacket:buff :metadata];
 }
-
 
 
 #pragma mark -- init
