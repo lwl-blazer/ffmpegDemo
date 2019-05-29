@@ -34,6 +34,10 @@ const uint8_t lyStartCode[4] = {0, 0, 0, 1};
     VTDecompressionSessionRef mDecodeSession;
     CMFormatDescriptionRef mFormatDescription;
     
+    FILE *fileP;
+    char *fileBuf;
+    long fileBufCount;
+    
 }
 @property (strong, nonatomic) AAPLEAGLLayer *eaglLayer;
 
@@ -68,14 +72,35 @@ const uint8_t lyStartCode[4] = {0, 0, 0, 1};
     
     //创建空文件
     self.path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).lastObject;
-    self.path = [self.path stringByAppendingPathComponent:@"receive.txt"];
+    self.path = [self.path stringByAppendingPathComponent:@"receive.flv"];
     
     if ([self.fileManager fileExistsAtPath:self.path]) {
         [self.fileManager removeItemAtPath:self.path error:nil];
     }
     [self.fileManager createFileAtPath:self.path contents:nil attributes:nil];
+    
+    
+    char output_str_full[500] = {0};
+    sprintf(output_str_full, "%s", [self.path UTF8String]);
+    printf("output path: %s\n", output_str_full);
+    fileP = fopen(output_str_full, "wb");
+    if (!fileP) {
+        NSLog(@"Open Flie Error.");
+    }
+    
+    int bufsize = 1024 * 1024 * 10;
+    fileBuf = (char *)malloc(bufsize);
+    memset(fileBuf, 0, bufsize);
+    
+    fileBufCount = 0;
+    
 }
 
+
+- (void)writeToFileWith:(void *)data length:(int)length{
+    fwrite(fileBuf, 1, length, fileP);
+    fileBufCount += length;
+}
 
 - (void)readLiveStream{
     
@@ -439,6 +464,7 @@ void didDecompress(void *decompressionOutputRefCon, void *sourceFrameRefCon, OSS
 
 - (void)displayDecodedFrame:(CVPixelBufferRef)imageBuffer{
     if (imageBuffer) {
+        NSLog(@"------- imageBuffer display ------");
         self.eaglLayer.pixelBuffer = imageBuffer;
         CVPixelBufferRelease(imageBuffer);
     }
@@ -453,7 +479,7 @@ void didDecompress(void *decompressionOutputRefCon, void *sourceFrameRefCon, OSS
 - (void)rtmpSession:(BLRtmpSession *)rtmpSession receiveVideoData:(uint8_t *)data length:(int)length{
     packetBuffer = data;
     packetSize = length;
-    [self updateFrame];
+    [self writeToFileWith:data length:length];
 }
 
 
