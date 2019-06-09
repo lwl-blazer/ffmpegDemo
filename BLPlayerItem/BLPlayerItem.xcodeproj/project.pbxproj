@@ -7,21 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		251309EF22855CFA00611CD8 /* 521.flv in Resources */ = {isa = PBXBuildFile; fileRef = 251309EE22855CFA00611CD8 /* 521.flv */; };
-		251309F62285717F00611CD8 /* DecodeObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 251309F52285717F00611CD8 /* DecodeObject.m */; };
-		251309F82285791A00611CD8 /* destinationfile.flv in Resources */ = {isa = PBXBuildFile; fileRef = 251309F72285791A00611CD8 /* destinationfile.flv */; };
-		25957AA92269A59E002532C0 /* XDecode.m in Sources */ = {isa = PBXBuildFile; fileRef = 25957AA82269A59E002532C0 /* XDecode.m */; };
 		25AA5B5A2269ADCD0007DCA8 /* testVideo-1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 25AA5B592269ADCC0007DCA8 /* testVideo-1.mp4 */; };
-		25AA5B5D2269B0370007DCA8 /* PlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 25AA5B5C2269B0370007DCA8 /* PlayView.m */; };
-		25AA5B5F2269B45F0007DCA8 /* shader.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 25AA5B5E2269B45F0007DCA8 /* shader.vsh */; };
-		25AA5B612269B4750007DCA8 /* shader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 25AA5B602269B4750007DCA8 /* shader.fsh */; };
 		25AA5B632269BDE70007DCA8 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25AA5B622269BDE70007DCA8 /* GLKit.framework */; };
 		25AA5B652269BDF00007DCA8 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25AA5B642269BDEF0007DCA8 /* OpenGLES.framework */; };
 		25AA5B672269BE010007DCA8 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25AA5B662269BE010007DCA8 /* CoreGraphics.framework */; };
-		25AA5B6B2269C8090007DCA8 /* ShaderProgram.m in Sources */ = {isa = PBXBuildFile; fileRef = 25AA5B6A2269C8090007DCA8 /* ShaderProgram.m */; };
 		25B4306722702B4E00761798 /* for_test.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 25B4306622702B4E00761798 /* for_test.jpg */; };
-		25B4306A22702CC200761798 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 25B4306922702CC200761798 /* RootViewController.m */; };
-		25BBCFE22269D734006B7C09 /* VideoWidgt.m in Sources */ = {isa = PBXBuildFile; fileRef = 25BBCFE12269D734006B7C09 /* VideoWidgt.m */; };
 		25E1C5022269929A00EDCDAE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 25E1C5012269929A00EDCDAE /* AppDelegate.m */; };
 		25E1C5052269929A00EDCDAE /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 25E1C5042269929A00EDCDAE /* ViewController.m */; };
 		25E1C5082269929A00EDCDAE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 25E1C5062269929A00EDCDAE /* Main.storyboard */; };
@@ -30,20 +20,21 @@
 		25E1C5102269929D00EDCDAE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 25E1C50F2269929D00EDCDAE /* main.m */; };
 		25E1C51A2269929D00EDCDAE /* BLPlayerItemTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 25E1C5192269929D00EDCDAE /* BLPlayerItemTests.m */; };
 		25E1C5252269929D00EDCDAE /* BLPlayerItemUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 25E1C5242269929D00EDCDAE /* BLPlayerItemUITests.m */; };
-		25E1C53A226992CC00EDCDAE /* libavformat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 25E1C533226992CC00EDCDAE /* libavformat.a */; };
-		25E1C53B226992CC00EDCDAE /* libswresample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 25E1C534226992CC00EDCDAE /* libswresample.a */; };
-		25E1C53C226992CC00EDCDAE /* libswscale.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 25E1C535226992CC00EDCDAE /* libswscale.a */; };
-		25E1C53D226992CC00EDCDAE /* libavfilter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 25E1C536226992CC00EDCDAE /* libavfilter.a */; };
-		25E1C53E226992CC00EDCDAE /* libavutil.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 25E1C537226992CC00EDCDAE /* libavutil.a */; };
-		25E1C53F226992CC00EDCDAE /* libavcodec.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 25E1C538226992CC00EDCDAE /* libavcodec.a */; };
-		25E1C540226992CC00EDCDAE /* libavdevice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 25E1C539226992CC00EDCDAE /* libavdevice.a */; };
 		25E1C542226992E600EDCDAE /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 25E1C541226992E600EDCDAE /* libz.tbd */; };
 		25E1C544226992F100EDCDAE /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 25E1C543226992F100EDCDAE /* libbz2.tbd */; };
 		25E1C546226992FA00EDCDAE /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 25E1C545226992FA00EDCDAE /* libiconv.tbd */; };
 		25E1C5482269930900EDCDAE /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25E1C5472269930900EDCDAE /* AudioToolbox.framework */; };
 		25E1C54A2269931300EDCDAE /* VideoToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25E1C5492269931300EDCDAE /* VideoToolbox.framework */; };
 		25E1C54C2269931B00EDCDAE /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25E1C54B2269931B00EDCDAE /* CoreMedia.framework */; };
-		25E1C5592269994B00EDCDAE /* XDemux.m in Sources */ = {isa = PBXBuildFile; fileRef = 25E1C5582269994B00EDCDAE /* XDemux.m */; };
+		8E075B1322ABF4540059E4E8 /* libavfilter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8E075B0C22ABF4540059E4E8 /* libavfilter.a */; };
+		8E075B1422ABF4540059E4E8 /* libswresample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8E075B0D22ABF4540059E4E8 /* libswresample.a */; };
+		8E075B1522ABF4540059E4E8 /* libavcodec.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8E075B0E22ABF4540059E4E8 /* libavcodec.a */; };
+		8E075B1622ABF4540059E4E8 /* libavutil.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8E075B0F22ABF4540059E4E8 /* libavutil.a */; };
+		8E075B1722ABF4540059E4E8 /* libavdevice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8E075B1022ABF4540059E4E8 /* libavdevice.a */; };
+		8E075B1822ABF4540059E4E8 /* libavformat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8E075B1122ABF4540059E4E8 /* libavformat.a */; };
+		8E075B1922ABF4540059E4E8 /* libswscale.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8E075B1222ABF4540059E4E8 /* libswscale.a */; };
+		8E075B1F22ABF8680059E4E8 /* XDemux.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E075B1B22ABF8680059E4E8 /* XDemux.m */; };
+		8E075B2022ABF8680059E4E8 /* XDecode.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E075B1C22ABF8680059E4E8 /* XDecode.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,27 +55,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		251309EE22855CFA00611CD8 /* 521.flv */ = {isa = PBXFileReference; lastKnownFileType = file; path = 521.flv; sourceTree = "<group>"; };
-		251309F42285717F00611CD8 /* DecodeObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DecodeObject.h; sourceTree = "<group>"; };
-		251309F52285717F00611CD8 /* DecodeObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DecodeObject.m; sourceTree = "<group>"; };
-		251309F72285791A00611CD8 /* destinationfile.flv */ = {isa = PBXFileReference; lastKnownFileType = file; path = destinationfile.flv; sourceTree = "<group>"; };
-		25957AA72269A59E002532C0 /* XDecode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XDecode.h; sourceTree = "<group>"; };
-		25957AA82269A59E002532C0 /* XDecode.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XDecode.m; sourceTree = "<group>"; };
 		25AA5B592269ADCC0007DCA8 /* testVideo-1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "testVideo-1.mp4"; sourceTree = "<group>"; };
-		25AA5B5B2269B0370007DCA8 /* PlayView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlayView.h; sourceTree = "<group>"; };
-		25AA5B5C2269B0370007DCA8 /* PlayView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PlayView.m; sourceTree = "<group>"; };
-		25AA5B5E2269B45F0007DCA8 /* shader.vsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader.vsh; sourceTree = "<group>"; };
-		25AA5B602269B4750007DCA8 /* shader.fsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader.fsh; sourceTree = "<group>"; };
 		25AA5B622269BDE70007DCA8 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		25AA5B642269BDEF0007DCA8 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		25AA5B662269BE010007DCA8 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		25AA5B692269C8090007DCA8 /* ShaderProgram.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderProgram.h; sourceTree = "<group>"; };
-		25AA5B6A2269C8090007DCA8 /* ShaderProgram.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ShaderProgram.m; sourceTree = "<group>"; };
 		25B4306622702B4E00761798 /* for_test.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = for_test.jpg; sourceTree = "<group>"; };
-		25B4306822702CC200761798 /* RootViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
-		25B4306922702CC200761798 /* RootViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
-		25BBCFE02269D734006B7C09 /* VideoWidgt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VideoWidgt.h; sourceTree = "<group>"; };
-		25BBCFE12269D734006B7C09 /* VideoWidgt.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VideoWidgt.m; sourceTree = "<group>"; };
 		25E1C4FD2269929A00EDCDAE /* BLPlayerItem.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BLPlayerItem.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		25E1C5002269929A00EDCDAE /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		25E1C5012269929A00EDCDAE /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -114,8 +89,17 @@
 		25E1C5472269930900EDCDAE /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		25E1C5492269931300EDCDAE /* VideoToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VideoToolbox.framework; path = System/Library/Frameworks/VideoToolbox.framework; sourceTree = SDKROOT; };
 		25E1C54B2269931B00EDCDAE /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
-		25E1C5572269994B00EDCDAE /* XDemux.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XDemux.h; sourceTree = "<group>"; };
-		25E1C5582269994B00EDCDAE /* XDemux.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XDemux.m; sourceTree = "<group>"; };
+		8E075B0C22ABF4540059E4E8 /* libavfilter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavfilter.a; path = "BLPlayerItem/FFmpeg-iOS/lib/libavfilter.a"; sourceTree = "<group>"; };
+		8E075B0D22ABF4540059E4E8 /* libswresample.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libswresample.a; path = "BLPlayerItem/FFmpeg-iOS/lib/libswresample.a"; sourceTree = "<group>"; };
+		8E075B0E22ABF4540059E4E8 /* libavcodec.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavcodec.a; path = "BLPlayerItem/FFmpeg-iOS/lib/libavcodec.a"; sourceTree = "<group>"; };
+		8E075B0F22ABF4540059E4E8 /* libavutil.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavutil.a; path = "BLPlayerItem/FFmpeg-iOS/lib/libavutil.a"; sourceTree = "<group>"; };
+		8E075B1022ABF4540059E4E8 /* libavdevice.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavdevice.a; path = "BLPlayerItem/FFmpeg-iOS/lib/libavdevice.a"; sourceTree = "<group>"; };
+		8E075B1122ABF4540059E4E8 /* libavformat.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavformat.a; path = "BLPlayerItem/FFmpeg-iOS/lib/libavformat.a"; sourceTree = "<group>"; };
+		8E075B1222ABF4540059E4E8 /* libswscale.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libswscale.a; path = "BLPlayerItem/FFmpeg-iOS/lib/libswscale.a"; sourceTree = "<group>"; };
+		8E075B1B22ABF8680059E4E8 /* XDemux.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XDemux.m; sourceTree = "<group>"; };
+		8E075B1C22ABF8680059E4E8 /* XDecode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XDecode.m; sourceTree = "<group>"; };
+		8E075B1D22ABF8680059E4E8 /* XDemux.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XDemux.h; sourceTree = "<group>"; };
+		8E075B1E22ABF8680059E4E8 /* XDecode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XDecode.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -123,6 +107,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8E075B1322ABF4540059E4E8 /* libavfilter.a in Frameworks */,
+				8E075B1422ABF4540059E4E8 /* libswresample.a in Frameworks */,
+				8E075B1522ABF4540059E4E8 /* libavcodec.a in Frameworks */,
+				8E075B1622ABF4540059E4E8 /* libavutil.a in Frameworks */,
+				8E075B1722ABF4540059E4E8 /* libavdevice.a in Frameworks */,
+				8E075B1822ABF4540059E4E8 /* libavformat.a in Frameworks */,
+				8E075B1922ABF4540059E4E8 /* libswscale.a in Frameworks */,
 				25AA5B672269BE010007DCA8 /* CoreGraphics.framework in Frameworks */,
 				25AA5B652269BDF00007DCA8 /* OpenGLES.framework in Frameworks */,
 				25AA5B632269BDE70007DCA8 /* GLKit.framework in Frameworks */,
@@ -132,13 +123,6 @@
 				25E1C546226992FA00EDCDAE /* libiconv.tbd in Frameworks */,
 				25E1C544226992F100EDCDAE /* libbz2.tbd in Frameworks */,
 				25E1C542226992E600EDCDAE /* libz.tbd in Frameworks */,
-				25E1C53A226992CC00EDCDAE /* libavformat.a in Frameworks */,
-				25E1C53B226992CC00EDCDAE /* libswresample.a in Frameworks */,
-				25E1C53C226992CC00EDCDAE /* libswscale.a in Frameworks */,
-				25E1C53D226992CC00EDCDAE /* libavfilter.a in Frameworks */,
-				25E1C53E226992CC00EDCDAE /* libavutil.a in Frameworks */,
-				25E1C53F226992CC00EDCDAE /* libavcodec.a in Frameworks */,
-				25E1C540226992CC00EDCDAE /* libavdevice.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -183,35 +167,18 @@
 		25E1C4FF2269929A00EDCDAE /* BLPlayerItem */ = {
 			isa = PBXGroup;
 			children = (
-				251309EE22855CFA00611CD8 /* 521.flv */,
-				251309F72285791A00611CD8 /* destinationfile.flv */,
+				8E075B1A22ABF8680059E4E8 /* encode */,
 				25AA5B592269ADCC0007DCA8 /* testVideo-1.mp4 */,
 				25E1C5002269929A00EDCDAE /* AppDelegate.h */,
 				25E1C5012269929A00EDCDAE /* AppDelegate.m */,
 				25E1C5032269929A00EDCDAE /* ViewController.h */,
 				25E1C5042269929A00EDCDAE /* ViewController.m */,
-				25957AA72269A59E002532C0 /* XDecode.h */,
-				25957AA82269A59E002532C0 /* XDecode.m */,
-				25E1C5572269994B00EDCDAE /* XDemux.h */,
-				25E1C5582269994B00EDCDAE /* XDemux.m */,
-				25AA5B692269C8090007DCA8 /* ShaderProgram.h */,
-				25AA5B6A2269C8090007DCA8 /* ShaderProgram.m */,
-				25BBCFE02269D734006B7C09 /* VideoWidgt.h */,
-				25BBCFE12269D734006B7C09 /* VideoWidgt.m */,
-				25AA5B5B2269B0370007DCA8 /* PlayView.h */,
-				25AA5B5C2269B0370007DCA8 /* PlayView.m */,
-				25AA5B5E2269B45F0007DCA8 /* shader.vsh */,
-				25AA5B602269B4750007DCA8 /* shader.fsh */,
 				25E1C5062269929A00EDCDAE /* Main.storyboard */,
 				25B4306622702B4E00761798 /* for_test.jpg */,
 				25E1C5092269929D00EDCDAE /* Assets.xcassets */,
 				25E1C50B2269929D00EDCDAE /* LaunchScreen.storyboard */,
 				25E1C50E2269929D00EDCDAE /* Info.plist */,
 				25E1C50F2269929D00EDCDAE /* main.m */,
-				25B4306822702CC200761798 /* RootViewController.h */,
-				25B4306922702CC200761798 /* RootViewController.m */,
-				251309F42285717F00611CD8 /* DecodeObject.h */,
-				251309F52285717F00611CD8 /* DecodeObject.m */,
 			);
 			path = BLPlayerItem;
 			sourceTree = "<group>";
@@ -237,6 +204,13 @@
 		25E1C532226992CB00EDCDAE /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				8E075B0E22ABF4540059E4E8 /* libavcodec.a */,
+				8E075B1022ABF4540059E4E8 /* libavdevice.a */,
+				8E075B0C22ABF4540059E4E8 /* libavfilter.a */,
+				8E075B1122ABF4540059E4E8 /* libavformat.a */,
+				8E075B0F22ABF4540059E4E8 /* libavutil.a */,
+				8E075B0D22ABF4540059E4E8 /* libswresample.a */,
+				8E075B1222ABF4540059E4E8 /* libswscale.a */,
 				25AA5B662269BE010007DCA8 /* CoreGraphics.framework */,
 				25AA5B642269BDEF0007DCA8 /* OpenGLES.framework */,
 				25AA5B622269BDE70007DCA8 /* GLKit.framework */,
@@ -255,6 +229,17 @@
 				25E1C535226992CC00EDCDAE /* libswscale.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		8E075B1A22ABF8680059E4E8 /* encode */ = {
+			isa = PBXGroup;
+			children = (
+				8E075B1D22ABF8680059E4E8 /* XDemux.h */,
+				8E075B1B22ABF8680059E4E8 /* XDemux.m */,
+				8E075B1E22ABF8680059E4E8 /* XDecode.h */,
+				8E075B1C22ABF8680059E4E8 /* XDecode.m */,
+			);
+			path = encode;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -362,11 +347,7 @@
 			files = (
 				25B4306722702B4E00761798 /* for_test.jpg in Resources */,
 				25E1C50D2269929D00EDCDAE /* LaunchScreen.storyboard in Resources */,
-				25AA5B612269B4750007DCA8 /* shader.fsh in Resources */,
-				251309F82285791A00611CD8 /* destinationfile.flv in Resources */,
-				25AA5B5F2269B45F0007DCA8 /* shader.vsh in Resources */,
 				25E1C50A2269929D00EDCDAE /* Assets.xcassets in Resources */,
-				251309EF22855CFA00611CD8 /* 521.flv in Resources */,
 				25E1C5082269929A00EDCDAE /* Main.storyboard in Resources */,
 				25AA5B5A2269ADCD0007DCA8 /* testVideo-1.mp4 in Resources */,
 			);
@@ -395,13 +376,8 @@
 			files = (
 				25E1C5052269929A00EDCDAE /* ViewController.m in Sources */,
 				25E1C5102269929D00EDCDAE /* main.m in Sources */,
-				25E1C5592269994B00EDCDAE /* XDemux.m in Sources */,
-				25AA5B6B2269C8090007DCA8 /* ShaderProgram.m in Sources */,
-				25957AA92269A59E002532C0 /* XDecode.m in Sources */,
-				25B4306A22702CC200761798 /* RootViewController.m in Sources */,
-				25BBCFE22269D734006B7C09 /* VideoWidgt.m in Sources */,
-				25AA5B5D2269B0370007DCA8 /* PlayView.m in Sources */,
-				251309F62285717F00611CD8 /* DecodeObject.m in Sources */,
+				8E075B1F22ABF8680059E4E8 /* XDemux.m in Sources */,
+				8E075B2022ABF8680059E4E8 /* XDecode.m in Sources */,
 				25E1C5022269929A00EDCDAE /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -575,14 +551,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = ME92NL5RP7;
-				HEADER_SEARCH_PATHS = "/Users/luowailin/Documents/Code/ffmpegDemo/FFmpeg-iOS/include";
+				ENABLE_BITCODE = NO;
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/BLPlayerItem/FFmpeg-iOS/include";
 				INFOPLIST_FILE = BLPlayerItem/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = "/Users/luowailin/Documents/Code/ffmpegDemo/FFmpeg-iOS/lib";
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/BLPlayerItem/FFmpeg-iOS/lib";
 				PRODUCT_BUNDLE_IDENTIFIER = bee2c.com.BLPlayerItem;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = 1;
@@ -595,14 +572,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = ME92NL5RP7;
-				HEADER_SEARCH_PATHS = "/Users/luowailin/Documents/Code/ffmpegDemo/FFmpeg-iOS/include";
+				ENABLE_BITCODE = NO;
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/BLPlayerItem/FFmpeg-iOS/include";
 				INFOPLIST_FILE = BLPlayerItem/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = "/Users/luowailin/Documents/Code/ffmpegDemo/FFmpeg-iOS/lib";
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/BLPlayerItem/FFmpeg-iOS/lib";
 				PRODUCT_BUNDLE_IDENTIFIER = bee2c.com.BLPlayerItem;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = 1;

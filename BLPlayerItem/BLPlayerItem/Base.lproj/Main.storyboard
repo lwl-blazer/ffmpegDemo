@@ -14,92 +14,16 @@
         <scene sceneID="tne-QT-ifu">
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="ViewController" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC" customClass="GLKView">
                         <rect key="frame" x="0.0" y="0.0" width="896" height="414"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jx1-Tn-zYe">
-                                <rect key="frame" x="44" y="0.0" width="808" height="43"/>
-                                <subviews>
-                                    <textField opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="http://vfx.mtime.cn/Video/2019/04/10/mp4/190410081607863991.mp4" borderStyle="roundedRect" placeholder="输入地址" textAlignment="center" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="EsG-tz-Zgv">
-                                        <rect key="frame" x="52" y="8" width="566" height="30"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <nil key="textColor"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                        <textInputTraits key="textInputTraits"/>
-                                    </textField>
-                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gBM-iq-8HK">
-                                        <rect key="frame" x="653" y="8" width="81" height="30"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <fontDescription key="fontDescription" type="system" weight="medium" pointSize="15"/>
-                                        <state key="normal" title="Run"/>
-                                        <connections>
-                                            <action selector="runButtonAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="5u5-u5-1hV"/>
-                                        </connections>
-                                    </button>
-                                </subviews>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="43" id="QG1-iH-23w"/>
-                                </constraints>
-                            </view>
-                        </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        <constraints>
-                            <constraint firstItem="jx1-Tn-zYe" firstAttribute="leading" secondItem="b36-ET-7kl" secondAttribute="leading" id="0Lf-P4-vq2"/>
-                            <constraint firstItem="b36-ET-7kl" firstAttribute="trailing" secondItem="jx1-Tn-zYe" secondAttribute="trailing" id="PMK-M4-poO"/>
-                            <constraint firstItem="jx1-Tn-zYe" firstAttribute="top" secondItem="b36-ET-7kl" secondAttribute="top" id="Uhv-j4-Kcx"/>
-                        </constraints>
                         <viewLayoutGuide key="safeArea" id="b36-ET-7kl"/>
                     </view>
-                    <connections>
-                        <outlet property="urlField" destination="EsG-tz-Zgv" id="FnW-Vx-u1P"/>
-                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="89.732142857142847" y="111.59420289855073"/>
-        </scene>
-        <!--Root View Controller-->
-        <scene sceneID="If8-4m-yPn">
-            <objects>
-                <viewController id="5XG-rp-Vwj" customClass="RootViewController" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="W9k-xG-ed2" customClass="GLKView">
-                        <rect key="frame" x="0.0" y="0.0" width="896" height="414"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="请输入文件地址/URL地址" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="kcq-ea-JgW">
-                                <rect key="frame" x="158" y="9" width="581" height="30"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="30" id="UJM-DK-LU6"/>
-                                </constraints>
-                                <nil key="textColor"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits"/>
-                            </textField>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="82j-pF-ziV">
-                                <rect key="frame" x="753" y="9" width="79" height="30"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="30" id="Jw6-gw-Ufn"/>
-                                    <constraint firstAttribute="width" constant="79" id="dYw-R9-7Qy"/>
-                                </constraints>
-                                <state key="normal" title="RUN"/>
-                            </button>
-                        </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <constraints>
-                            <constraint firstItem="vRB-lL-Dj2" firstAttribute="trailing" secondItem="82j-pF-ziV" secondAttribute="trailing" constant="20" id="K6B-d3-Gyv"/>
-                            <constraint firstItem="82j-pF-ziV" firstAttribute="leading" secondItem="kcq-ea-JgW" secondAttribute="trailing" constant="14" id="LvR-SZ-ee4"/>
-                            <constraint firstItem="kcq-ea-JgW" firstAttribute="leading" secondItem="vRB-lL-Dj2" secondAttribute="leading" constant="114" id="QZT-QI-moo"/>
-                            <constraint firstItem="kcq-ea-JgW" firstAttribute="top" secondItem="vRB-lL-Dj2" secondAttribute="top" constant="9" id="aYm-Kq-usg"/>
-                            <constraint firstItem="82j-pF-ziV" firstAttribute="top" secondItem="vRB-lL-Dj2" secondAttribute="top" constant="9" id="wwf-qD-D3i"/>
-                        </constraints>
-                        <viewLayoutGuide key="safeArea" id="vRB-lL-Dj2"/>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="hBO-YE-txg" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="99.776785714285708" y="889.85507246376824"/>
         </scene>
     </scenes>
 </document>
