@@ -503,6 +503,7 @@
 				DEVELOPMENT_TEAM = ME92NL5RP7;
 				HEADER_SEARCH_PATHS = "/Users/luowailin/Documents/Code/ffmpegDemo/FFmpeg-iOS/include";
 				INFOPLIST_FILE = FFmpegDecoder/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -522,6 +523,7 @@
 				DEVELOPMENT_TEAM = ME92NL5RP7;
 				HEADER_SEARCH_PATHS = "/Users/luowailin/Documents/Code/ffmpegDemo/FFmpeg-iOS/include";
 				INFOPLIST_FILE = FFmpegDecoder/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
