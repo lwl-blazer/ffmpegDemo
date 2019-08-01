@@ -8,6 +8,7 @@
 
 #include "accompany_decoder.hpp"
 
+
 #define LOG_TAG "AccompanyDecoder"
 
 AccompanyDecoder::AccompanyDecoder(){
