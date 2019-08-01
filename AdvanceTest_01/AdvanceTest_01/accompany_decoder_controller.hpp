@@ -10,5 +10,32 @@
 #define accompany_decoder_controller_hpp
 
 #include <stdio.h>
+#include <unistd.h>
+#include "accompany_decoder.hpp"
+
+#define CHANNEL_PER_FRAME 2
+#define BITS_PER_CHANNEL 16
+#define BITS_PER_BYTE 8
+
+#define QUEUE_SIZE_MAX_THRESHOLD 25
+#define QUEUE_SIZE_MIN_THRESHOLD 20
+
+class AccompanyDecoderController{
+protected:
+    FILE *pcmFile;
+    
+    AccompanyDecoder *accompanyDecoder;
+    
+    int accompanySampleRate;
+    int accompanyPacketBufferSize;
+    
+public:
+    AccompanyDecoderController();
+    ~AccompanyDecoderController();
+    
+    void Init(const char *accompanyPath, const char *pcmFilePath);
+    void Decode();
+    void Destroy();
+};
 
 #endif /* accompany_decoder_controller_hpp */

@@ -29,6 +29,7 @@ int Mp3Encoder::Init(const char *pcmFilePath, const char *mp3FilePath, int sampl
             lame_set_out_samplerate(lameClient, sampleRate);
             
             lame_set_num_channels(lameClient, channels);
+            //bitRate-比特率 单位是bps 声音中的比特率是指将模拟声音信号转换成数字声音信号后，单位时间内的二进制数据量是间接衡量音频质量的一个指标。
             lame_set_brate(lameClient, bitRate/1000);
             
             lame_init_params(lameClient);
@@ -42,9 +43,9 @@ int Mp3Encoder::Init(const char *pcmFilePath, const char *mp3FilePath, int sampl
 void Mp3Encoder::Encode(){
     //每次读取bufferSize大小
     int bufferSize = 1024 * 256;
-    short *buffer = new short(bufferSize/2);
-    short *leftBuffer  = new short(bufferSize/4);
-    short *rightBuffer = new short(bufferSize/4);
+    short *buffer = new short[bufferSize/2];
+    short *leftBuffer  = new short[bufferSize/4];
+    short *rightBuffer = new short[bufferSize/4];
     
     unsigned char *mp3_buffer = new unsigned char[bufferSize];
     size_t readBufferSize = 0;
@@ -62,8 +63,8 @@ void Mp3Encoder::Encode(){
         
         //送入编码器进行编码
         size_t wroteSize = lame_encode_buffer(lameClient,
-                                              leftBuffer,
-                                              rightBuffer,
+                                              (short int *)leftBuffer,
+                                              (short int *)rightBuffer,
                                               (int)(readBufferSize/2),
                                               mp3_buffer,
                                               bufferSize);
@@ -71,9 +72,9 @@ void Mp3Encoder::Encode(){
         fwrite(mp3_buffer, 1, wroteSize, mp3File);
     }
     
-    delete buffer;
-    delete leftBuffer;
-    delete rightBuffer;
+    delete[] buffer;
+    delete[] leftBuffer;
+    delete[] rightBuffer;
     delete[] mp3_buffer;
 }
 
