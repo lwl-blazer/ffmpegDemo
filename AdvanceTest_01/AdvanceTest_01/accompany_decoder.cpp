@@ -234,6 +234,7 @@ void AccompanyDecoder::seek_frame(){
     seek_success_read_frame_success = false;
 }
 
+//解码
 int AccompanyDecoder::readFrame(){
     if (seek_req) {
         this->seek_frame();
@@ -244,12 +245,12 @@ int AccompanyDecoder::readFrame(){
     int readFrameCode = -1;
     while (true) {
         readFrameCode = av_read_frame(avFormatContext, &packet);
-        if (readFrameCode >= 0) {
+        if (readFrameCode >= 0) { //read frame success
             if (packet.stream_index == stream_index) {
                 int len = avcodec_decode_audio4(avCodecContext,
                                                 pAudioFrame,
                                                 &gotframe,
-                                                &packet);
+                                                &packet); //解码--解码出原始数据
                 if (len < 0) {
                     LOGI("decode audio error, skip packet");
                 }
@@ -259,6 +260,7 @@ int AccompanyDecoder::readFrame(){
                     void *audioData;
                     if (swrContext) {
                         const int ratio = 2;
+                        //此函数用于音频，计算编码每一帧给编码器需要多少字节，然后我们自己再分配空间，填充到初始化AVFrame中
                         const int bufSize = av_samples_get_buffer_size(nullptr,
                                                                        numChannels,
                                                                        pAudioFrame->nb_samples * ratio,
@@ -269,17 +271,18 @@ int AccompanyDecoder::readFrame(){
                             swrBuffer = realloc(swrBuffer, swrBufferSize);
                         }
                         byte *outbuf[2] = {(byte *)swrBuffer, nullptr};
+                        //numFrames 返回每个通道输出的样本数
                         numFrames = swr_convert(swrContext,
-                                                outbuf,
-                                                pAudioFrame->nb_samples *ratio,
-                                                (const uint8_t **)pAudioFrame->data,
-                                                pAudioFrame->nb_samples);
+                                                outbuf,   //输出的
+                                                pAudioFrame->nb_samples *ratio,    //输出的数量
+                                                (const uint8_t **)pAudioFrame->data, //输入的
+                                                pAudioFrame->nb_samples);  //输入的数量
                         if (numFrames < 0) {
                             LOGI("fail resample audio");
                             ret = -1;
                             break;
                         }
-                        
+                        //得到重采样的数据
                         audioData = swrBuffer;
                     } else {
                         if (avCodecContext->sample_fmt != AV_SAMPLE_FMT_S16) {

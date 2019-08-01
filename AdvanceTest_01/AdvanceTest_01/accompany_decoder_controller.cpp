@@ -20,14 +20,16 @@ AccompanyDecoderController::~AccompanyDecoderController(){
 }
 
 void AccompanyDecoderController::Init(const char *accompanyPath, const char *pcmFilePath){
-    AccompanyDecoder *tempDecoder = new AccompanyDecoder();
     int accompanyMetaData[2];
+    //用一个临时的获取meta data
+    AccompanyDecoder *tempDecoder = new AccompanyDecoder();
     tempDecoder->getMusicMeta(accompanyPath, accompanyMetaData);
     delete tempDecoder;
     
-    accompanySampleRate = accompanyMetaData[0];
+    
+    accompanySampleRate = accompanyMetaData[0]; //采样率
     int accompanyByteCountPerSec = accompanySampleRate * CHANNEL_PER_FRAME * BITS_PER_CHANNEL / BITS_PER_BYTE;
-    accompanyPacketBufferSize = (int)((accompanyByteCountPerSec / 2) * 0.2);
+    accompanyPacketBufferSize = (int)((accompanyByteCountPerSec / 2) * 0.2); //每次写入文件的大小 也是packet的size
     accompanyDecoder = new AccompanyDecoder();
     accompanyDecoder->init(accompanyPath, accompanyPacketBufferSize);
     pcmFile = fopen(pcmFilePath, "wb+");
@@ -40,9 +42,10 @@ void AccompanyDecoderController::Decode(){
             break;
         }
         
-        fwrite(accompanyPacket->buffer,
-               sizeof(short),
-               accompanyPacket->size, pcmFile);
+        fwrite(accompanyPacket->buffer, //要被写入的指针
+               sizeof(short),  //每次写的字节大小
+               accompanyPacket->size, //总共写多少字节大小
+               pcmFile); //写入的地方--输出流
     }
 }
 

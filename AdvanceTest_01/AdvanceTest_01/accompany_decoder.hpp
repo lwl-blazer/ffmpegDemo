@@ -148,7 +148,6 @@ public:
 
 #endif /* accompany_decoder_hpp */
 
-
 /** 术语
  * 容器/文件 Container/File  即特定格式的多媒体文件，比如MP4,flv,mov...
  *
@@ -168,5 +167,6 @@ public:
  *
  * AVPacket AVFrame 对于编解码器或者解码器的输入输出部分，也就是压缩数据以及原始数据的抽象
  *
- * 上面是FFmpeg的层次， 除了编解码外，对于音视频的处理肯定是针对于原始数据的处理，也就是AVFrame的处理 
+ * 上面是FFmpeg的层次， 除了编解码外，对于音视频的处理肯定是针对于原始数据的处理，也就是AVFrame的处理
+ *
  */
