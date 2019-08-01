@@ -247,14 +247,17 @@ int AccompanyDecoder::readFrame(){
         readFrameCode = av_read_frame(avFormatContext, &packet);
         if (readFrameCode >= 0) { //read frame success
             if (packet.stream_index == stream_index) {
-                int len = avcodec_decode_audio4(avCodecContext,
+                int len = avcodec_send_packet(avCodecContext, &packet);
+                /*int len = avcodec_decode_audio4(avCodecContext,
                                                 pAudioFrame,
                                                 &gotframe,
-                                                &packet); //解码--解码出原始数据
+                                                &packet);*/ //解码--解码出原始数据
                 if (len < 0) {
                     LOGI("decode audio error, skip packet");
                 }
-                if (gotframe) {
+                //avcodec_send_packet avcodec_receive_frame 配套出现
+                gotframe = avcodec_receive_frame(avCodecContext, pAudioFrame);
+                if (gotframe == 0) {
                     int numChannels = OUT_PUT_CHANNELS;
                     int numFrames = 0;
                     void *audioData;
@@ -296,14 +299,16 @@ int AccompanyDecoder::readFrame(){
                     
                     if (isNeedFirstFrameCorrectFlag && position >= 0) {
                         float expectedPosition = position + duration;
-                        float actualPosition = av_frame_get_best_effort_timestamp(pAudioFrame) * timeBase;
-                        
+                        //float actualPosition = av_frame_get_best_effort_timestamp(pAudioFrame) * timeBase;
+                        float actualPosition = pAudioFrame->best_effort_timestamp * timeBase;
                         firstFrameCorrectionInSecs = actualPosition - expectedPosition;
                         isNeedFirstFrameCorrectFlag = false;
                     }
                     
-                    duration = av_frame_get_pkt_duration(pAudioFrame) * timeBase;
-                    position = av_frame_get_best_effort_timestamp(pAudioFrame) * timeBase - firstFrameCorrectionInSecs;
+//                    duration = av_frame_get_pkt_duration(pAudioFrame) * timeBase;
+//                    position = av_frame_get_best_effort_timestamp(pAudioFrame) * timeBase - firstFrameCorrectionInSecs;
+                    duration = pAudioFrame->pkt_duration * timeBase;
+                    position = pAudioFrame->best_effort_timestamp * timeBase - firstFrameCorrectionInSecs;
                     
                     if (!seek_success_read_frame_success) {
                         LOGI("position is %.6f", position);

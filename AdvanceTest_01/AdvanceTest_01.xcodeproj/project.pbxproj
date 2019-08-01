@@ -19,6 +19,7 @@
 		25A79AD322F297CD00D3ED8F /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 25A79AD222F297CD00D3ED8F /* libiconv.tbd */; };
 		25A79AD522F297E000D3ED8F /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25A79AD422F297DF00D3ED8F /* CoreMedia.framework */; };
 		25A79AD722F2991E00D3ED8F /* 131.aac in Resources */ = {isa = PBXBuildFile; fileRef = 25A79AD622F2991E00D3ED8F /* 131.aac */; };
+		25A79ADC22F2D9CA00D3ED8F /* testDecoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25A79ADA22F2D9CA00D3ED8F /* testDecoder.cpp */; };
 		25ABC6E522F17EE700ED88D0 /* CommonUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 25ABC6E422F17EE700ED88D0 /* CommonUtil.m */; };
 		25ABC6ED22F18FCA00ED88D0 /* libavdevice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 25ABC6E622F18FCA00ED88D0 /* libavdevice.a */; };
 		25ABC6EE22F18FCA00ED88D0 /* libavutil.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 25ABC6E722F18FCA00ED88D0 /* libavutil.a */; };
@@ -72,6 +73,8 @@
 		25A79AD422F297DF00D3ED8F /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		25A79AD622F2991E00D3ED8F /* 131.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = 131.aac; sourceTree = "<group>"; };
 		25A79AD822F2C26100D3ED8F /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		25A79ADA22F2D9CA00D3ED8F /* testDecoder.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = testDecoder.cpp; sourceTree = "<group>"; };
+		25A79ADB22F2D9CA00D3ED8F /* testDecoder.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = testDecoder.hpp; sourceTree = "<group>"; };
 		25ABC6E322F17EE700ED88D0 /* CommonUtil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CommonUtil.h; sourceTree = "<group>"; };
 		25ABC6E422F17EE700ED88D0 /* CommonUtil.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CommonUtil.m; sourceTree = "<group>"; };
 		25ABC6E622F18FCA00ED88D0 /* libavdevice.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavdevice.a; path = "../FFmpeg-iOS/lib/libavdevice.a"; sourceTree = "<group>"; };
@@ -208,6 +211,8 @@
 				25A79AC322F2749C00D3ED8F /* accompany_decoder.hpp */,
 				25A79AC522F274CF00D3ED8F /* accompany_decoder_controller.cpp */,
 				25A79AC622F274CF00D3ED8F /* accompany_decoder_controller.hpp */,
+				25A79ADA22F2D9CA00D3ED8F /* testDecoder.cpp */,
+				25A79ADB22F2D9CA00D3ED8F /* testDecoder.hpp */,
 			);
 			path = AdvanceTest_01;
 			sourceTree = "<group>";
@@ -368,6 +373,7 @@
 				25BB94BD22EEEFE500A63950 /* ViewController.mm in Sources */,
 				25BB94C822EEEFE900A63950 /* main.m in Sources */,
 				25BB94BA22EEEFE500A63950 /* AppDelegate.m in Sources */,
+				25A79ADC22F2D9CA00D3ED8F /* testDecoder.cpp in Sources */,
 				25BB94EC22EEF23200A63950 /* Mp3Encoder.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
