@@ -10,6 +10,7 @@
 #import "CommonUtil.h"
 #import "Mp3Encoder.hpp"
 #import "accompany_decoder_controller.hpp"
+#import "testDecoder.hpp"
 
 @interface ViewController ()
 @property (weak, nonatomic) IBOutlet UILabel *pathLabel;
@@ -55,8 +56,17 @@
 }
 
 - (IBAction)aac2pcmAction:(id)sender {
+    NSLog(@"decode Test...");
+    const char* mp3FilePath = [[CommonUtil bundlePath:@"131" type:@"aac"] cStringUsingEncoding:NSUTF8StringEncoding];
+    const char *pcmFilePath = [[CommonUtil documentsPath:@"131.pcm"] cStringUsingEncoding:NSUTF8StringEncoding];
+    printf("%s\n", pcmFilePath);
     
-    
+    DecoderAction *action = new DecoderAction();
+    action->Init(mp3FilePath, pcmFilePath);
+    action->decodePacket();
+    action->destroy();
+    delete action;
+    NSLog(@"After decode Test...");
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{

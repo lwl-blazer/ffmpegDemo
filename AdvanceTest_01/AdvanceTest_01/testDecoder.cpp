@@ -7,6 +7,7 @@
 //
 
 #include "testDecoder.hpp"
+#define byte uint8_t
 
 DecoderAction::DecoderAction(){
 
@@ -27,8 +28,9 @@ int DecoderAction::Init(const char *filePath, const char *pcmFilePath) {
     avformat_network_init();
     avFormatContext = avformat_alloc_context();
 
-    fopen(pcmFilePath, "wb+");
+    pcmFile = fopen(pcmFilePath, "wb+");
     
+#pragma mark -- 解复用
     int result = avformat_open_input(&avFormatContext,
                                      filePath,
                                      nullptr,
@@ -47,6 +49,7 @@ int DecoderAction::Init(const char *filePath, const char *pcmFilePath) {
         return -1;
     }
     
+    av_dump_format(avFormatContext, 0, pcmFilePath, 0);
     
     stream_index = av_find_best_stream(avFormatContext,
                                        AVMEDIA_TYPE_AUDIO,
@@ -86,7 +89,6 @@ int DecoderAction::Init(const char *filePath, const char *pcmFilePath) {
     }
     
     if (!audioCodecIsSupported()) {
-        
         swrContext = swr_alloc_set_opts(nullptr,
                                         av_get_default_channel_layout(2),
                                         AV_SAMPLE_FMT_S16,
@@ -110,11 +112,9 @@ int DecoderAction::Init(const char *filePath, const char *pcmFilePath) {
 }
 
 bool DecoderAction::audioCodecIsSupported(){
-    
-    if (avCodecContext->sample_fmt == AV_SAMPLE_FMT_S16) {
+    if (avCodecContext->sample_fmt == AV_SAMPLE_FMT_S16) { //采样格式
         return true;
     }
-    
     return false;
 }
 
@@ -130,7 +130,7 @@ void DecoderAction::decodePacket(){
         if (stereoSampleSize <= 0) {
             break;
         }
-        fwrite(nullptr, sizeof(short), stereoSampleSize, pcmFile);
+        fwrite(samples, sizeof(short), stereoSampleSize, pcmFile);
     }
 }
 
@@ -193,17 +193,41 @@ int DecoderAction::readFrame(){
                         
                         uint8_t *outbuf[2] = {(uint8_t *)swrBuffer, nullptr};
                         numFrames = swr_convert(swrContext,
-                                                outbuf,
-                                                pAudioFrame->nb_samples * ratio,
-                                                (const uint8_t *)pAudioFrame->data,
-                                                pAudioFrame->nb_samples);
+                                                outbuf,   //输出的
+                                                pAudioFrame->nb_samples *ratio,    //输出的数量
+                                                (const uint8_t **)pAudioFrame->data, //输入的
+                                                pAudioFrame->nb_samples);  //输入的数量
                         
-                        
+                        if (numFrames < 0) {
+                            printf("fail resample audio\n");
+                            ret = -1;
+                            break;
+                        }
+                        audioData = swrBuffer;
+                    } else {
+                        if (avCodecContext->sample_fmt == AV_SAMPLE_FMT_S16) {
+                            printf("bucheck, audio format is invalid\n");
+                            ret = -1;
+                            break;
+                        }
+                        audioData = pAudioFrame->data[0];
+                        numFrames = pAudioFrame->nb_samples;
                     }
+                    
+                    audioBufferSize = numFrames * numChannels;
+                    audioBuffer = (short *)audioData;
+                    audioBufferCursor = 0;
+                    break;
                 }
             }
+        } else {
+            ret = -1;
+            break;
         }
     }
+    
+    av_packet_unref(&packet);
+    return ret;
 }
 
 

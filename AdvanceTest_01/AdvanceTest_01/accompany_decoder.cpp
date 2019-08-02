@@ -69,7 +69,7 @@ int AccompanyDecoder::init(const char *fileString){
         memset(accompanyFilePath, 0, length + 1);
         memcpy(accompanyFilePath, fileString, length + 1);
     }
-    
+#pragma mark -- 解复用
     int result = avformat_open_input(&avFormatContext,
                                      fileString,
                                      nullptr, nullptr);
@@ -128,7 +128,8 @@ int AccompanyDecoder::init(const char *fileString){
     
     if (!audioCodecIsSupported()) {
         LOGI("because of audio Codec Is Not Supported so we will init swresampler...");
-        
+        /** 重采样 * 改变音频的采样率、sample rate、声道数等参数,使之按照我们期望的参数输出 */
+        //分配SwrContext并设置/重置常用的参数
         swrContext = swr_alloc_set_opts(nullptr,
                                         av_get_default_channel_layout(OUT_PUT_CHANNELS),
                                         AV_SAMPLE_FMT_S16,
@@ -138,7 +139,7 @@ int AccompanyDecoder::init(const char *fileString){
                                         avCodecContext->sample_rate,
                                         0,
                                         nullptr);
-        if (!swrContext || swr_init(swrContext)) {
+        if (!swrContext || swr_init(swrContext)) { //swr_init() 当设置好相关的参数后，初始化SwrContext结构体
             if (swrContext) {
                 swr_free(&swrContext);
             }
@@ -195,7 +196,6 @@ int AccompanyDecoder::readSamples(short *samples, int size){
             }
         }
     }
-    
     int fillSize = sampleSize - size;
     if (fillSize == 0) {
         return -1;
@@ -274,7 +274,7 @@ int AccompanyDecoder::readFrame(){
                             swrBuffer = realloc(swrBuffer, swrBufferSize);
                         }
                         byte *outbuf[2] = {(byte *)swrBuffer, nullptr};
-                        //numFrames 返回每个通道输出的样本数
+                        //numFrames 返回每个通道输出的样本数   按照swrContext设置的参数进行转换并输出
                         numFrames = swr_convert(swrContext,
                                                 outbuf,   //输出的
                                                 pAudioFrame->nb_samples *ratio,    //输出的数量
