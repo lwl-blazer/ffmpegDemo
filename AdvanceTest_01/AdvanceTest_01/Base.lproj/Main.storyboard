@@ -35,9 +35,9 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wpm-vt-yJB">
-                                <rect key="frame" x="115" y="332" width="144" height="30"/>
+                                <rect key="frame" x="117" y="332" width="143" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="AAC convert PCM"/>
+                                <state key="normal" title="AAC decode-to PCM"/>
                                 <connections>
                                     <action selector="aac2pcmAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="fpW-lf-Jpu"/>
                                 </connections>

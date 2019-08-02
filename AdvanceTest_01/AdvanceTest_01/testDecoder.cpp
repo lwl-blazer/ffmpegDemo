@@ -158,7 +158,6 @@ int DecoderAction::readSamples(short *samples, int size){
     if (fillSize == 0) {
         return -1;
     }
-    printf("filleSize:%d------------\n", fillSize);
     return fillSize;
 }
 
@@ -173,14 +172,14 @@ int DecoderAction::readFrame(){
 #pragma mark 获取流
         readFrameCode = av_read_frame(avFormatContext, &packet);
         if (readFrameCode >= 0) {
+#pragma mark 读取数据包
             if (packet.stream_index == stream_index) {
                 int len = avcodec_send_packet(avCodecContext, &packet);
                 if (len < 0) {
                     printf("skip packet\n");
                 }
-#pragma mark 读取数据包
                 gotframe = avcodec_receive_frame(avCodecContext, pAudioFrame);
-                if (gotframe == 0) {
+                if (gotframe == 0) { //每次解一帧数据 得到的是裸数据 pAudioFrame是保存的音频裸数据
                     int numChannels = 2;
                     int numFrames = 0;
                     void *audioData;
@@ -224,7 +223,7 @@ int DecoderAction::readFrame(){
                     audioBufferSize = numFrames * numChannels;
                     audioBuffer = (short *)audioData;
                     audioBufferCursor = 0;
-                    break;
+                    break; //每次解一帧数据
                 }
             }
         } else {
@@ -232,7 +231,6 @@ int DecoderAction::readFrame(){
             break;
         }
     }
-    
     av_packet_unref(&packet);
     return ret;
 }

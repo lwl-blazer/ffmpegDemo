@@ -244,7 +244,7 @@ int AccompanyDecoder::readFrame(){
     int gotframe = 0;
     int readFrameCode = -1;
     while (true) {
-        readFrameCode = av_read_frame(avFormatContext, &packet);
+        readFrameCode = av_read_frame(avFormatContext, &packet);  //得到的是AVPacket   对于音频流，一个AVPacket可能包含多个AVFrame,但是对于视频流一个AVPacket只包含一个AVFrame
         if (readFrameCode >= 0) { //read frame success
             if (packet.stream_index == stream_index) {
                 int len = avcodec_send_packet(avCodecContext, &packet);

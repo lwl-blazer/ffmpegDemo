@@ -76,7 +76,7 @@
 		25A79ADA22F2D9CA00D3ED8F /* testDecoder.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = testDecoder.cpp; sourceTree = "<group>"; };
 		25A79ADB22F2D9CA00D3ED8F /* testDecoder.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = testDecoder.hpp; sourceTree = "<group>"; };
 		25ABC6E322F17EE700ED88D0 /* CommonUtil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CommonUtil.h; sourceTree = "<group>"; };
-		25ABC6E422F17EE700ED88D0 /* CommonUtil.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CommonUtil.m; sourceTree = "<group>"; };
+		25ABC6E422F17EE700ED88D0 /* CommonUtil.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CommonUtil.m; path = ../../AUPlayer/AUPlayer/CommonUtil.m; sourceTree = "<group>"; };
 		25ABC6E622F18FCA00ED88D0 /* libavdevice.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavdevice.a; path = "../FFmpeg-iOS/lib/libavdevice.a"; sourceTree = "<group>"; };
 		25ABC6E722F18FCA00ED88D0 /* libavutil.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavutil.a; path = "../FFmpeg-iOS/lib/libavutil.a"; sourceTree = "<group>"; };
 		25ABC6E822F18FCA00ED88D0 /* libswresample.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libswresample.a; path = "../FFmpeg-iOS/lib/libswresample.a"; sourceTree = "<group>"; };
