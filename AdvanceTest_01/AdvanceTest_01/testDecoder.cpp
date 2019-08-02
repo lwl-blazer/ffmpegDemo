@@ -120,6 +120,7 @@ bool DecoderAction::audioCodecIsSupported(){
 
 void DecoderAction::decodePacket(){
     
+    //每次写入多少字节放入文件中
     int accompanySampleRate = avCodecContext->sample_rate;
     int accompanyByteCountPerSec = accompanySampleRate * 2 * 16 / 8;
     int packetBufferSize = (int)((accompanyByteCountPerSec / 2) * 0.2);
@@ -137,15 +138,16 @@ void DecoderAction::decodePacket(){
 
 int DecoderAction::readSamples(short *samples, int size){
     int sampleSize = size;
+    //这个while循环是要达到一次要写入多少字节到文件中去，如果达到了，就进行一次写入
     while (size) {
-        if (audioBufferCursor < audioBufferSize) {
+        if (audioBufferCursor < audioBufferSize) { //直接把数据写入文件中
             int audioBufferDataSize = audioBufferSize - audioBufferCursor;
-            int copySize = MIN(size, audioBufferDataSize);
+            int copySize = MIN(size, audioBufferDataSize); //保证把一次获取出来的数据全部写入完整
             
             memcpy(samples + (sampleSize - size), audioBuffer + audioBufferCursor, copySize * 2);
             size -= copySize;
             audioBufferCursor += copySize;
-        } else {
+        } else { //读取数据
             if (readFrame() < 0) {
                 break;
             }
@@ -156,8 +158,10 @@ int DecoderAction::readSamples(short *samples, int size){
     if (fillSize == 0) {
         return -1;
     }
+    printf("filleSize:%d------------\n", fillSize);
     return fillSize;
 }
+
 
 int DecoderAction::readFrame(){
     int ret = 1;
@@ -166,6 +170,7 @@ int DecoderAction::readFrame(){
     int readFrameCode = -1;
 
     while (true) {
+#pragma mark 获取流
         readFrameCode = av_read_frame(avFormatContext, &packet);
         if (readFrameCode >= 0) {
             if (packet.stream_index == stream_index) {
@@ -173,6 +178,7 @@ int DecoderAction::readFrame(){
                 if (len < 0) {
                     printf("skip packet\n");
                 }
+#pragma mark 读取数据包
                 gotframe = avcodec_receive_frame(avCodecContext, pAudioFrame);
                 if (gotframe == 0) {
                     int numChannels = 2;
@@ -180,6 +186,7 @@ int DecoderAction::readFrame(){
                     void *audioData;
                     if (swrContext) {
                         const int ratio = 2;
+                        //获取bufferSize就是要让swrBuffer有足够的存储空间，如果没有这个判断 这里会溢出
                         const int bufSize = av_samples_get_buffer_size(nullptr,
                                                                        numChannels,
                                                                        pAudioFrame->nb_samples * ratio,
@@ -230,7 +237,7 @@ int DecoderAction::readFrame(){
     return ret;
 }
 
-
+#pragma mark 释放资源
 void DecoderAction::destroy(){
     
     if (swrBuffer != nullptr) {

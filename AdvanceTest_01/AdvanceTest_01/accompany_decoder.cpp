@@ -100,7 +100,7 @@ int AccompanyDecoder::init(const char *fileString){
     }
     
     AVStream *audioStream = avFormatContext->streams[stream_index];
-    if (audioStream->time_base.den && audioStream->time_base.num) {
+    if (audioStream->time_base.den && audioStream->time_base.num) { //时间基
         timeBase = av_q2d(audioStream->time_base);
     }
     
