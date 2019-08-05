@@ -63,6 +63,15 @@
     }
 }
 
+/**
+ * Audio Unit的构建
+ *
+ * 首先构建AudioUnit描述的结构体
+ * 然后再使用这个描述的结构体 构建真正的AudioUnit
+ * 构建的方式有两种：
+ * 1.直接使用AudioUnit裸的创建方式
+ * 2.使用AUGraph和AUNode(其实一个AUNode就是对AudioUnit的封装，可以理解为一个AudioUnit的Wrapper)来构建
+ */
 - (void)initializePlayGraph{
     OSStatus status = noErr;
     //1构造AUGraph
@@ -146,17 +155,17 @@
     stereoStreamFormat.mSampleRate = 48000.0;
     status = AudioUnitSetProperty(mPlayerIOUnit,
                                   kAudioUnitProperty_StreamFormat,
-                                  kAudioUnitScope_Output,
-                                  1,
+                                  kAudioUnitScope_Output,  //scope 主要使用kAudioUnitScope_Input 和输出kAudioUnitScope_Output
+                                  1,     //而在Element,Input用“1”表示，Output用“0”表示
                                   &stereoStreamFormat,
-                                  sizeof(stereoStreamFormat));
+                                  sizeof(stereoStreamFormat));  //AudioUnit实际上就是一个AudioComponentInstance实例对象，一个AudioUnit由Scope(范围)和Element(元素)组成，实际开发中主要涉及的是输入输出的问题
     CheckStatus(status, @"set remote IO output element stream format", YES);
-    status = AudioUnitSetProperty(mPlayerUnit,
+    status = AudioUnitSetProperty(mPlayerUnit,    //属性名称
                                   kAudioUnitProperty_StreamFormat,
-                                  kAudioUnitScope_Output,
-                                  0,
-                                  &stereoStreamFormat,
-                                  sizeof(stereoStreamFormat));
+                                  kAudioUnitScope_Output,  //AudioUnit的Scope 主要用于输入输出范围
+                                  0,    //AudioUnit的Element主要用1输入总线(bus), 0输出总线(bus)
+                                  &stereoStreamFormat,    //输入值
+                                  sizeof(stereoStreamFormat));   //输入值的长度
     CheckStatus(status, @"Could not set StreamFormat for player Unit", YES);
     
     //5-2 配置Spliter的属性
@@ -223,7 +232,7 @@
     
     [self setInputSource:NO];
     
-    //6连接起来Node
+    //6连接起来Node    AUGraphConnectNodeInput 将一个节点的输出连接到另一个节点的输入
     status = AUGraphConnectNodeInput(mPlayerGraph, mPlayerNode, 0, mSplitterNode, 0);
     CheckStatus(status, @"Player node connect To IONode", YES);
     status = AUGraphConnectNodeInput(mPlayerGraph, mSplitterNode, 0, mVocalMixerNode, 0);
@@ -246,8 +255,10 @@
     [self setupFilePlayer];
 }
 
+//调整音量
 - (void)setInputSource:(BOOL)isAcc{
     OSStatus status;
+    
     AudioUnitParameterValue value;
     status = AudioUnitGetParameter(mVocalMixerUnit,
                                    kMultiChannelMixerParam_Volume,
@@ -274,32 +285,34 @@
     NSLog(@"Acc Mixer 1 %f", value);
     
     if (isAcc) {
+        NSLog(@"---1");
         status = AudioUnitSetParameter(mAccMixerUnit,
                                        kMultiChannelMixerParam_Volume,
                                        kAudioUnitScope_Input,
-                                       0,
+                                       0, //输出
                                        0.1,
                                        0);
         CheckStatus(status, @"set parameter fail", YES);
         status = AudioUnitSetParameter(mAccMixerUnit,
                                        kMultiChannelMixerParam_Volume,
                                        kAudioUnitScope_Input,
-                                       1,
+                                       1,  //输入
                                        1,
                                        0);
         CheckStatus(status, @"set parameter fail", YES);
     } else{
+        NSLog(@"---0");
         status = AudioUnitSetParameter(mAccMixerUnit,
                                        kMultiChannelMixerParam_Volume,
                                        kAudioUnitScope_Input,
-                                       0,
+                                       0,  //输出
                                        1,
                                        0);
         CheckStatus(status, @"set parameter fail", YES);
         status = AudioUnitSetParameter(mAccMixerUnit,
                                        kMultiChannelMixerParam_Volume,
                                        kAudioUnitScope_Input,
-                                       1,
+                                       1, //输入
                                        0.1,
                                        0);
         CheckStatus(status, @"set parameter fail", YES);

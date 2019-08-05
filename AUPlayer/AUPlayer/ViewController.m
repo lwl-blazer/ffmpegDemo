@@ -52,7 +52,6 @@
 
     NSLog(@"stop music ...");
     [graphPlayer stop];
-    
 }
 
 @end

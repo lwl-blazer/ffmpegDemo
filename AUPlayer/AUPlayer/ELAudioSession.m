@@ -34,6 +34,7 @@ const NSTimeInterval AUSAudioSessionLatency_LowLatency = 0.0058;
     return self;
 }
 
+//设置以何种方式使用音频硬件做哪些处理
 - (void)setCategory:(NSString *)category{
     _category = category;
     
@@ -47,12 +48,14 @@ const NSTimeInterval AUSAudioSessionLatency_LowLatency = 0.0058;
 - (void)setActive:(BOOL)active{
     _active = active;
     
+    //设置采样频率、让硬件设置按照设置的采样频率来采集或者播放音频
     NSError *error = nil;
     if (![self.audioSession setPreferredSampleRate:self.perferredSampleRate
                                              error:&error]) {
         NSLog(@"Error when setting sample rate on audio session: %@", error.localizedDescription);
     }
     
+    //当设置完毕所有的参数之后就可以激活AudioSession
     if (![self.audioSession setActive:active
                                 error:&error]) {
         NSLog(@"Error when setting active state of audio session:%@", error.localizedDescription);
@@ -61,6 +64,7 @@ const NSTimeInterval AUSAudioSessionLatency_LowLatency = 0.0058;
     _currentSampleRate = [self.audioSession sampleRate];
 }
 
+//设置I/O的Buffer,Buffer越小则说明延迟越低
 - (void)setPreferredLatency:(NSTimeInterval)preferredLatency{
     _preferredLatency = preferredLatency;
     NSError *error = nil;
