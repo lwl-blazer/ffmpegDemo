@@ -296,12 +296,12 @@ const float SMAudioIOBufferDurationSmall = 0.0058f;
 
 @end
 
-static OSStatus InputRenderCallback(void *inRefCon,
-                                    AudioUnitRenderActionFlags *ioActionFlags,
-                                    const AudioTimeStamp *inTimeStamp,
-                                    UInt32 inBusNumber,
-                                    UInt32 inNumberFrames,
-                                    AudioBufferList *ioData){
+OSStatus InputRenderCallBack(void *inRefCon,
+                             AudioUnitRenderActionFlags *ioActionFlags,
+                             const AudioTimeStamp *inTimeStamp,
+                             UInt32 inBusNumber,
+                             UInt32 inNumberFrames,
+                             AudioBufferList *ioData){
     AudioOutput *audioOutput = (__bridge id)inRefCon;
     return [audioOutput renderData:ioData
                        atTimeStamp:inTimeStamp

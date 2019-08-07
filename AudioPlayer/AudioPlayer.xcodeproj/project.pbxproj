@@ -30,10 +30,14 @@
 		25D30F9022F8092300449B1E /* libavfilter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 25D30F8922F8092300449B1E /* libavfilter.a */; };
 		25D30F9122F8092300449B1E /* libavformat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 25D30F8A22F8092300449B1E /* libavformat.a */; };
 		25D30F9422F809A600449B1E /* CommonUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 25D30F9322F809A600449B1E /* CommonUtil.m */; };
-		25D30F9722F809C100449B1E /* AudioPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 25D30F9622F809C100449B1E /* AudioPlayer.m */; };
+		25D30F9722F809C100449B1E /* AudioPlayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 25D30F9622F809C100449B1E /* AudioPlayer.mm */; };
 		25D30F9A22F80A2F00449B1E /* AudioOutput.m in Sources */ = {isa = PBXBuildFile; fileRef = 25D30F9922F80A2F00449B1E /* AudioOutput.m */; };
 		25D30F9F22F80BFC00449B1E /* ELAudioSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 25D30F9C22F80BFC00449B1E /* ELAudioSession.m */; };
 		25D30FA022F80BFC00449B1E /* AVAudioSession+RouteUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 25D30F9E22F80BFC00449B1E /* AVAudioSession+RouteUtils.m */; };
+		25D30FA522F8210800449B1E /* accompany_decoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25D30FA222F8210800449B1E /* accompany_decoder.cpp */; };
+		25D30FA622F8210800449B1E /* accompany_decoder_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25D30FA422F8210800449B1E /* accompany_decoder_controller.cpp */; };
+		25D30FA922F8234A00449B1E /* packet_queue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25D30FA722F8234A00449B1E /* packet_queue.cpp */; };
+		25D30FAC22F8245200449B1E /* packet_pool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25D30FAA22F8245200449B1E /* packet_pool.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -87,13 +91,21 @@
 		25D30F9222F809A600449B1E /* CommonUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CommonUtil.h; path = ../../AdvanceTest_01/AdvanceTest_01/CommonUtil.h; sourceTree = "<group>"; };
 		25D30F9322F809A600449B1E /* CommonUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CommonUtil.m; path = ../../AUPlayer/AUPlayer/CommonUtil.m; sourceTree = "<group>"; };
 		25D30F9522F809C100449B1E /* AudioPlayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AudioPlayer.h; sourceTree = "<group>"; };
-		25D30F9622F809C100449B1E /* AudioPlayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioPlayer.m; sourceTree = "<group>"; };
+		25D30F9622F809C100449B1E /* AudioPlayer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AudioPlayer.mm; sourceTree = "<group>"; };
 		25D30F9822F80A2F00449B1E /* AudioOutput.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AudioOutput.h; sourceTree = "<group>"; };
 		25D30F9922F80A2F00449B1E /* AudioOutput.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioOutput.m; sourceTree = "<group>"; };
 		25D30F9B22F80BFC00449B1E /* AVAudioSession+RouteUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "AVAudioSession+RouteUtils.h"; path = "../../AUPlayer/AUPlayer/AVAudioSession+RouteUtils.h"; sourceTree = "<group>"; };
 		25D30F9C22F80BFC00449B1E /* ELAudioSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ELAudioSession.m; path = ../../AUPlayer/AUPlayer/ELAudioSession.m; sourceTree = "<group>"; };
 		25D30F9D22F80BFC00449B1E /* ELAudioSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ELAudioSession.h; path = ../../AUPlayer/AUPlayer/ELAudioSession.h; sourceTree = "<group>"; };
 		25D30F9E22F80BFC00449B1E /* AVAudioSession+RouteUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "AVAudioSession+RouteUtils.m"; path = "../../AUPlayer/AUPlayer/AVAudioSession+RouteUtils.m"; sourceTree = "<group>"; };
+		25D30FA122F8210800449B1E /* accompany_decoder.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = accompany_decoder.hpp; path = ../../AdvanceTest_01/AdvanceTest_01/accompany_decoder.hpp; sourceTree = "<group>"; };
+		25D30FA222F8210800449B1E /* accompany_decoder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = accompany_decoder.cpp; path = ../../AdvanceTest_01/AdvanceTest_01/accompany_decoder.cpp; sourceTree = "<group>"; };
+		25D30FA322F8210800449B1E /* accompany_decoder_controller.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = accompany_decoder_controller.hpp; path = ../../AdvanceTest_01/AdvanceTest_01/accompany_decoder_controller.hpp; sourceTree = "<group>"; };
+		25D30FA422F8210800449B1E /* accompany_decoder_controller.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = accompany_decoder_controller.cpp; path = ../../AdvanceTest_01/AdvanceTest_01/accompany_decoder_controller.cpp; sourceTree = "<group>"; };
+		25D30FA722F8234A00449B1E /* packet_queue.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = packet_queue.cpp; sourceTree = "<group>"; };
+		25D30FA822F8234A00449B1E /* packet_queue.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = packet_queue.hpp; sourceTree = "<group>"; };
+		25D30FAA22F8245200449B1E /* packet_pool.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = packet_pool.cpp; sourceTree = "<group>"; };
+		25D30FAB22F8245200449B1E /* packet_pool.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = packet_pool.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -165,10 +177,18 @@
 				25D30F9E22F80BFC00449B1E /* AVAudioSession+RouteUtils.m */,
 				25D30F9D22F80BFC00449B1E /* ELAudioSession.h */,
 				25D30F9C22F80BFC00449B1E /* ELAudioSession.m */,
+				25D30FA422F8210800449B1E /* accompany_decoder_controller.cpp */,
+				25D30FA322F8210800449B1E /* accompany_decoder_controller.hpp */,
+				25D30FA222F8210800449B1E /* accompany_decoder.cpp */,
+				25D30FA122F8210800449B1E /* accompany_decoder.hpp */,
+				25D30FA722F8234A00449B1E /* packet_queue.cpp */,
+				25D30FA822F8234A00449B1E /* packet_queue.hpp */,
+				25D30FAA22F8245200449B1E /* packet_pool.cpp */,
+				25D30FAB22F8245200449B1E /* packet_pool.hpp */,
 				25D30F9822F80A2F00449B1E /* AudioOutput.h */,
 				25D30F9922F80A2F00449B1E /* AudioOutput.m */,
 				25D30F9522F809C100449B1E /* AudioPlayer.h */,
-				25D30F9622F809C100449B1E /* AudioPlayer.m */,
+				25D30F9622F809C100449B1E /* AudioPlayer.mm */,
 				25D30F4322F8087200449B1E /* AppDelegate.h */,
 				25D30F4422F8087200449B1E /* AppDelegate.m */,
 				25D30F4622F8087200449B1E /* ViewController.h */,
@@ -351,10 +371,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				25D30FA622F8210800449B1E /* accompany_decoder_controller.cpp in Sources */,
+				25D30FAC22F8245200449B1E /* packet_pool.cpp in Sources */,
+				25D30FA522F8210800449B1E /* accompany_decoder.cpp in Sources */,
 				25D30F4822F8087200449B1E /* ViewController.m in Sources */,
 				25D30F9A22F80A2F00449B1E /* AudioOutput.m in Sources */,
 				25D30F5322F8087500449B1E /* main.m in Sources */,
-				25D30F9722F809C100449B1E /* AudioPlayer.m in Sources */,
+				25D30F9722F809C100449B1E /* AudioPlayer.mm in Sources */,
+				25D30FA922F8234A00449B1E /* packet_queue.cpp in Sources */,
 				25D30F9422F809A600449B1E /* CommonUtil.m in Sources */,
 				25D30F9F22F80BFC00449B1E /* ELAudioSession.m in Sources */,
 				25D30FA022F80BFC00449B1E /* AVAudioSession+RouteUtils.m in Sources */,
