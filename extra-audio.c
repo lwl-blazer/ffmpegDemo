@@ -89,7 +89,7 @@ int main(int argc, char *argv[]){
     }
     
     av_dump_format(fmt_ctx, 0, src_filename, 0);
-    
+/*    
     frame = av_frame_alloc();
     if(!frame) {
         av_log(NULL, AV_LOG_DEBUG, "Could not allocate frame\n");
@@ -121,7 +121,8 @@ int main(int argc, char *argv[]){
         }
         av_packet_unref(&pkt);
     }
-    
+    */
+
     avformat_close_input(&fmt_ctx);
     if (dst_fd) {
         fclose(dst_fd);
