@@ -1,4 +1,4 @@
-#include <stdio.h>
+include <stdio.h>
 #include <libavutil/log.h>
 #include <libavformat/avio.h>
 #include <libavformat/avformat.h>
