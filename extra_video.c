@@ -25,9 +25,11 @@ static int alloc_and_copy(AVPacket *out,
                           const uint8_t *in,
                           uint32_t in_size) {
     uint32_t offset = out->size;
+    //SPS和PPS的startCode是00 00 00 01  非SPS和PPS的startCode是00 00 01
     uint8_t nal_header_size = offset ? 3 : 4;
     int err;
     
+    //av_grow_packet增大数组缓存空间  就是扩容的意思
     err = av_grow_packet(out, sps_pps_size + in_size + nal_header_size);
     if (err < 0) {
         return err;
@@ -60,7 +62,7 @@ int h264_extradata_to_annexb(const uint8_t *codec_extradata, const int codec_ext
     sps_offset = pps_offset = -1;
  
     /**retrieve sps and pps unit(s)*/
-    unit_nb = *extradata++ & 0x1f; /** number of sps unit(s)*/
+    unit_nb = *extradata++ & 0x1f; /** number of sps unit(s) 查看有多少个sps和pps 一般情况下只有一个*/
     if (!unit_nb) {
         goto pps;
     }else {
@@ -132,7 +134,6 @@ int h264_mp4toannexb(AVFormatContext *fmt_ctx, AVPacket *in, FILE *dst_fd){
     int buf_size;
     int ret = 0, i;
     
-    
     out = av_packet_alloc();
     
     buf = in->data;
@@ -145,24 +146,34 @@ int h264_mp4toannexb(AVFormatContext *fmt_ctx, AVPacket *in, FILE *dst_fd){
             goto fail;
         }
         
+        //AVPacket的前4个字节 算出的是nalu的长度  因为AVPacket内可能有一帧也可能有多帧
         for(nal_size = 0, i = 0; i < 4; i ++) {
-            nal_size = (nal_size << 8) | buf[i];
+            nal_size = (nal_size << 8) | buf[i]; //<<8 低地址32位的高位  高地址实际上是32位的低位
         }
         
         buf += 4;
-        unit_type = *buf & 0x1f;
+        //第一个字节的后五位是type
+        unit_type = *buf & 0x1f;  //NAL Header中的第5个字节表示type   0x1f取出后5位
         
         if (nal_size > buf_end - buf || nal_size < 0) {
             goto fail;
         }
  
         /**prepend only to the first type 5 NAL unit of an IDR picture, if no sps/pps are already present*/
+        /**IDR
+         * 一个序列的第一个图像叫做IDR图像(立即刷新图像) IDR图像都是I帧图像
+         * I和IDR帧都使用帧内预测，I帧不用参考任何帧，但是之后的P帧和B帧是有可能参考这个I帧之前的帧的。IDR不允许
+         *
+         * IDR的核心作用:
+         * H.264引入IDR图像是为了解码的重同步，当解码器解码到IDR图像时，立即将将参考帧队列清空，将已解码的数据全部输出或抛弃。重新查找参数集，开始一个新的序列。这样，如果前一个序列出现重大错误，在这里可以获得重新同步的机会。IDR图像之后的图像永远不会使用IDR之前的图像的数据来解码
+         */
         if (unit_type == 5) {
+            //sps pps
             h264_extradata_to_annexb(fmt_ctx->streams[in->stream_index]->codec->extradata,
                                      fmt_ctx->streams[in->stream_index]->codec->extradata_size,
                                      &spspps_pkt,
                                      AV_INPUT_BUFFER_PADDING_SIZE);
-            
+            //startcode
             if ((ret = alloc_and_copy(out,
                                       spspps_pkt.data,
                                       spspps_pkt.size,
@@ -170,7 +181,7 @@ int h264_mp4toannexb(AVFormatContext *fmt_ctx, AVPacket *in, FILE *dst_fd){
                                       nal_size)) < 0) {
                 goto fail;
             }
-        }else {
+        }else { //非关建帧
                 if ((ret = alloc_and_copy(out, NULL, 0, buf, nal_size)) < 0) {
                     goto fail;
                 }
