@@ -329,6 +329,7 @@ int AccompanyDecoder::readFrame(){
             break;
         }
     }
+
     av_packet_unref(&packet);
     return ret;
 }

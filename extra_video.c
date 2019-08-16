@@ -2,6 +2,7 @@
 #include <libavutil/log.h>
 #include <libavformat/avio.h>
 #include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
 
 #ifndef AV_WB32
 #   define AV_WB32(p, val) do {                 \
@@ -50,6 +51,28 @@ static int alloc_and_copy(AVPacket *out,
     return 0;
 }
 
+/** SPS PPS
+ * 正常SPS和PPS包含在FLV的AVCDecoderConfigurationRecord结构中，而AVCDecoderConfigurationRecord就是经过FFmpeg分析后，就是AVCodecContext里面的extradata
+ 
+ *
+ * 处理SPS-PPS
+ * 第一种方法:
+ * h264_extradata_to_annexb
+    从AVPacket中的extra_data 获取并组装
+    添加startCode
+ * 第二种方法:  在新的FFmpeg中不建议使用会造成内存漏的问题
+    AVBitStreamFilterContext *h264bsfc = av_bitstream_filter_init("h264_mp4toannexb");  //定义放在循环外面
+    av_bitstream_filter_filter(h264bsfc, fmt_ctx->streams[in->stream_index]->codec, NULL, &spspps_pkt.data, &spspps_pkt.size, in->data, in->size, 0);  //解析sps pps
+ 
+ * 第三种方法 新版FFmpeg中使用
+     AVBitStreamFilter和AVBSFContext
+      如方法 bl_decode
+ *
+ *
+ * 为什么需要处理sps和pps startCode,其实是因为H.264有两种封装格式
+ * 1.Annexb模式 传统模式 有startCode SPS和PPS是在ES中   这种一般都是网络比特流
+ * 2.MP4模式  一般mp4 mkv会有，没有startcode SPS和PPS以及其它信息被封装在container中，每一个frame前面是这个frame的长度。很多解码器只支持Annexb这种模式，因为需要将MP4做转换  用于保存文件
+ */
 int h264_extradata_to_annexb(const uint8_t *codec_extradata, const int codec_extradata_size, AVPacket *out_extradata, int padding){
     uint16_t unit_size;
     uint64_t total_size = 0;
@@ -140,6 +163,8 @@ int h264_mp4toannexb(AVFormatContext *fmt_ctx, AVPacket *in, FILE *dst_fd){
     buf_size = in->size;
     buf_end = in->data + in->size;
     
+    AVBitStreamFilterContext *h264bsfc = av_bitstream_filter_init("h264_mp4toannexb");
+    
     do {
         ret = AVERROR(EINVAL);
         if (buf + 4 > buf_end) { //越界
@@ -168,11 +193,14 @@ int h264_mp4toannexb(AVFormatContext *fmt_ctx, AVPacket *in, FILE *dst_fd){
          * H.264引入IDR图像是为了解码的重同步，当解码器解码到IDR图像时，立即将将参考帧队列清空，将已解码的数据全部输出或抛弃。重新查找参数集，开始一个新的序列。这样，如果前一个序列出现重大错误，在这里可以获得重新同步的机会。IDR图像之后的图像永远不会使用IDR之前的图像的数据来解码
          */
         if (unit_type == 5) {
+            
+            
             //sps pps
-            h264_extradata_to_annexb(fmt_ctx->streams[in->stream_index]->codec->extradata,
+            /*h264_extradata_to_annexb(fmt_ctx->streams[in->stream_index]->codec->extradata,
                                      fmt_ctx->streams[in->stream_index]->codec->extradata_size,
                                      &spspps_pkt,
-                                     AV_INPUT_BUFFER_PADDING_SIZE);
+                                     AV_INPUT_BUFFER_PADDING_SIZE);*/
+            av_bitstream_filter_filter(h264bsfc, fmt_ctx->streams[in->stream_index]->codec, NULL, &spspps_pkt.data, &spspps_pkt.size, in->data, in->size, 0);
             //startcode
             if ((ret = alloc_and_copy(out,
                                       spspps_pkt.data,
@@ -203,6 +231,47 @@ fail:
     av_packet_free(&out);
     return ret;
 }
+
+
+int bl_decode(AVFormatContext *fmt_ctx, AVPacket *in, FILE *dst_fd){
+    int len = 0;
+    
+    const AVBitStreamFilter *absFilter = av_bsf_get_by_name("h264_mp4toannexb");
+    AVBSFContext *absCtx = NULL;
+    AVCodecParameters *codecpar = NULL;
+    
+    av_bsf_alloc(absFilter, &absCtx);
+    
+    if (fmt_ctx->streams[in->stream_index]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+        codecpar = fmt_ctx->streams[in->stream_index]->codecpar;
+    } else {
+        return -1;
+    }
+    
+    avcodec_parameters_copy(absCtx->par_in, codecpar);
+    
+    av_bsf_init(absCtx);
+    
+    if (av_bsf_send_packet(absCtx, in) != 0) {
+        av_bsf_free(&absCtx);
+        absCtx = NULL;
+        return -1;
+    }
+    
+    while (av_bsf_receive_packet(absCtx, in) == 0) {
+        len = fwrite(in->data, 1, in->size, dst_fd);
+        if (len != in->size) {
+            av_log(NULL, AV_LOG_DEBUG, "warning,length of writed data isn't equal pkt.size(%d,%d)\n", len,
+                   in->size);
+        }
+        fflush(dst_fd);
+    }
+    av_bsf_free(&absCtx);
+    absCtx = NULL;
+    return 0;
+}
+
+
 
 
 int main(int argc, char *argv[]){
@@ -269,7 +338,8 @@ int main(int argc, char *argv[]){
     /**read frames from media file*/
     while (av_read_frame(fmt_ctx, &pkt) >= 0) {
         if (pkt.stream_index == video_stream_index) {
-            h264_mp4toannexb(fmt_ctx, &pkt, dst_fd);
+           // h264_mp4toannexb(fmt_ctx, &pkt, dst_fd);
+            bl_decode(fmt_ctx, &pkt, dst_fd);
         }
         av_packet_unref(&pkt);
     }
