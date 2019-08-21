@@ -42,17 +42,18 @@ public:
     virtual void abortDecoderAccompanyPacketQueue();
     virtual void destoryDecoderAccompanyPacketQueue();
     virtual int getDecoderAccompanyPacket(AudioPacket **audioPacket, bool block);
-    virtual void pushDecoderAccompanyPacketToQueue(AudioPacket *adioPacket);
+    virtual void pushDecoderAccompanyPacketToQueue(AudioPacket *audioPacket);
     virtual void clearDecoderAccompanyPacketToQueue();
-    virtual int geDecoderAccompanyPacketQueueSize();
+    virtual int getDecoderAccompanyPacketQueueSize();
     
     //解码出来的原唱的queue的所有操作
     virtual void initDecoderOriginalSongPacketQueue();
-    virtual void abortDecodeOriginalSongPacketQueue();
+    virtual void abortDecoderOriginalSongPacketQueue();
     virtual void destoryDecoderOringalSongPacketQueue();
-    virtual void getDecoderOriginalSongPacket(AudioPacket **audioPacket, bool block);
+    virtual int getDecoderOriginalSongPacket(AudioPacket **audioPacket, bool block);
     virtual void pushDecoderOriginalSongPacketToQueue(AudioPacket *audioPacket);
-    virtual void clearDecoderOriginalSongPacketQueueSize();
+    virtual void clearDecoderOriginalSongPacketQueue();
+    virtual int getDecoderOriginalSongPacketQueueSize();
     
     //人声的packet queue的操作
     virtual void initAudioPacketQueue();
@@ -84,7 +85,7 @@ public:
     virtual void initLiveSubscriberPacketQueue();
     virtual void abortLiveSubscriberPacketQueue();
     virtual void destoryLiveSubscriberPacketQueue();
-    virtual void getLiveSubscriberPacket(AudioPacket **livePacket, bool block);
+    virtual int getLiveSubscriberPacket(AudioPacket **livePacket, bool block);
     virtual void pushLiveSubscriberPacketToQueue(AudioPacket *livePacket);
     virtual int getLiveSubscriberPacketQueueSize();
     
@@ -92,8 +93,8 @@ public:
     virtual void initTuningPacketQueue();
     virtual void abortTuningPacketQueue();
     virtual void destoryTuningPacketQueue();
-    virtual int getTuningPacket(AudioPacket **livePacket, bool block);
-    virtual void pushTuningPacketToQueue(AudioPacket *livePacket);
+    virtual int getTuningPacket(AudioPacket **tuningPacket, bool block);
+    virtual void pushTuningPacketToQueue(AudioPacket *tuningPacket);
     virtual int getTuningPacketQueueSize();
     
 };

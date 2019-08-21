@@ -23,7 +23,8 @@
     self = [super init];
     if (self) {
         _decoderController = new AccompanyDecoderController();
-        
+        _decoderController->Init([filePath cStringUsingEncoding:NSUTF8StringEncoding],
+                                 <#const char *pcmFilePath#>)
     }
     return self;
 }
