@@ -8,7 +8,6 @@
 
 #include "accompany_decoder.hpp"
 
-
 #define LOG_TAG "AccompanyDecoder"
 
 AccompanyDecoder::AccompanyDecoder(){
@@ -60,6 +59,7 @@ int AccompanyDecoder::init(const char *fileString){
     
     avformat_network_init();
     avFormatContext = avformat_alloc_context();
+    //打开输入文件
     LOGI("open accompany file %s..", fileString);
     
     if (accompanyFilePath == nullptr) {
@@ -79,12 +79,15 @@ int AccompanyDecoder::init(const char *fileString){
     } else {
         LOGI("open file %s success and result is %d", fileString, result);
     }
+    avFormatContext->max_analyze_duration = 50000;
     
+    //检查在文件中的流的信息
     if (avformat_find_stream_info(avFormatContext, NULL) < 0) {
         LOGI("Couldn't find stream information");
         return -1;
+    } else {
+        LOGI("sucess avformat_find_stream_info result is %d", result);
     }
-    
     
     stream_index = av_find_best_stream(avFormatContext,
                                        AVMEDIA_TYPE_AUDIO,
@@ -92,31 +95,35 @@ int AccompanyDecoder::init(const char *fileString){
                                        -1,
                                        nullptr,
                                        0);
-    if (stream_index == -1) {
+    if (stream_index == -1) { //没有音频
         LOGI("no audio stream");
         return -1;
     } else {
         LOGI("stream index is %d", stream_index);
     }
     
+    //音频流
     AVStream *audioStream = avFormatContext->streams[stream_index];
-
     if (audioStream->time_base.den && audioStream->time_base.num) { //时间基
+        timeBase = av_q2d(audioStream->time_base);
+    } else if (audioStream->time_base.den && audioStream->time_base.num) {
         timeBase = av_q2d(audioStream->time_base);
     }
     
+    //获取音频流解码器上下文
     //avCodecContext = audioStream->codec;
     avCodecContext = avcodec_alloc_context3(nullptr);
     avcodec_parameters_to_context(avCodecContext, audioStream->codecpar);
     
     LOGI("avCodecContext->codec_id is %d AV_CODEC_ID_AAC is %d", avCodecContext->codec_id, AV_CODEC_ID_AAC);
-    
+    //根据解码器上下文找到解码器
     AVCodec *avCodec = avcodec_find_decoder(avCodecContext->codec_id);
     if (avCodec == nullptr) {
         LOGI("unsupported codec");
         return -1;
     }
     
+    //打开解码器
     result = avcodec_open2(avCodecContext,
                            avCodec,
                            nullptr);
@@ -127,6 +134,7 @@ int AccompanyDecoder::init(const char *fileString){
         LOGI("sucess avformat_find_stream_info result is %d", result);
     }
     
+    //判断是否需要resampler
     if (!audioCodecIsSupported()) {
         LOGI("because of audio Codec Is Not Supported so we will init swresampler...");
         /** 重采样 * 改变音频的采样率、sample rate、声道数等参数,使之按照我们期望的参数输出 */
@@ -167,8 +175,10 @@ AudioPacket* AccompanyDecoder::decodePacket(){
     int stereoSampleSize = readSamples(samples, packetBufferSize);
     AudioPacket *samplePacket = new AudioPacket();
     if (stereoSampleSize > 0) {
+        //构造成一个packet
         samplePacket->buffer = samples;
         samplePacket->size = stereoSampleSize;
+        /**这里由于每一个paceket的大小不一样有可能是200ms 但是这样子position就有可能不准确了*/
         samplePacket->position = position;
     } else {
         samplePacket->size = -1;
@@ -213,6 +223,7 @@ void AccompanyDecoder::seek_frame(){
     if (targetPosition < currentPosition) {
         this->destroy();
         this->init(accompanyFilePath);
+        //TODO:这里的GT的测试样本会差距25ms 不会累加
         currentPosition = 0.0;
     }
     

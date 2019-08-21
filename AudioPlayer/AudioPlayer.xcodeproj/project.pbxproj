@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		254A32052306A2D500E8E3AD /* packet_pool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 254A32012306A2D500E8E3AD /* packet_pool.cpp */; };
 		254A32062306A2D500E8E3AD /* packet_queue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 254A32042306A2D500E8E3AD /* packet_queue.cpp */; };
+		25BB6849230D5E630085281B /* 111.aac in Resources */ = {isa = PBXBuildFile; fileRef = 25BB6848230D5E630085281B /* 111.aac */; };
 		25D30F4522F8087200449B1E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 25D30F4422F8087200449B1E /* AppDelegate.m */; };
 		25D30F4822F8087200449B1E /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 25D30F4722F8087200449B1E /* ViewController.m */; };
 		25D30F4B22F8087200449B1E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 25D30F4922F8087200449B1E /* Main.storyboard */; };
@@ -62,6 +63,7 @@
 		254A32022306A2D500E8E3AD /* packet_queue.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = packet_queue.hpp; sourceTree = "<group>"; };
 		254A32032306A2D500E8E3AD /* packet_pool.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = packet_pool.hpp; sourceTree = "<group>"; };
 		254A32042306A2D500E8E3AD /* packet_queue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = packet_queue.cpp; sourceTree = "<group>"; };
+		25BB6848230D5E630085281B /* 111.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = 111.aac; sourceTree = "<group>"; };
 		25D30F4022F8087200449B1E /* AudioPlayer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AudioPlayer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		25D30F4322F8087200449B1E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		25D30F4422F8087200449B1E /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -155,8 +157,8 @@
 				25D30FA222F8210800449B1E /* accompany_decoder.cpp */,
 				25D30FA122F8210800449B1E /* accompany_decoder.hpp */,
 				254A32012306A2D500E8E3AD /* packet_pool.cpp */,
-				254A32022306A2D500E8E3AD /* packet_queue.hpp */,
 				254A32032306A2D500E8E3AD /* packet_pool.hpp */,
+				254A32022306A2D500E8E3AD /* packet_queue.hpp */,
 				254A32042306A2D500E8E3AD /* packet_queue.cpp */,
 			);
 			path = libFFmpeg_decoder;
@@ -206,6 +208,7 @@
 				25D30F4E22F8087500449B1E /* LaunchScreen.storyboard */,
 				25D30F5122F8087500449B1E /* Info.plist */,
 				25D30F5222F8087500449B1E /* main.m */,
+				25BB6848230D5E630085281B /* 111.aac */,
 			);
 			path = AudioPlayer;
 			sourceTree = "<group>";
@@ -353,6 +356,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				25D30F5022F8087500449B1E /* LaunchScreen.storyboard in Resources */,
+				25BB6849230D5E630085281B /* 111.aac in Resources */,
 				25D30F4D22F8087500449B1E /* Assets.xcassets in Resources */,
 				25D30F4B22F8087200449B1E /* Main.storyboard in Resources */,
 			);
