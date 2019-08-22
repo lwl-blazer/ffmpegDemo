@@ -35,18 +35,19 @@ int main(int argc, char **argv){
     out_filename = argv[2];
     
     av_register_all();
-    if ((ret = avformat_open_input(&ifmt_ctx, in_filename, 0, 9)) < 0) {
+    if ((ret = avformat_open_input(&ifmt_ctx, in_filename, 0, 0)) < 0) { //创建输入文件上下文
         fprintf(stderr, "Could not open input file %s", in_filename);
         goto end;
     }
     
+    /**avformat_find_stream_info() 该函数可以读取一部分音视频数据并且获得一些相关的信息 探测文件信息*/
     if ((ret = avformat_find_stream_info(ifmt_ctx, 0)) < 0) {
         fprintf(stderr, "Failed to retrieve input stream information");
         goto end;
     }
-    
     av_dump_format(ifmt_ctx, 0, in_filename, 0);
     
+    //创建输出文件上下文
     avformat_alloc_output_context2(&ofmt_ctx, NULL, NULL, out_filename);
     if (!ofmt_ctx) {
         fprintf(stderr, "Could not create output context\n");
@@ -55,7 +56,7 @@ int main(int argc, char **argv){
     }
     
     stream_mapping_size = ifmt_ctx->nb_streams;
-    stream_mapping = av_mallocz_array(stream_mapping sizeof(*stream_mapping));
+    stream_mapping = av_mallocz_array(stream_mapping_size, sizeof(*stream_mapping));
     if (!stream_mapping) {
         ret = AVERROR(ENOMEM);
         goto end;
@@ -63,6 +64,7 @@ int main(int argc, char **argv){
     
     ofmt = ofmt_ctx->oformat;
     
+    //就是把AVStream 读取内存中
     for (i = 0; i < ifmt_ctx->nb_streams; i++) {
         AVStream *out_stream;
         AVStream *in_stream = ifmt_ctx->streams[i];
@@ -95,20 +97,21 @@ int main(int argc, char **argv){
     
     av_dump_format(ofmt_ctx, 0, out_filename, 1);
     
-    if (!(ofmt->flags && AVFMT_NOFILE)) {
+    if (!(ofmt->flags & AVFMT_NOFILE)) {
         ret = avio_open(&ofmt_ctx->pb, out_filename, AVIO_FLAG_WRITE);
         if (ret < 0) {
             fprintf(stderr, "Could not open output file '%s'", out_filename);
             goto end;
         }
     }
-    
+
     ret = avformat_write_header(ofmt_ctx, NULL);
     if (ret < 0) {
         fprintf(stderr, "Error occurred when opening output file\n");
         goto end;
     }
     
+    //去内存中取
     while (1) {
         AVStream *in_stream, *out_stream;
         ret = av_read_frame(ifmt_ctx, &pkt);
@@ -144,11 +147,13 @@ int main(int argc, char **argv){
     
     av_write_trailer(ofmt_ctx);
 end:
-    avformat_close_input(&ifmt_ctx);
+    avformat_close_input(&ifmt_ctx); //关闭输入文件上下文
     
     if (ofmt_ctx && !(ofmt->flags && AVFMT_NOFILE)) {
         avio_closep(&ofmt_ctx->pb);
     }
+    
+    //释放输出文件的上下文
     avformat_free_context(ofmt_ctx);
     
     av_freep(&stream_mapping);
@@ -160,3 +165,18 @@ end:
     
     return 0;
 }
+
+/**
+ * MP4文件 转 FLV文件
+ *
+ * 输出文件的上下文
+ * avformat_alloc_output_context2()/avformat_free_context()
+ *
+ * avformat_new_stream()
+ *
+ * avcodec_parameters_copy()
+ *
+ * av_format_write_header()
+ * av_write_frame() / av_interleaved_write_frame()
+ * av_write_trailer()
+ */
