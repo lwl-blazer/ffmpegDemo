@@ -75,6 +75,11 @@ const NSTimeInterval AUSAudioSessionLatency_LowLatency = 0.0058;
 }
 
 - (void)addRouteChangeListener{
+    /**
+     * AVAudioSessionRouteChangeNotification 播放声音的设备改变
+     *
+     * AVAudioSessionInterruptionNotification 监听系统中断音频播放 (来电暂停  QQ微信语音暂停 其他音乐软件占用)
+     */
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onNotificationAudioRouteChange:)
                                                  name:AVAudioSessionRouteChangeNotification

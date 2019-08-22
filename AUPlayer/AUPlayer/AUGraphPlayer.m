@@ -35,9 +35,14 @@
 - (instancetype)initWithFilePath:(NSString *)path{
     self = [super self];
     if (self) {
+        /** 创建一个AudioSession的实例*/
+        //step:1
         [[ELAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord];
+        //step:2
         [[ELAudioSession sharedInstance] setPerferredSampleRate:44100];
+        //step:3  激活
         [[ELAudioSession sharedInstance] setActive:YES];
+    
         [[ELAudioSession sharedInstance] addRouteChangeListener];
         
         [self addAudioSessionInterruptedObserver];
@@ -400,6 +405,7 @@
     CheckStatus(status, @"set Player Unit Start Time...", YES);
 }
 
+//监听中断
 - (void)addAudioSessionInterruptedObserver{
     [self removeAudioSessionInterruptedObserver];
     [[NSNotificationCenter defaultCenter] addObserver:self

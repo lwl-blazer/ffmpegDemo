@@ -11,18 +11,20 @@
 @implementation AVAudioSession (RouteUtils)
 
 - (BOOL)usingBlueTooth{
+    //输入
     NSArray *inputs = self.currentRoute.inputs;
-    NSArray *blueToothInputRoutes = @[AVAudioSessionPortBluetoothHFP];
+    NSArray *blueToothInputRoutes = @[AVAudioSessionPortBluetoothHFP];   //AVAudioSessionPortBluetoothHFP 蓝牙免提设备
     for (AVAudioSessionPortDescription *desc in inputs) {
         if ([blueToothInputRoutes containsObject:desc.portType]) {
             return YES;
         }
     }
     
+    //输出
     NSArray *outputs = self.currentRoute.outputs;
     NSArray *blueToothOutputRoutes = @[AVAudioSessionPortBluetoothHFP,
                                        AVAudioSessionPortBluetoothA2DP,
-                                       AVAudioSessionPortBluetoothLE];
+                                       AVAudioSessionPortBluetoothLE];  //蓝牙外围设备
     for (AVAudioSessionPortDescription *desc in outputs) {
         if ([blueToothOutputRoutes containsObject:desc.portType]) {
             return YES;
@@ -34,7 +36,7 @@
 
 - (BOOL)usingWiredMicrophone{
     NSArray *inputs = self.currentRoute.inputs;
-    NSArray *headSetInputRoutes = @[AVAudioSessionPortHeadsetMic];
+    NSArray *headSetInputRoutes = @[AVAudioSessionPortHeadsetMic];  //有线耳机内置麦克风
     for (AVAudioSessionPortDescription *desc in inputs) {
         if ([headSetInputRoutes containsObject:desc.portType]) {
             return YES;
@@ -42,7 +44,7 @@
     }
     
     NSArray *outputs = self.currentRoute.outputs;
-    NSArray *headSetOutputRoutes = @[AVAudioSessionPortHeadphones, AVAudioSessionPortUSBAudio];
+    NSArray *headSetOutputRoutes = @[AVAudioSessionPortHeadphones, AVAudioSessionPortUSBAudio]; //有线耳机 和 USB耳机
     for (AVAudioSessionPortDescription *desc in outputs) {
         if ([headSetOutputRoutes containsObject:desc.portType]) {
             return YES;
