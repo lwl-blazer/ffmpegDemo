@@ -26,10 +26,13 @@ static void CheckStatus(OSStatus status, NSString *message, BOOL fatal);
 @interface AudioOutput (){
     SInt16 *_outData;
 }
+
+//播放 AUGraph
 @property(nonatomic, assign) AUGraph   auGraph;
 @property(nonatomic, assign) AUNode    ioNode;
 @property(nonatomic, assign) AudioUnit ioUnit;
 
+//格式转换AUGraph
 @property(nonatomic, assign) AUNode    convertNoder;
 @property(nonatomic, assign) AudioUnit convertUnit;
 
@@ -91,12 +94,14 @@ const float SMAudioIOBufferDurationSmall = 0.0058f;
 
 - (void)addAudioUnitNodes{
     OSStatus status = noErr;
+    
+    //I/O AudioUnit
     AudioComponentDescription ioDescription;
     bzero(&ioDescription, sizeof(ioDescription));
     ioDescription.componentManufacturer = kAudioUnitManufacturer_Apple;
     ioDescription.componentType = kAudioUnitType_Output;
     ioDescription.componentSubType = kAudioUnitSubType_RemoteIO;
-    
+    //最终创建AUGraph
     status = AUGraphAddNode(_auGraph,
                             &ioDescription,
                             &_ioNode);
@@ -277,7 +282,7 @@ const float SMAudioIOBufferDurationSmall = 0.0058f;
     for (int iBuffer = 0; iBuffer < ioData->mNumberBuffers; ++iBuffer) {
         memset(ioData->mBuffers[iBuffer].mData,
                0,
-               ioData->mBuffers[iBuffer].mDataByteSize);
+               ioData->mBuffers[iBuffer].mDataByteSize);   //重置
     }
     
     if (_fillAudioDataDelegate) {
@@ -309,6 +314,7 @@ OSStatus InputRenderCallBack(void *inRefCon,
                       numberFrames:inNumberFrames
                              flags:ioActionFlags];
 }
+
 
 static void CheckStatus(OSStatus status, NSString *message, BOOL fatal)
 {

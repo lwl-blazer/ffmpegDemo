@@ -118,6 +118,7 @@ void AccompanyDecoderController::init(const char *accompanyPath, float packetBuf
     initDecoderThread();
 }
 
+//初始化线程和锁
 void AccompanyDecoderController::initDecoderThread(){
     isRunning = true;
     isDecodePausingFlag = false;
@@ -125,6 +126,8 @@ void AccompanyDecoderController::initDecoderThread(){
     pthread_cond_init(&mCondition, nullptr);
     pthread_mutex_init(&mDecodePausingLock, nullptr);
     pthread_cond_init(&mDecodePausingCondition, nullptr);
+    
+    //pthread_create 创建线程的函数(实际上就是确定调用该线程函数的入口点)，在线程创建以后，就开始运行相关的线程函数
     pthread_create(&songDecoderThread, nullptr, startDecoderThread, this);
 }
 
@@ -134,6 +137,7 @@ void AccompanyDecoderController::decodeSongPacket(){
     accompanyPacket->action = AudioPacket::AUDIO_PACKET_ACTION_PLAY;
     packetPool->pushDecoderAccompanyPacketToQueue(accompanyPacket);
 }
+
 
 void AccompanyDecoderController::destroyDecoderThread(){
     isRunning = false;

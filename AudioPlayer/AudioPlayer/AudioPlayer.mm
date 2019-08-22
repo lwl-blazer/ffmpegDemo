@@ -22,13 +22,15 @@
 - (instancetype)initWithFilePath:(NSString *)filePath{
     self = [super init];
     if (self) {
-        //初始化解码模块，并且从解码模块中取出原始数据
+        //初始化解码模块，并且从解码模块中取出原始数据   FFmpeg进行解码
         _decoderController = new AccompanyDecoderController();
         _decoderController->init([filePath cStringUsingEncoding:NSUTF8StringEncoding], 0.2f);
         
         NSInteger channels = _decoderController->getChannels();
         NSInteger sampleRate = _decoderController->getAudioSampleRate();
         NSInteger bytesPersample = 2;
+        
+        //AudioUnit进行播放
         _audioOutput = [[AudioOutput alloc] initWithChannels:channels
                                                   sampleRate:sampleRate
                                               bytesPerSample:bytesPersample
