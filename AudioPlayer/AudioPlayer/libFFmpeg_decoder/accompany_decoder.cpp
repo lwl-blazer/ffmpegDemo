@@ -122,7 +122,7 @@ int AccompanyDecoder::init(const char *fileString){
         LOGI("unsupported codec");
         return -1;
     }
-    
+    avcodec_free_context(<#AVCodecContext **avctx#>)
     //打开解码器
     result = avcodec_open2(avCodecContext,
                            avCodec,
@@ -252,6 +252,7 @@ int AccompanyDecoder::readFrame(){
         this->seek_frame();
     }
     int ret = 1;
+    
     av_init_packet(&packet);
     int gotframe = 0;
     int readFrameCode = -1;
@@ -269,6 +270,7 @@ int AccompanyDecoder::readFrame(){
                 }
                 //avcodec_send_packet avcodec_receive_frame 配套出现
                 gotframe = avcodec_receive_frame(avCodecContext, pAudioFrame);
+
                 if (gotframe == 0) {
                     int numChannels = OUT_PUT_CHANNELS;
                     int numFrames = 0;
