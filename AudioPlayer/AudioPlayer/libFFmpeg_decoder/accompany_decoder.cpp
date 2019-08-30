@@ -122,7 +122,7 @@ int AccompanyDecoder::init(const char *fileString){
         LOGI("unsupported codec");
         return -1;
     }
-    avcodec_free_context(<#AVCodecContext **avctx#>)
+    
     //打开解码器
     result = avcodec_open2(avCodecContext,
                            avCodec,
