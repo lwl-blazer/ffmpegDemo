@@ -133,9 +133,9 @@ void AccompanyDecoderController::initDecoderThread(){
 
 //需要子类完成自己的操作
 void AccompanyDecoderController::decodeSongPacket(){
-    AudioPacket *accompanyPacket = accompanyDecoder->decodePacket();
+    AudioPacket *accompanyPacket = accompanyDecoder->decodePacket(); //解码器 解码 构建成一个AudioPacket
     accompanyPacket->action = AudioPacket::AUDIO_PACKET_ACTION_PLAY;
-    packetPool->pushDecoderAccompanyPacketToQueue(accompanyPacket);
+    packetPool->pushDecoderAccompanyPacketToQueue(accompanyPacket);  //放入到队列中
 }
 
 

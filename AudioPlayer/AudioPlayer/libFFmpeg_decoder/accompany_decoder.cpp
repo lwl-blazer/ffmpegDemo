@@ -79,8 +79,9 @@ int AccompanyDecoder::init(const char *fileString){
     } else {
         LOGI("open file %s success and result is %d", fileString, result);
     }
-    avFormatContext->max_analyze_duration = 50000;
     
+    
+    avFormatContext->max_analyze_duration = 50000; //max_analyze_duration  在解封装时，设置在avformat_find_stream_info之前
     //检查在文件中的流的信息
     if (avformat_find_stream_info(avFormatContext, NULL) < 0) {
         LOGI("Couldn't find stream information");
@@ -172,7 +173,7 @@ bool AccompanyDecoder::audioCodecIsSupported(){
 
 AudioPacket* AccompanyDecoder::decodePacket(){
     short *samples = new short[packetBufferSize];
-    int stereoSampleSize = readSamples(samples, packetBufferSize);
+    int stereoSampleSize = readSamples(samples, packetBufferSize); //解码的数据存放在samples
     AudioPacket *samplePacket = new AudioPacket();
     if (stereoSampleSize > 0) {
         //构造成一个packet
@@ -198,11 +199,11 @@ int AccompanyDecoder::readSamples(short *samples, int size){
             int audioBufferDataSize = audioBufferSize - audioBufferCursor;
             int copySize = MIN(size, audioBufferDataSize);
             
-            memcpy(samples + (sampleSize - size), audioBuffer + audioBufferCursor, copySize * 2);
+            memcpy(samples + (sampleSize - size), audioBuffer + audioBufferCursor, copySize * 2); //把audioBuffer copy到samples
             size -= copySize;
             audioBufferCursor += copySize;
         } else {
-            if (readFrame() < 0) {
+            if (readFrame() < 0) { //readFrame 得到的数据是放在 audioBuffer
                 break;
             }
         }
