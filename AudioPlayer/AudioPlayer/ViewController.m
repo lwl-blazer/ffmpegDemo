@@ -22,14 +22,14 @@
     [super viewDidLoad];
 }
 
-- (IBAction)playAction:(UIButton *)sender {
+- (IBAction)playAction:(UIButton *)sender { //开始播放
     NSLog(@"play music");
-    NSString *filtPath = [CommonUtil bundlePath:@"111" type:@"aac"];
+    NSString *filtPath = [CommonUtil bundlePath:@"music" type:@"aac"];
     _audioPlayer = [[AudioPlayer alloc] initWithFilePath:filtPath];
     [_audioPlayer start];
 }
 
-- (IBAction)stopAction:(UIButton *)sender {
+- (IBAction)stopAction:(UIButton *)sender { //停止播放
     NSLog(@"stop music");
     if (_audioPlayer) {
         [_audioPlayer stop];

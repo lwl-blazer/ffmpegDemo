@@ -58,6 +58,7 @@
     }
 }
 
+//写入和读取的串连方法
 - (NSInteger)fillAudioData:(SInt16 *)sampleBuffer numFrames:(NSInteger)frameNum numChannels:(NSInteger)channels{
     //默认填充空数据
     memset(sampleBuffer, 0, frameNum * channels *sizeof(SInt16));

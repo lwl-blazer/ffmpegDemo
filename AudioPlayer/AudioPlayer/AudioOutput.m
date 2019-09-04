@@ -68,45 +68,56 @@ const float SMAudioIOBufferDurationSmall = 0.0058f;
 }
 
 
-
+/** 构建AudioUnit
+ * 1.指定类型(type)
+ * 2.子类型(subtype)
+ * 3.厂商(manufacture) 比较固定 kAudioUnitManufacture_Apple
+ *
+ * Audio Unit主要涉及到三个常用概念:
+ * 1. AUGraph  包含和管理Audio Unit的组织者
+ * 2. AUNode / AudioComponent 是AUGraph音频处理环节中的一个节点
+ * 3. AudioUnit 音频处理组件，是对音频处理节点的实例描述者和操控者
+ */
 - (void)createAudioUnitGraph{
     OSStatus status = noErr;
     
-    status = NewAUGraph(&_auGraph);
+    status = NewAUGraph(&_auGraph); //创建AUGraph
     CheckStatus(status, @"Could not create a new AUGraph", YES);
+
+    [self addAudioUnitNodes]; //配置AUNode
     
-    [self addAudioUnitNodes];
-    
-    status = AUGraphOpen(_auGraph);
+    status = AUGraphOpen(_auGraph); //打开AUGraph
     CheckStatus(status, @"Could not open AUGraph", YES);
     
-    [self getUnitsFromNodes];
+    [self getUnitsFromNodes]; //获取AudioUnit
     
-    [self setAudioUnitProperties];
+    [self setAudioUnitProperties]; //设置AudioUnit的属性
     
-    [self makeNodeConnections];
+    [self makeNodeConnections];  //串联Audio Node   并设置回调函数
     
-    CAShow(_auGraph);
     
-    status = AUGraphInitialize(_auGraph);
+    CAShow(_auGraph);   //这是一个打印的作用
+    status = AUGraphInitialize(_auGraph);   //初始化 一定要全部配置完成以后
     CheckStatus(status, @"Could not initialize AUGraph", YES);
 }
 
+//创建AUNode 并添加到AUGraph
 - (void)addAudioUnitNodes{
     OSStatus status = noErr;
     
     //I/O AudioUnit
     AudioComponentDescription ioDescription;
-    bzero(&ioDescription, sizeof(ioDescription));
+    bzero(&ioDescription, sizeof(ioDescription));  //extern void bzero(void *s, int n) 置字节字符串前n个字节为零且包括'\0'
     ioDescription.componentManufacturer = kAudioUnitManufacturer_Apple;
     ioDescription.componentType = kAudioUnitType_Output;
     ioDescription.componentSubType = kAudioUnitSubType_RemoteIO;
     //最终创建AUGraph
     status = AUGraphAddNode(_auGraph,
                             &ioDescription,
-                            &_ioNode);
+                            &_ioNode);   //参数1:创建的AUGraph 参数2:描术信息 参数3:输出的AUNode
     CheckStatus(status, @"Could not add I/O node to AUGraph", YES);
     
+    //Convert AudioUnit
     AudioComponentDescription convertDescription;
     bzero(&convertDescription, sizeof(convertDescription));
     ioDescription.componentManufacturer = kAudioUnitManufacturer_Apple;
@@ -123,21 +134,26 @@ const float SMAudioIOBufferDurationSmall = 0.0058f;
     status = AUGraphNodeInfo(_auGraph,
                              _ioNode,
                              NULL,
-                             &_ioUnit);
+                             &_ioUnit);   //最终输出_ioUnit
     
-    status = AUGraphNodeInfo(_auGraph, _convertNoder, NULL, &_convertUnit);
+    status = AUGraphNodeInfo(_auGraph, _convertNoder, NULL, &_convertUnit); //最终输出_convertUnit
     CheckStatus(status, @"Could not retrieve node info for Convert node", YES);
 }
 
+/** 设置AudioUnit的属性
+ * AudioUnit实际上就是一个AudioComponentInstance实例对象，一个AudioUnit由scope(范围)和element(元素)组成，
+ * scope 主要使用到的输入kAudioUnitScope_Input 和 输出 kAudioUnitScope_Output
+ * element   Input用“1”表示   Output用“0”表示
+ */
 - (void)setAudioUnitProperties{
     OSStatus status = noErr;
     AudioStreamBasicDescription streamFormat = [self nonInterleavedPCMFormatWithChannels:_channels];
     status = AudioUnitSetProperty(_ioUnit,
-                                  kAudioUnitProperty_StreamFormat,
-                                  kAudioUnitScope_Output,
-                                  inputElement,
-                                  &streamFormat,
-                                  sizeof(streamFormat));
+                                  kAudioUnitProperty_StreamFormat,     //属性名称
+                                  kAudioUnitScope_Output,      //scope 输入输出范围
+                                  inputElement,         //element  1表示输入总线 0输出总线
+                                  &streamFormat,     //输入值
+                                  sizeof(streamFormat));     //输入值长度
     CheckStatus(status, @"Could not set stream format on I/O unit output scope", YES);
     
     AudioStreamBasicDescription _clientFormat16int;
@@ -167,7 +183,6 @@ const float SMAudioIOBufferDurationSmall = 0.0058f;
                                   &_clientFormat16int,
                                   sizeof(_clientFormat16int));
     CheckStatus(status, @"augraph recorder normal unit set client format error", YES);
-    
 }
 
 - (AudioStreamBasicDescription)nonInterleavedPCMFormatWithChannels:(UInt32)channels{
@@ -175,14 +190,14 @@ const float SMAudioIOBufferDurationSmall = 0.0058f;
     
     AudioStreamBasicDescription asbd;
     bzero(&asbd, sizeof(asbd));
-    asbd.mSampleRate = _sampleRate;
-    asbd.mFormatID = kAudioFormatLinearPCM;
+    asbd.mSampleRate = _sampleRate;    //采样率
+    asbd.mFormatID = kAudioFormatLinearPCM;  //PCM采样率
     asbd.mFormatFlags = kAudioFormatFlagsNativeFloatPacked|kAudioFormatFlagIsNonInterleaved;
-    asbd.mBitsPerChannel = 8 * bytesPerSample;
-    asbd.mBytesPerFrame = bytesPerSample;
-    asbd.mBytesPerPacket = bytesPerSample;
-    asbd.mFramesPerPacket = 1;
-    asbd.mChannelsPerFrame = channels;
+    asbd.mBitsPerChannel = 8 * bytesPerSample;    //语音每采样点占用位数
+    asbd.mBytesPerFrame = bytesPerSample;     //每帧的bytes数
+    asbd.mBytesPerPacket = bytesPerSample;   //每个数据包的bytes总数，每帧的bytes数 * 每个数据包的帧数
+    asbd.mFramesPerPacket = 1;   //每个数据包多少帧
+    asbd.mChannelsPerFrame = channels;    //1单声道 2立体声
     return asbd;
 }
 
@@ -192,7 +207,7 @@ const float SMAudioIOBufferDurationSmall = 0.0058f;
                                      _convertNoder,
                                      0,
                                      _ioNode,
-                                     0);
+                                     0); //串联
     CheckStatus(status,
                 @"Could not connect I/O node input to mixer node input",
                 YES);
@@ -202,7 +217,7 @@ const float SMAudioIOBufferDurationSmall = 0.0058f;
     callbacStruct.inputProcRefCon = (__bridge void *)self;
     
     status = AudioUnitSetProperty(_convertUnit,
-                                  kAudioUnitProperty_SetRenderCallback,
+                                  kAudioUnitProperty_SetRenderCallback,     //回调函数的类型
                                   kAudioUnitScope_Input,
                                   0,
                                   &callbacStruct,
@@ -224,14 +239,14 @@ const float SMAudioIOBufferDurationSmall = 0.0058f;
 }
 
 - (BOOL)play{
-    OSStatus status = AUGraphStart(_auGraph);
+    OSStatus status = AUGraphStart(_auGraph);    //开始播放
     CheckStatus(status,
                 @"Could not start AUGraph", YES);
     return YES;
 }
 
 - (void)stop{
-    OSStatus status = AUGraphStop(_auGraph);
+    OSStatus status = AUGraphStop(_auGraph);   //停止播放
     CheckStatus(status, @"Could not stop AUGraph", YES);
 }
 
