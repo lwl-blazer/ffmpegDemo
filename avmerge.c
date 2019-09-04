@@ -153,6 +153,7 @@ int main(int argc, char *argv[]){
     
     av_init_packet(&pkt);
     while (stream1 || stream2) {
+        //av_compare_ts 时间基的比较 int av_compare_ts(int64_t ts_a, AVRational tb_a, int64_t ts_b, AVRational tb_b)   算法：return ts_a == ts_b ? 0 : ts_a < ts_b ? -1 : 1;
         if (stream1 && (!stream2 || av_compare_ts(cur_pts1, in_stream1->time_base, cur_pts2, in_stream2->time_base) <= 0)) {
             ret = av_read_frame(ifmt_ctx1, &pkt);
             if (ret < 0) {
