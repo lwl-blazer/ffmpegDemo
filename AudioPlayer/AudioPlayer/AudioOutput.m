@@ -144,9 +144,13 @@ const float SMAudioIOBufferDurationSmall = 0.0058f;
  * AudioUnit实际上就是一个AudioComponentInstance实例对象，一个AudioUnit由scope(范围)和element(元素)组成，
  * scope 主要使用到的输入kAudioUnitScope_Input 和 输出 kAudioUnitScope_Output
  * element   Input用“1”表示   Output用“0”表示
+ *
+ *AudioUnit的数据格式分为输入和输出两个部分
  */
 - (void)setAudioUnitProperties{
     OSStatus status = noErr;
+    
+    //Description 是用来描述音视频具体格式的。
     AudioStreamBasicDescription streamFormat = [self nonInterleavedPCMFormatWithChannels:_channels];
     status = AudioUnitSetProperty(_ioUnit,
                                   kAudioUnitProperty_StreamFormat,     //属性名称
@@ -218,7 +222,7 @@ const float SMAudioIOBufferDurationSmall = 0.0058f;
     
     status = AudioUnitSetProperty(_convertUnit,
                                   kAudioUnitProperty_SetRenderCallback,     //回调函数的类型
-                                  kAudioUnitScope_Input,
+                                  kAudioUnitScope_Input, //赋值给ConvertUnit的输入端，当ConvertUnit需要数据输入的时候就会回调该回调函数
                                   0,
                                   &callbacStruct,
                                   sizeof(callbacStruct));
@@ -316,6 +320,7 @@ const float SMAudioIOBufferDurationSmall = 0.0058f;
 
 @end
 
+//回调函数  此函数的作用有两个：1.向上一级要数据，得到数据后放到ioData中，从而填充回调方法中的参数  2.给到speaker或者耳机进行播放
 OSStatus InputRenderCallBack(void *inRefCon,
                              AudioUnitRenderActionFlags *ioActionFlags,
                              const AudioTimeStamp *inTimeStamp,

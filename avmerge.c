@@ -46,12 +46,14 @@ int main(int argc, char *argv[]){
     av_register_all();
     
     //open first file
-    if ((err_code = avformat_open_input(&ifmt_ctx1, src_file1, 0, 0)) < 0) {
+    err_code = avformat_open_input(&ifmt_ctx1, src_file1, 0, 0);
+    if (err_code < 0) {
         av_strerror(err_code, errors, ERROR_STR_SIZE);
         av_log(NULL, AV_LOG_ERROR, "Could not open src file %s, %d(%s)\n", src_file1, err_code, errors);
         goto __FAIL;
     }
-    if ((err_code = avformat_find_stream_info(ifmt_ctx1, 0)) < 0) {
+    err_code = avformat_find_stream_info(ifmt_ctx1, 0);
+    if (err_code < 0) {
         av_strerror(err_code, errors, ERROR_STR_SIZE);
         av_log(NULL, AV_LOG_ERROR, "Failed to retrieve input stream info %s", src_file1);
         goto __FAIL;
@@ -59,12 +61,14 @@ int main(int argc, char *argv[]){
     av_dump_format(ifmt_ctx1, 0, src_file1, 0);
     
     //open second file
-    if ((err_code = avformat_open_input(&ifmt_ctx2, src_file2, 0, 0)) < 0) {
+    err_code = avformat_open_input(&ifmt_ctx2, src_file2, 0, 0);
+    if (err_code < 0) {
         av_strerror(err_code, errors, ERROR_STR_SIZE);
         av_log(NULL, AV_LOG_ERROR, "Could not open the second src file %s", src_file2);
         goto __FAIL;
     }
-    if ((err_code = avformat_find_stream_info(ifmt_ctx2, 0)) < 0) {
+    err_code = avformat_find_stream_info(ifmt_ctx2, 0);
+    if (err_code < 0) {
         av_strerror(err_code, errors, ERROR_STR_SIZE);
         av_log(NULL, AV_LOG_ERROR, "Failed to retrieve input stream info %s", src_file2);
         goto __FAIL;
@@ -73,18 +77,20 @@ int main(int argc, char *argv[]){
     
     
     //create out context
-    if ((err_code = avformat_alloc_output_context2(&ofmt_ctx, NULL, NULL, out_file)) < 0) {
+    err_code = avformat_alloc_output_context2(&ofmt_ctx, NULL, NULL, out_file);
+    if (err_code < 0) {
         av_strerror(err_code, errors, ERROR_STR_SIZE);
         av_log(NULL, AV_LOG_ERROR, "Failed to create an context of outfile %s", errors);
     }
     ofmt = ofmt_ctx->oformat;
     
     //create out stream according to input stream
-    if (ifmt_ctx1->nb_streams == 1) {
+    if (ifmt_ctx1->nb_streams >= 1) {
         in_stream1 = ifmt_ctx1->streams[0];
         stream1 = 1;
         
         AVCodecParameters *in_codecpar = in_stream1->codecpar;
+        
         if (in_codecpar->codec_type != AVMEDIA_TYPE_AUDIO &&
             in_codecpar->codec_type != AVMEDIA_TYPE_VIDEO &&
             in_codecpar->codec_type != AVMEDIA_TYPE_SUBTITLE) {
@@ -98,15 +104,15 @@ int main(int argc, char *argv[]){
             goto __FAIL;
         }
         
-        if ((err_code = avcodec_parameters_copy(out_stream1->codecpar, in_codecpar)) < 0) {
+        err_code = avcodec_parameters_copy(out_stream1->codecpar, in_codecpar);
+        if (err_code < 0) {
             av_strerror(err_code, errors, ERROR_STR_SIZE);
             av_log(NULL, AV_LOG_ERROR, "Failed to copy codec parameter %s", errors);
         }
-        
         out_stream1->codecpar->codec_tag = 0;
     }
     
-    if (ifmt_ctx2->nb_streams == 1) {
+    if (ifmt_ctx2->nb_streams >= 1) {
         in_stream2 = ifmt_ctx2->streams[0];
         stream2 = 1;
         
@@ -142,9 +148,17 @@ int main(int argc, char *argv[]){
             goto __FAIL;
         }
     }
-    
-    //write media header
-    if ((err_code = avformat_write_header(ofmt_ctx, NULL)) < 0) {
+
+    /** write media header
+     * 参数1: 用于输出的AVFormatContext
+     * options: 额外的选项， 一般都传NULL
+     *
+     * 内部调用函数:   init_muxer()   初始化复用器    主要做检查,遍历AVFormatContext中的每个Stream,并作如下检查 1.AVStream的time_base是否正确设置。如果发现AVStream的time_base没有设置，则会调用avpriv_set_pts_info()进行设置 2.对于音频，检查采样率设置是否正常，对于视频，检查宽、高、宽高比   3.其他一些检查
+                     oformat->write_header() 调用AVOutputFormat的write_header().write_header()是AVOutputFormat中的一个函数指针，指向写文件头的函数。不同的AVOutputFormat有不同的write_header()的实现方法
+     
+     */
+    err_code = avformat_write_header(ofmt_ctx, NULL);
+    if (err_code < 0) {
         av_strerror(err_code, errors, ERROR_STR_SIZE);
         av_log(NULL, AV_LOG_ERROR, "Error occured when writing media header\n");
         goto __FAIL;
@@ -160,7 +174,7 @@ int main(int argc, char *argv[]){
                 continue;
             }
             
-            if (!b_use_video_ts && (in_stream1->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)) {
+            if (!b_use_video_ts && (in_stream1->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)) { //这段代码应该是不会执行的
                 pkt.pts = ++packets;
                 in_stream1->time_base = (AVRational){in_stream1->r_frame_rate.den, in_stream1->r_frame_rate.num};
                 
@@ -170,7 +184,7 @@ int main(int argc, char *argv[]){
             }
             
             
-            if (pkt.pts == AV_NOPTS_VALUE) {
+            if (pkt.pts == AV_NOPTS_VALUE) { //如果没有pts
                 AVRational time_base1 = in_stream1->time_base;
                 
                 av_log(NULL, AV_LOG_DEBUG, "AV_TIME_BASE=%d, av_q2d=%d(num=%d,den=%d)", AV_TIME_BASE,
@@ -195,8 +209,24 @@ int main(int argc, char *argv[]){
             pkt.stream_index = 0;
             av_log(NULL, AV_LOG_DEBUG, "xxxx%d, dts=%lld, pts=%lld\n", packets, pkt.dts, pkt.pts);
             
-            stream1 = !av_interleaved_write_frame(ofmt_ctx, &pkt);
+            AVStream *tempStream = ofmt_ctx->streams[pkt.stream_index];
+//            av_log(NULL, AV_LOG_DEBUG, "debug:xxxx%d, dts=%lld, cur_dts=%lld\n", ofmt_ctx->oformat->flags, pkt.dts, tempStream->cur_dts);
+            if (tempStream->cur_dts && tempStream->cur_dts != AV_NOPTS_VALUE &&
+                ((!(ofmt_ctx->oformat->flags & AVFMT_TS_NONSTRICT) &&
+                  tempStream->codec->codec_type != AVMEDIA_TYPE_SUBTITLE &&
+                  tempStream->cur_dts >= pkt.dts) || tempStream->cur_dts > pkt.dts)) {
+                continue;
+            }
             
+            //在第三四次的时候，报‘Application provided invalid, non monotonically increasing dts to muxer in stream 0: 15000 >= -7500’错误
+            stream1 = !av_interleaved_write_frame(ofmt_ctx, &pkt); //s->oformat->flags
+            /**
+             * av_interleaved_write_frame 将对packet进行缓存和pts检查
+             * av_write_frame 直接将包写进Mux 没有缓存和重新排序，一切都需要用户自己设置
+             *
+             * 报Application provided invalid, non monotonically increasing dts to muxer in stream 0: 15000 >= -7500’错误
+             */
+//            stream1 = !av_write_frame(ofmt_ctx, &pkt);
         } else if (stream2) {
             ret = av_read_frame(ifmt_ctx2, &pkt);
             if (ret < 0) {
@@ -204,7 +234,7 @@ int main(int argc, char *argv[]){
                 continue;
             }
             
-            if (!b_use_video_ts && (in_stream2->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)) {
+            if (!b_use_video_ts && (in_stream2->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)) { //这个判断里面的应该是没有走
                 pkt.pts = packets++;
                 pkt.dts = pkt.pts;
             }
@@ -217,7 +247,17 @@ int main(int argc, char *argv[]){
             pkt.pos = -1;
             pkt.stream_index = 1;
             av_log(NULL, AV_LOG_DEBUG, "Write stream2 Packet. size:%5d\tpts:%lld\tdts:%lld\n", pkt.size, pkt.pts, pkt.dts);
+
+            AVStream *tempStream = ofmt_ctx->streams[pkt.stream_index];
+            if (tempStream->cur_dts && tempStream->cur_dts != AV_NOPTS_VALUE &&
+                ((!(ofmt_ctx->oformat->flags & AVFMT_TS_NONSTRICT) &&
+                  tempStream->codec->codec_type != AVMEDIA_TYPE_SUBTITLE &&
+                  tempStream->cur_dts >= pkt.dts) || tempStream->cur_dts > pkt.dts)) {
+                continue;
+            }
+            
             stream2 = !av_interleaved_write_frame(ofmt_ctx, &pkt);
+//            stream2 = !av_write_frame(ofmt_ctx, &pkt);
         }
         av_packet_unref(&pkt);
     }
