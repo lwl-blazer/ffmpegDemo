@@ -43,8 +43,6 @@ int main(int argc, char *argv[]){
     src_file2 = argv[2];
     out_file = argv[3];
     
-    
-    
     av_register_all();
     
     //open first file
@@ -135,6 +133,7 @@ int main(int argc, char *argv[]){
         out_stream2->codecpar->codec_tag = 0;
     }
     av_dump_format(ofmt_ctx, 0, out_file, 1);
+    
     
     //open out file
     if (!(ofmt->flags & AVFMT_NOFILE)) { //如果没有，一定要用avio_open进行打开  ofmt_ctx->pb 是一个输入数据的缓存(I/O上下文)
