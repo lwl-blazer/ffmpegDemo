@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import "PngPreviewController.h"
+#import "CommonUtil.h"
 
 @interface ViewController ()
 
@@ -20,7 +21,10 @@
 }
 
 - (IBAction)display:(UIButton *)sender {
-    PngPreviewController *previewController = [[PngPreviewController alloc] init];
+    
+    NSString* pngFilePath = [CommonUtil bundlePath:@"1" type:@"png"];
+    
+    PngPreviewController *previewController = [PngPreviewController viewControllerWithContentPath:pngFilePath contentFrame:self.view.bounds];
     [self.navigationController pushViewController:previewController animated:YES];
 }
 

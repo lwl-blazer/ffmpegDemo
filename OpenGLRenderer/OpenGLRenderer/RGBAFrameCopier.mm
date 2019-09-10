@@ -11,12 +11,13 @@
 
 #define STRINGIZE(x) #x
 #define STRINGIZE2(x) STRINGIZE(x)
-#define SHADER_STRING(text) @ STRINGIZE2(test)
+#define SHADER_STRING(text) @ STRINGIZE2(text)
 
 NSString *const vertexShaderString = SHADER_STRING(
                                                    attribute vec4 position;
                                                    attribute vec2 texcoord;
                                                    varying vec2 v_texcoord;
+                                                   
                                                    void main(){
                                                        gl_Position = position;
                                                        v_texcoord = texcoord.xy;
@@ -67,7 +68,6 @@ NSString *const rgbFragmentShaderString = SHADER_STRING(
     GLuint vertShader = 0, fragShader = 0;
     filterProgram = glCreateProgram();
     vertShader = compileShader(GL_VERTEX_SHADER, vertexShader);
-    
     if (!vertShader) {
         goto exit;
     }
