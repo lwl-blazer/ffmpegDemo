@@ -131,14 +131,15 @@ exit:
          1.0f,  1.0f,
     };
     GLfloat noRotationTextureCoordinates[] = {
-        0.0f, 1.0f,
-        1.0f, 1.0f,
-        0.0f, 0.0f,
-        1.0f, 0.0f,
+        0.0f, 1.0f,   //左上
+        1.0f, 1.0f,   //右上
+        0.0f, 0.0f,   //左下
+        1.0f, 0.0f,  //右下
     };
     
     glVertexAttribPointer(filterPositionAttribute, 2, GL_FLOAT, 0, 0, imageVertices);
     glEnableVertexAttribArray(filterPositionAttribute);
+    
     glVertexAttribPointer(filterTextureCoordinateAttribute, 2, GL_FLOAT, 0, 0, noRotationTextureCoordinates);
     glEnableVertexAttribArray(filterTextureCoordinateAttribute);
     

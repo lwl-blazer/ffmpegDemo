@@ -53,7 +53,11 @@
         
         CAEAGLLayer *eaglLayer = (CAEAGLLayer *)self.layer;
         eaglLayer.opaque = YES;
-        eaglLayer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:FALSE], kEAGLDrawablePropertyRetainedBacking, kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat, nil];
+        eaglLayer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:
+                                        [NSNumber numberWithBool:FALSE],
+                                        kEAGLDrawablePropertyRetainedBacking,
+                                        kEAGLColorFormatRGBA8,
+                                        kEAGLDrawablePropertyColorFormat, nil];
         
         _contextQueue = dispatch_queue_create("com.changba.video_player.videoRenderQueue", NULL);
         __weak typeof(self) WEAKSELF = self;
