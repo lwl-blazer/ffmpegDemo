@@ -9,8 +9,6 @@
 #ifndef rgba_frame_hpp
 #define rgba_frame_hpp
 
-#include <stdio.h>
-
 #include <string>
 
 class RGBAFrame {
