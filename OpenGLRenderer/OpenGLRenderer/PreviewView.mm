@@ -100,7 +100,8 @@
             [self.shouldEnableOpenGLLock unlock];
             [EAGLContext setCurrentContext:WEAKSELF.context];
             glBindFramebuffer(GL_FRAMEBUFFER, WEAKSELF.displayFramebuffer);
-            glViewport(0, WEAKSELF.backingHeight - WEAKSELF.backingWidth - 75, WEAKSELF.backingWidth, WEAKSELF.backingHeight);
+            //glViewport(0, WEAKSELF.backingHeight - WEAKSELF.backingWidth - 75, WEAKSELF.backingWidth, WEAKSELF.backingHeight);
+            glViewport(0, 0, WEAKSELF.backingWidth, WEAKSELF.backingHeight);
             [WEAKSELF.frameCopier renderFrame:self->_frame->pixels];
             glBindRenderbuffer(GL_RENDERBUFFER, WEAKSELF.renderBuffer);
             [WEAKSELF.context presentRenderbuffer:GL_RENDERBUFFER];
