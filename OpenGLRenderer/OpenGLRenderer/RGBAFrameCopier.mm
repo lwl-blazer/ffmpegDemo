@@ -123,13 +123,6 @@ exit:
     
     glBindTexture(GL_TEXTURE_2D, _inputTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, (GLsizei)frameWidth, (GLsizei)frameHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, rgbaFrame);
-    
-//    static const GLfloat imageVertices[] = {
-//        -1.0f, -1.0f,
-//         1.0f, -1.0f,
-//        -1.0f,  1.0f,
-//         1.0f,  1.0f,
-//    };
 
     static const GLfloat imageVertices[] = {
         -0.8f, -0.5f,   //左下
