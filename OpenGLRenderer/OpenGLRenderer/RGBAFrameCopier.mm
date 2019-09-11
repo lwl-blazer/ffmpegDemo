@@ -44,6 +44,7 @@ NSString *const rgbFragmentShaderString = SHADER_STRING(
     GLuint _inputTexture;
 }
 
+//准备绘制  初始化program 和 初始化纹理
 - (BOOL)prepareRender:(NSInteger)textureWidth height:(NSInteger)textureHeight{
     BOOL ret = NO;
     frameWidth = textureWidth;
@@ -114,6 +115,7 @@ exit:
     return result;
 }
 
+//进行绘制
 - (void)renderFrame:(uint8_t *)rgbaFrame{
     glUseProgram(filterProgram);
     glClearColor(0.0f, 0.0f, 1.0f, 1.0f);

@@ -12,10 +12,10 @@ int PngPicDecoder::openFile(char *pngFilePath) {
 	pngFile = fopen(pngFilePath, "rb");
 
 	fseek(pngFile, 0, SEEK_END);
-	int data_length = ftell(pngFile);
+	int data_length = (int)ftell(pngFile);
 	rewind(pngFile);
 	compressedData = new byte[data_length];
-	actualSize = fread(compressedData, 1, data_length, pngFile);
+	actualSize = (int)fread(compressedData, 1, data_length, pngFile);
     return 1;
 }
 

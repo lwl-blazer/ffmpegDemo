@@ -49,10 +49,13 @@ static inline GLuint compileShader(GLenum type, NSString *shaderString){
         return 0;
     }
     
+    //把编写的着色器程序加载到着色器句柄所关联的内存中
     glShaderSource(shader, 1, &sources, NULL);
+    //编译该shader
     glCompileShader(shader);
     
 #ifdef DEBUG
+    //验证该shader是否编译成功
     GLint logLength;
     glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLength);
     if (logLength > 0) {
@@ -62,7 +65,7 @@ static inline GLuint compileShader(GLenum type, NSString *shaderString){
         free(log);
     }
 #endif
-    
+    //打印信息帮助我们调试shader launage的错误信息
     glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
     if (status == GL_FALSE) {
         glDeleteShader(shader);
