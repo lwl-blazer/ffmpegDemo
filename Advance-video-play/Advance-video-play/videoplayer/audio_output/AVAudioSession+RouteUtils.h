@@ -12,6 +12,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface AVAudioSession (RouteUtils)
 
+- (BOOL)usingBlueTooth;
+
+- (BOOL)usingWiredMicrophone;
+
+- (BOOL)shouldShowEarphoneAlert;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -10,7 +10,25 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol FillDataDelegate <NSObject>
+
+- (NSInteger)fillAudioData:(SInt16 *)sampleBuffer
+                 numFrames:(NSInteger)frameNum
+               numChannels:(NSInteger)channels;
+
+@end
+
 @interface AudioOutput : NSObject
+
+@property(nonatomic, assign) Float64 sampleRate;
+@property(nonatomic, assign) Float64 channels;
+
+- (instancetype)initWithChannels:(NSInteger)channels
+            sampleRate:(NSInteger)sampleRate
+        bytesPerSample:(NSInteger)bytePerSample filleDataDelegate:(id<FillDataDelegate>)fillAudioDataDelegate;
+
+- (BOOL)play;
+- (void)stop;
 
 @end
 
