@@ -454,15 +454,56 @@ static int interrupt_callback(void *ctx){
                 }
             }
         } else if (pktStreamIndex == _audioStreamIndex) {
-            
+            while (pktSize > 0) {
+                int gotframe = 0;
+                int len = avcodec_decode_audio4(_audioCondecCtx,
+                                                _audioFrame,
+                                                &gotframe,
+                                                &packet);
+                
+                if (len < 0) {
+                    NSLog(@"decode audio error, skip packet");
+                    break;
+                }
+                
+                if (gotframe) {
+                    AudioFrame *frame = [self handleAudioFrame];
+                    if (frame) {
+                        [result addObject:frame];
+                        if (_videoStreamIndex == -1;) {
+                            _decodePosition = frame.position;
+                            decodeDuration += frame.duration;
+                            if (decodeDuration > minDuration) {
+                                finished = YES;
+                            }
+                        }
+                    }
+                }
+                
+                if (len == 0) {
+                    break;
+                }
+                pktSize -= len;
+            }
         } else {
             NSLog(@"We Can Not Process Stream Except Audio And Video Stream...");
         }
         av_free_packet(&packet);
     }
+    
+    _readLastestFrameTime = [[NSDate date] timeIntervalSince1970];
+    return result;
+}
+
+- (BuriedPoint *)getBuriedPoint{
+    return _buriedPoint;
 }
 
 - (VideoFrame *)handleVideoFrame{
+    
+}
+
+- (AudioFrame *)handleAudioFrame{
     
 }
 
