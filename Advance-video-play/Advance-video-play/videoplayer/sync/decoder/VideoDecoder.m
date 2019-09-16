@@ -470,7 +470,7 @@ static int interrupt_callback(void *ctx){
                     AudioFrame *frame = [self handleAudioFrame];
                     if (frame) {
                         [result addObject:frame];
-                        if (_videoStreamIndex == -1;) {
+                        if (_videoStreamIndex == -1) {
                             _decodePosition = frame.position;
                             decodeDuration += frame.duration;
                             if (decodeDuration > minDuration) {
@@ -500,11 +500,284 @@ static int interrupt_callback(void *ctx){
 }
 
 - (VideoFrame *)handleVideoFrame{
+    if (!_videoFrame->data[0]) {
+        return nil;
+    }
     
+    VideoFrame *frame = [[VideoFrame alloc] init];
+    if (_videoCodecCtx->pix_fmt == AV_PIX_FMT_YUV420P || _videoCodecCtx->pix_fmt == AV_PIX_FMT_YUVJ420P) {
+        frame.luma = copyFrameData(_videoFrame->data[0],
+                                   _videoFrame->linesize[0],
+                                   _videoCodecCtx->width,
+                                   _videoCodecCtx->height);
+        frame.chromaB = copyFrameData(_videoFrame->data[1],
+                                      _videoFrame->linesize[1],
+                                      _videoCodecCtx->width / 2,
+                                      _videoCodecCtx->height / 2);
+        
+        frame.chromaR = copyFrameData(_videoFrame->data[2],
+                                      _videoFrame->linesize[2],
+                                      _videoCodecCtx->width/2,
+                                      _videoCodecCtx->height/2);
+        
+    } else {
+        if (!_swrContext && ![self setupScaler]) {
+            NSLog(@"Faile setup video scaler");
+            return nil;
+        }
+        
+        sws_scale(_swsContext,
+                  (const uint8_t **)_videoFrame->data,
+                  _videoFrame->linesize,
+                  0,
+                  _videoCodecCtx->height,
+                  _picture.data,
+                  _picture.linesize);
+        
+        frame.luma = copyFrameData(_picture.data[0],
+                                   _picture.linesize[0],
+                                   _videoCodecCtx->width,
+                                   _videoCodecCtx->height);
+        
+        frame.chromaB = copyFrameData(_picture.data[1],
+                                      _picture.linesize[1],
+                                      _videoCodecCtx->width / 2,
+                                      _videoCodecCtx->height / 2);
+        
+        frame.chromaR = copyFrameData(_picture.data[2],
+                                      _picture.linesize[2],
+                                      _videoCodecCtx->width / 2,
+                                      _videoCodecCtx->height / 2);
+    }
+    frame.width = _videoCodecCtx->width;
+    frame.height = _videoCodecCtx->height;
+    frame.linesize = _videoFrame->linesize[0];
+    frame.type = VideoFrameType;
+    frame.position = av_frame_get_best_effort_timestamp(_videoFrame);
+    const int64_t frameDuration = av_frame_get_pkt_duration(_videoFrame);
+    if (frameDuration) {
+        frame.duration = frameDuration * _videoTimeBase;
+        frame.duration += _videoFrame->repeat_pict * _videoTimeBase * 0.5;
+    } else {
+        frame.duration = 1.0 / _fps;
+    }
+    
+    return frame;
 }
 
 - (AudioFrame *)handleAudioFrame{
+    if (!_audioFrame->data[0]) {
+        return nil;
+    }
     
+    const NSUInteger numChannels = _audioCondecCtx->channels;
+    NSInteger numFrames;
+    
+    void *audioData;
+    
+    if (_swrContext) {
+        const NSUInteger ratio = 2;
+        const int bufSize = av_samples_get_buffer_size(NULL, (int)numChannels, (int)(_audioFrame->nb_samples * ratio), AV_SAMPLE_FMT_S16, 1);
+        if (!_swrBuffer || _swrBufferSize < bufSize) {
+            _swrBufferSize = bufSize;
+            _swrBuffer = realloc(_swrBuffer, _swrBufferSize);
+        }
+        
+        Byte *outbuf[2] = {_swrBuffer, 0};
+        numFrames = swr_convert(_swrContext,
+                                outbuf,
+                                (int)(_audioFrame->nb_samples * ratio),
+                                (const uint8_t **)_audioFrame->data,
+                                _audioFrame->nb_samples);
+        
+        if (numFrames < 0) {
+            NSLog(@"Faile resample audio");
+            return nil;
+        }
+        audioData = _swrBuffer;
+    } else {
+        if (_audioCondecCtx->sample_fmt != AV_SAMPLE_FMT_S16) {
+            NSLog(@"Audio format is invalid");
+            return nil;
+        }
+        
+        audioData = _audioFrame->data[0];
+        numFrames = _audioFrame->nb_samples;
+    }
+    const NSUInteger numElements = numFrames *numChannels;
+    NSMutableData *pcmData = [NSMutableData dataWithLength:numElements * sizeof(SInt16)];
+    memcpy(pcmData.mutableBytes, audioData, numElements * sizeof(SInt16));
+    AudioFrame *frame = [[AudioFrame alloc] init];
+    frame.position = av_frame_get_best_effort_timestamp(_audioFrame) * _audioTimeBase;
+    frame.duration = av_frame_get_pkt_duration(_audioFrame) * _audioTimeBase;
+    frame.samples = pcmData;
+    frame.type = AudioFrameType;
+    return frame;
+}
+
+- (void)triggerFirstScreen{
+    if (_buriedPoint.failOpenType == 1) {
+        _buriedPoint.firstScreenTimeMills = ([[NSDate date] timeIntervalSince1970] * 1000 - _buriedPoint.beginOpen) / 1000.0f;
+    }
+}
+
+- (void)addBufferStatusRecord:(NSString *)statusFlag{
+    if ([@"F" isEqualToString:statusFlag] && [[_buriedPoint.bufferStatusRecords lastObject] hasPrefix:@"F_"]) {
+        return;
+    }
+    
+    float timeInterval = ([[NSDate date] timeIntervalSince1970] * 1000 - _buriedPoint.beginOpen) / 1000.0f;
+    [_buriedPoint.bufferStatusRecords addObject:[NSString stringWithFormat:@"%@_%.3f", statusFlag, timeInterval]];
+}
+
+- (void)closeFile{
+    NSLog(@"Enter close File...");
+    if (_buriedPoint.failOpenType == 1) {
+        _buriedPoint.duration = ([[NSDate date] timeIntervalSince1970] * 1000 - _buriedPoint.beginOpen) / 1000.0f;
+    }
+    
+    [self interrupt];
+    
+    [self closeAudioStream];
+    [self closeVideoStream];
+    
+    _videoStreams = nil;
+    _audioStreams = nil;
+    
+    if (_formatCtx) {
+        _formatCtx->interrupt_callback.opaque = NULL;
+        _formatCtx->interrupt_callback.callback = NULL;
+        avformat_close_input(&_formatCtx);
+        
+        _formatCtx = NULL;
+    }
+    
+    float decodeFrameAVGTimeMills = (double)decodeVideoFrameWasteTimeMills / (float)totalVideoFramecount;
+    NSLog(@"Decoder decoder totalVideoFramecount is %d decodeFrameAVGTimeMills is %.3f", totalVideoFramecount, decodeFrameAVGTimeMills);
+}
+
+
+- (void)closeAudioStream{
+    _audioStreamIndex = -1;
+    
+    if (_swrBuffer) {
+        free(_swrBuffer);
+        _swrBuffer = NULL;
+        _swrBufferSize = 0;
+    }
+    
+    if (_swrContext) {
+        swr_free(&_swrContext);
+        _swrContext = NULL;
+    }
+    
+    if (_audioFrame) {
+        av_free(_audioFrame);
+        _audioFrame = NULL;
+    }
+    
+    if (_audioCondecCtx) {
+        avcodec_close(_audioCondecCtx);
+        _audioCondecCtx = NULL;
+    }
+}
+
+- (void)closeVideoStream{
+    _videoStreamIndex = -1;
+    
+    [self closeScaler];
+    
+    if (_videoFrame) {
+        av_free(_videoFrame);
+        _videoFrame = NULL;
+    }
+    
+    if (_videoCodecCtx) {
+        avcodec_close(_videoCodecCtx);
+        _videoCodecCtx = NULL;
+    }
+}
+
+- (BOOL)setupScaler{
+    [self closeScaler];
+    _pictureValid = avpicture_alloc(&_picture,
+                                    AV_PIX_FMT_YUV420P,
+                                    _videoCodecCtx->width,
+                                    _videoCodecCtx->height) == 0;
+    if (!_pictureValid) {
+        return NO;
+    }
+    
+    _swsContext = sws_getCachedContext(_swsContext,
+                                       _videoCodecCtx->width,
+                                       _videoCodecCtx->height,
+                                       _videoCodecCtx->pix_fmt,
+                                       _videoCodecCtx->width,
+                                       _videoCodecCtx->height,
+                                       AV_PIX_FMT_YUV420P,
+                                       SWS_FAST_BILINEAR,
+                                       NULL, NULL, NULL);
+    
+    return _swsContext != NULL;
+}
+
+- (void)closeScaler{
+    if (_swsContext) {
+        sws_freeContext(_swsContext);
+        _swsContext = NULL;
+    }
+    
+    if (_pictureValid) {
+        avpicture_free(&_picture);
+        _pictureValid = NO;
+    }
+}
+
+
+- (BOOL)isEOF{
+    return _isEOF;
+}
+
+- (BOOL)isSubscribed{
+    return _isSubscribe;
+}
+
+- (NSUInteger)frameWidth{
+    return  _videoCodecCtx ? _videoCodecCtx->width : 0;
+}
+
+- (NSUInteger)frameHeight{
+    return _videoCodecCtx ? _videoCodecCtx->height : 0;
+}
+
+- (CGFloat)sampleRate{
+    return _audioCondecCtx ? _audioCondecCtx->sample_rate : 0;
+}
+
+- (NSUInteger)channels{
+    return _audioCondecCtx ? _audioCondecCtx->channels : 0;
+}
+
+- (BOOL)validVideo{
+    return _videoStreamIndex != -1;
+}
+
+- (BOOL)validAudio{
+    return _audioStreamIndex != -1;
+}
+
+- (CGFloat)getVideoFPS{
+    return _fps;
+}
+
+- (CGFloat)getDuration{
+    if (_formatCtx) {
+        if (_formatCtx->duration == AV_NOPTS_VALUE) {
+            return -1;
+        }
+        return _formatCtx->duration / AV_TIME_BASE;
+    }
+    return -1;
 }
 
 @end

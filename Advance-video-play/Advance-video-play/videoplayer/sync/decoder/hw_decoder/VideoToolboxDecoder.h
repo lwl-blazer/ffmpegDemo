@@ -7,10 +7,22 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <VideoToolbox/VideoToolbox.h>
+#import "VideoDecoder.h"
 
 NS_ASSUME_NONNULL_BEGIN
+@protocol H264DecoderDelegate <NSObject>
+@optional
 
-@interface VideoToolboxDecoder : NSObject
+- (void)getDecodeImageData:(CVImageBufferRef)imageBuffer;
+@end
+
+@interface VideoToolboxDecoder : VideoDecoder
+
+@property(nonatomic, weak) id<H264DecoderDelegate>delegate;
+
+@property(nonatomic, assign) CMVideoFormatDescriptionRef formatDesc;
+@property(nonatomic, assign) VTDecompressionSessionRef decompressionSession;
 
 @end
 
