@@ -43,6 +43,8 @@
 		254884CD2328D23300ACDCEF /* ContrastEnhancerFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 254884CC2328D23300ACDCEF /* ContrastEnhancerFilter.m */; };
 		254884D02328D24900ACDCEF /* VideoOutput.m in Sources */ = {isa = PBXBuildFile; fileRef = 254884CF2328D24900ACDCEF /* VideoOutput.m */; };
 		254884D32328D27000ACDCEF /* VideoPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 254884D22328D27000ACDCEF /* VideoPlayerViewController.m */; };
+		254A25EE2330E03F00E393F8 /* ELVideoViewPlayController.m in Sources */ = {isa = PBXBuildFile; fileRef = 254A25ED2330E03F00E393F8 /* ELVideoViewPlayController.m */; };
+		254A25F12330E15700E393F8 /* LoadingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 254A25F02330E15700E393F8 /* LoadingView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -121,6 +123,10 @@
 		254884CF2328D24900ACDCEF /* VideoOutput.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VideoOutput.m; sourceTree = "<group>"; };
 		254884D12328D27000ACDCEF /* VideoPlayerViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VideoPlayerViewController.h; sourceTree = "<group>"; };
 		254884D22328D27000ACDCEF /* VideoPlayerViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VideoPlayerViewController.m; sourceTree = "<group>"; };
+		254A25EC2330E03F00E393F8 /* ELVideoViewPlayController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ELVideoViewPlayController.h; sourceTree = "<group>"; };
+		254A25ED2330E03F00E393F8 /* ELVideoViewPlayController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ELVideoViewPlayController.m; sourceTree = "<group>"; };
+		254A25EF2330E15700E393F8 /* LoadingView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LoadingView.h; sourceTree = "<group>"; };
+		254A25F02330E15700E393F8 /* LoadingView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LoadingView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -193,6 +199,10 @@
 				2548844A2328CCFB00ACDCEF /* AppDelegate.m */,
 				2548844C2328CCFB00ACDCEF /* ViewController.h */,
 				2548844D2328CCFB00ACDCEF /* ViewController.m */,
+				254A25EC2330E03F00E393F8 /* ELVideoViewPlayController.h */,
+				254A25ED2330E03F00E393F8 /* ELVideoViewPlayController.m */,
+				254A25EF2330E15700E393F8 /* LoadingView.h */,
+				254A25F02330E15700E393F8 /* LoadingView.m */,
 				2548844F2328CCFB00ACDCEF /* Main.storyboard */,
 				254884522328CCFD00ACDCEF /* Assets.xcassets */,
 				254884542328CCFD00ACDCEF /* LaunchScreen.storyboard */,
@@ -491,6 +501,8 @@
 				2548844E2328CCFB00ACDCEF /* ViewController.m in Sources */,
 				254884592328CCFD00ACDCEF /* main.m in Sources */,
 				254884C42328D1A700ACDCEF /* YUVFrameCopier.m in Sources */,
+				254A25F12330E15700E393F8 /* LoadingView.m in Sources */,
+				254A25EE2330E03F00E393F8 /* ELVideoViewPlayController.m in Sources */,
 				254884C72328D1C600ACDCEF /* YUVFrameFastCopier.m in Sources */,
 				254884BB2328D0AC00ACDCEF /* VideoDecoder.m in Sources */,
 				254884A32328CF8A00ACDCEF /* CommonUtil.m in Sources */,

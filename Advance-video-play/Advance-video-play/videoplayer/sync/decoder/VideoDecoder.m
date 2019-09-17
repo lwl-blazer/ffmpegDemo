@@ -227,7 +227,7 @@ static int interrupt_callback(void *ctx){
             return NO;
         }
         
-        _videoFrame = avcodec_alloc_frame();
+        _videoFrame = av_frame_alloc();
         if (!_videoFrame) {
             NSLog(@"Alloc Video Frame failed...");
             avcodec_close(codecCtx);
@@ -287,7 +287,7 @@ static int interrupt_callback(void *ctx){
                 return NO;
             }
             
-            _audioFrame = avcodec_alloc_frame();
+            _audioFrame = av_frame_alloc();
             if (!_audioFrame) {
                 NSLog(@"Alloc Audio Frame Failed...");
                 if (swrContext) {

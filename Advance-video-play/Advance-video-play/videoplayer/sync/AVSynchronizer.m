@@ -266,7 +266,7 @@ static void *decodeFirstBufferRunLoop(void *ptr){
     }
     
     //5.开启解码线程和解码队列
-    _audioFrame = [NSMutableArray array];
+    _audioFrames = [NSMutableArray array];
     _videoFrames = [NSMutableArray array];
     
     [self startDecoderThread];
