@@ -7,10 +7,13 @@
 //
 
 #import "BaseEffectFilter.h"
+#import "VideoDecoder.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface YUVFrameCopier : BaseEffectFilter
+
+- (void)renderWithTexId:(VideoFrame *)videoFrame;
 
 @end
 
