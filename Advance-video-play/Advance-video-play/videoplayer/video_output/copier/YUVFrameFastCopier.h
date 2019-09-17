@@ -7,10 +7,13 @@
 //
 
 #import "YUVFrameCopier.h"
+#import "VideoDecoder.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface YUVFrameFastCopier : YUVFrameCopier
+
+- (void)renderWithTexId:(VideoFrame *)videoFrame;
 
 @end
 

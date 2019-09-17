@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface ContrastEnhancerFilter : BaseEffectFilter
+@interface ContrastEnhancerFilter : BaseEffectFilter<ImageFilterInput>
 
 @end
 
