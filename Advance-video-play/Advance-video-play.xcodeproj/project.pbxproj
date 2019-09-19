@@ -16,7 +16,6 @@
 		254884632328CCFD00ACDCEF /* Advance_video_playTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 254884622328CCFD00ACDCEF /* Advance_video_playTests.m */; };
 		2548846E2328CCFD00ACDCEF /* Advance_video_playUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2548846D2328CCFD00ACDCEF /* Advance_video_playUITests.m */; };
 		2548847D2328CD7900ACDCEF /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2548847C2328CD7900ACDCEF /* CoreMedia.framework */; };
-		2548847F2328CD8000ACDCEF /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 2548847E2328CD8000ACDCEF /* libiconv.tbd */; };
 		254884812328CD8700ACDCEF /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 254884802328CD8700ACDCEF /* libbz2.tbd */; };
 		254884832328CD8F00ACDCEF /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 254884822328CD8F00ACDCEF /* AudioToolbox.framework */; };
 		254884852328CD9500ACDCEF /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 254884842328CD9500ACDCEF /* AVFoundation.framework */; };
@@ -45,6 +44,7 @@
 		254884D32328D27000ACDCEF /* VideoPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 254884D22328D27000ACDCEF /* VideoPlayerViewController.m */; };
 		254A25EE2330E03F00E393F8 /* ELVideoViewPlayController.m in Sources */ = {isa = PBXBuildFile; fileRef = 254A25ED2330E03F00E393F8 /* ELVideoViewPlayController.m */; };
 		254A25F12330E15700E393F8 /* LoadingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 254A25F02330E15700E393F8 /* LoadingView.m */; };
+		25AA617D2331B9C7000E6AD4 /* libiconv.2.4.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 25AA617C2331B9C7000E6AD4 /* libiconv.2.4.0.tbd */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -127,6 +127,7 @@
 		254A25ED2330E03F00E393F8 /* ELVideoViewPlayController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ELVideoViewPlayController.m; sourceTree = "<group>"; };
 		254A25EF2330E15700E393F8 /* LoadingView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LoadingView.h; sourceTree = "<group>"; };
 		254A25F02330E15700E393F8 /* LoadingView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LoadingView.m; sourceTree = "<group>"; };
+		25AA617C2331B9C7000E6AD4 /* libiconv.2.4.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.2.4.0.tbd; path = usr/lib/libiconv.2.4.0.tbd; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -134,6 +135,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				25AA617D2331B9C7000E6AD4 /* libiconv.2.4.0.tbd in Frameworks */,
 				254884912328CDE600ACDCEF /* libavutil.a in Frameworks */,
 				254884922328CDE600ACDCEF /* libswscale.a in Frameworks */,
 				254884932328CDE600ACDCEF /* libavfilter.a in Frameworks */,
@@ -146,7 +148,6 @@
 				254884852328CD9500ACDCEF /* AVFoundation.framework in Frameworks */,
 				254884832328CD8F00ACDCEF /* AudioToolbox.framework in Frameworks */,
 				254884812328CD8700ACDCEF /* libbz2.tbd in Frameworks */,
-				2548847F2328CD8000ACDCEF /* libiconv.tbd in Frameworks */,
 				2548847D2328CD7900ACDCEF /* CoreMedia.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -233,6 +234,7 @@
 		2548847B2328CD7800ACDCEF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				25AA617C2331B9C7000E6AD4 /* libiconv.2.4.0.tbd */,
 				254884902328CDE500ACDCEF /* libavcodec.a */,
 				2548848E2328CDE500ACDCEF /* libavdevice.a */,
 				2548848C2328CDE500ACDCEF /* libavfilter.a */,
