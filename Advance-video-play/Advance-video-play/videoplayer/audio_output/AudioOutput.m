@@ -122,7 +122,7 @@ static void CheckStatus(OSStatus status, NSString *message, BOOL fatal);
     CheckStatus(status, @"Could not set stream format on I/O unit output scope", YES);
     
     AudioStreamBasicDescription _clientFormat16int;
-    UInt32 bytesPerSample = sizeof(_clientFormat16int);
+    UInt32 bytesPerSample = sizeof(SInt16);
     _clientFormat16int.mFormatID = kAudioFormatLinearPCM;
     _clientFormat16int.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
     _clientFormat16int.mBytesPerPacket = bytesPerSample * _channels;
@@ -243,7 +243,7 @@ static void CheckStatus(OSStatus status, NSString *message, BOOL fatal);
                                         numFrames:numFrames
                                       numChannels:_channels];
             for (int iBuffer = 0; iBuffer < ioData->mNumberBuffers; ++iBuffer) {
-                memcpy((SInt16 *)ioData->mBuffers[iBuffer].mData, _outData, ioData->mNumberBuffers);
+                memcpy((SInt16 *)ioData->mBuffers[iBuffer].mData, _outData, ioData->mBuffers[iBuffer].mDataByteSize);
             }
         }
         return noErr;

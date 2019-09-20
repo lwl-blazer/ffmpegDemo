@@ -218,6 +218,7 @@ static int interrupt_callback(void *ctx){
         AVCodecContext *codecCtx = _formatCtx->streams[iStream]->codec;
         AVCodec *codec = avcodec_find_decoder(codecCtx->codec_id);
         if (!codec) {
+            NSLog(@"Find Video Decoder Failed codec_id %d CODEC_ID_H264 is %d", codecCtx->codec_id, AV_CODEC_ID_H264);
             return NO;
         }
         

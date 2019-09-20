@@ -89,6 +89,7 @@ static BOOL isNetworkPath(NSString *path){
     return YES;
 }
 
+//开始跑解码线程
 static void *runDecoderThread(void *ptr){
     AVSynchronizer *synchronizer = (__bridge AVSynchronizer *)ptr;
     [synchronizer run];
@@ -182,7 +183,9 @@ static void *decodeFirstBufferRunLoop(void *ptr){
     }
 }
 
-- (OpenState)openFile:(NSString *)path usingHWCodec:(BOOL)usingHWCodec error:(NSError * _Nullable __autoreleasing *)perror{
+- (OpenState)openFile:(NSString *)path
+         usingHWCodec:(BOOL)usingHWCodec
+                error:(NSError * _Nullable __autoreleasing *)perror{
     NSMutableDictionary *parameters = [NSMutableDictionary dictionary];
     parameters[FPS_PROBE_SIZE_CONFIGURED] = @(true);
     parameters[PROBE_SIZE] = @(50 * 1024);
@@ -192,22 +195,21 @@ static void *decodeFirstBufferRunLoop(void *ptr){
     durations[1] = @(1750000);
     durations[2] = @(2000000);
     parameters[MAX_ANALYZE_DURATION_ARRAY] = durations;
-    return [self openFile:path usingHWCodec:usingHWCodec parameters:parameters error:perror];
+    return [self openFile:path
+             usingHWCodec:usingHWCodec
+               parameters:parameters
+                    error:perror];
 }
 
 - (BOOL)usingHWCodec{
     return _usingHWCodec;
 }
 
-- (OpenState)openFile:(NSString *)path usingHWCodec:(BOOL)usingHWCodec parameters:(NSDictionary *)parameters error:(NSError * _Nullable __autoreleasing *)perror{
+- (OpenState)openFile:(NSString *)path
+         usingHWCodec:(BOOL)usingHWCodec
+           parameters:(NSDictionary *)parameters
+                error:(NSError * _Nullable __autoreleasing *)perror{
     //1.创建decoder实例
-    if (usingHWCodec) {
-        BOOL isIOS8OrUpper = ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0);
-        if (!isIOS8OrUpper) {
-            usingHWCodec = false;
-        }
-    }
-    
     _usingHWCodec = usingHWCodec;
     [self createDecoderInstance];
     
@@ -301,7 +303,7 @@ float lastPosition = -1.0;
     @synchronized (_videoFrames) {
         while (_videoFrames.count > 0) {
             frame = _videoFrames[0];
-            const CGFloat delta = _audioPosition - frame.duration;
+            const CGFloat delta = _audioPosition - frame.position;
             if (delta < (0 - _syncMaxTimeDiff)) {
                 //NSLog(@"视频比音频快了好多,我们还是渲染上一帧");
                 frame = NULL;
@@ -353,6 +355,7 @@ float lastPosition = -1.0;
     @autoreleasepool {
         while (numFrames > 0) {
             if (!_currentAudioFrame) {
+                //从队列中取出音频数据
                 @synchronized (_audioFrames) {
                     NSUInteger count = _audioFrames.count;
                     if (count > 0) {
@@ -415,10 +418,12 @@ float lastPosition = -1.0;
         if (_decodeVideoErrorTotalTime > TIMEOUT_DECODE_ERROR) {
             NSLog(@"decodeVideoErrorTotalTime = %f", _decodeVideoErrorTotalTime);
             _decodeVideoErrorTotalTime = 0;
+            __weak typeof(self) weakSelf = self;
             dispatch_async(dispatch_get_main_queue(), ^{
+                __strong typeof(weakSelf) strongify = weakSelf;
                NSLog(@"restart after decodeVideoError");
-                if (_playerStateDelegate && [_playerStateDelegate respondsToSelector:@selector(restart)]) {
-                    [_playerStateDelegate restart];
+                if (strongify->_playerStateDelegate && [strongify->_playerStateDelegate respondsToSelector:@selector(restart)]) {
+                    [strongify->_playerStateDelegate restart];
                 }
             });
         }

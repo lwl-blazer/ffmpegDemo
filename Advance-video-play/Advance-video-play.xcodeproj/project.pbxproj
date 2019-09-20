@@ -45,6 +45,8 @@
 		254A25EE2330E03F00E393F8 /* ELVideoViewPlayController.m in Sources */ = {isa = PBXBuildFile; fileRef = 254A25ED2330E03F00E393F8 /* ELVideoViewPlayController.m */; };
 		254A25F12330E15700E393F8 /* LoadingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 254A25F02330E15700E393F8 /* LoadingView.m */; };
 		25AA617D2331B9C7000E6AD4 /* libiconv.2.4.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 25AA617C2331B9C7000E6AD4 /* libiconv.2.4.0.tbd */; };
+		25B583BF23331715008D3756 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 25B583BE23331715008D3756 /* libz.tbd */; };
+		25B583C1233317B7008D3756 /* music.flv in Resources */ = {isa = PBXBuildFile; fileRef = 25B583C0233317B7008D3756 /* music.flv */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -128,6 +130,8 @@
 		254A25EF2330E15700E393F8 /* LoadingView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LoadingView.h; sourceTree = "<group>"; };
 		254A25F02330E15700E393F8 /* LoadingView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LoadingView.m; sourceTree = "<group>"; };
 		25AA617C2331B9C7000E6AD4 /* libiconv.2.4.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.2.4.0.tbd; path = usr/lib/libiconv.2.4.0.tbd; sourceTree = SDKROOT; };
+		25B583BE23331715008D3756 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		25B583C0233317B7008D3756 /* music.flv */ = {isa = PBXFileReference; lastKnownFileType = file; path = music.flv; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -135,6 +139,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				25B583BF23331715008D3756 /* libz.tbd in Frameworks */,
 				25AA617D2331B9C7000E6AD4 /* libiconv.2.4.0.tbd in Frameworks */,
 				254884912328CDE600ACDCEF /* libavutil.a in Frameworks */,
 				254884922328CDE600ACDCEF /* libswscale.a in Frameworks */,
@@ -209,6 +214,7 @@
 				254884542328CCFD00ACDCEF /* LaunchScreen.storyboard */,
 				254884572328CCFD00ACDCEF /* Info.plist */,
 				254884582328CCFD00ACDCEF /* main.m */,
+				25B583C0233317B7008D3756 /* music.flv */,
 			);
 			path = "Advance-video-play";
 			sourceTree = "<group>";
@@ -234,6 +240,7 @@
 		2548847B2328CD7800ACDCEF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				25B583BE23331715008D3756 /* libz.tbd */,
 				25AA617C2331B9C7000E6AD4 /* libiconv.2.4.0.tbd */,
 				254884902328CDE500ACDCEF /* libavcodec.a */,
 				2548848E2328CDE500ACDCEF /* libavdevice.a */,
@@ -469,6 +476,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				25B583C1233317B7008D3756 /* music.flv in Resources */,
 				254884562328CCFD00ACDCEF /* LaunchScreen.storyboard in Resources */,
 				254884532328CCFD00ACDCEF /* Assets.xcassets in Resources */,
 				254884512328CCFB00ACDCEF /* Main.storyboard in Resources */,

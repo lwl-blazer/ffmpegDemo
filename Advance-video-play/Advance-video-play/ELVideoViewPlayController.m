@@ -21,7 +21,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
 }
 
 + (instancetype)viewControllerWithContentPath:(NSString *)path
@@ -45,7 +44,7 @@
                                                                             usingHWCodec:usingHWCodec
                                                                      playerStateDelegate:self
                                                                               parameters:parameters];
-        
+
         [self addChildViewController:_playerViewController];
         [self.view addSubview:_playerViewController.view];
     }
@@ -71,17 +70,20 @@
     }
 }
 
-- (void) restart
-{
+- (void) restart{
     //Loading 或者 毛玻璃效果在这里处理
     [_playerViewController restart];
 }
 
-- (void) connectFailed;
-{
+- (void) connectFailed;{
     dispatch_async(dispatch_get_main_queue(), ^{
-        UIAlertView *alterView = [[UIAlertView alloc] initWithTitle:@"提示信息" message:@"打开视频失败, 请检查文件或者远程连接是否存在！" delegate:self cancelButtonTitle:@"取消" otherButtonTitles: nil];
-        [alterView show];
+        UIAlertController *alertCtn = [UIAlertController alertControllerWithTitle:@"提示信息"
+                                                                          message:@"打开视频失败, 请检查文件或者远程连接是否存在！"
+                                                                   preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *action = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel
+                                                       handler:NULL];
+        [alertCtn addAction:action];
+        [self presentViewController:alertCtn animated:YES completion:NULL];
     });
 }
 
@@ -110,28 +112,32 @@
     NSLog(@"buried point is %@", buriedPointStatictics);
 }
 
-- (void) hideLoading
+- (void)hideLoading
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [[LoadingView shareLoadingView] close];
+        //[[LoadingView shareLoadingView] close];
     });
 }
 
-- (void) showLoading
+- (void)showLoading
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [[LoadingView shareLoadingView] show];
+        //[[LoadingView shareLoadingView] show];
     });
 }
 
-- (void) onCompletion
-{
+- (void)onCompletion{
     dispatch_async(dispatch_get_main_queue(), ^{
         [[LoadingView shareLoadingView] close];
-        UIAlertView *alterView = [[UIAlertView alloc] initWithTitle:@"提示信息" message:@"视频播放完毕了" delegate:self cancelButtonTitle:@"取消" otherButtonTitles: nil];
-        [alterView show];
+        
+        UIAlertController *alertCtn = [UIAlertController alertControllerWithTitle:@"提示信息"
+                                                                          message:@"视频播放完毕了"
+                                                                   preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *action = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel
+                                                       handler:NULL];
+        [alertCtn addAction:action];
+        [self presentViewController:alertCtn animated:YES completion:NULL];
     });
-    
 }
 
 @end

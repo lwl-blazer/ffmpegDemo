@@ -34,10 +34,10 @@ NSString * const MAX_BUFFERED_DURATION = @"Max Buffered Duration";
 }
 
 - (IBAction)actionButton:(id)sender {
-    NSString* videoFilePath = [CommonUtil bundlePath:@"" type:@""];
+    NSString* videoFilePath = [CommonUtil bundlePath:@"music" type:@"flv"];
     BOOL usingHWCodec = NO;//YES;
     ELVideoViewPlayController *vc = [ELVideoViewPlayController viewControllerWithContentPath:videoFilePath contentFrame:self.view.bounds usingHWCodec:usingHWCodec parameters:_requestHeader];
-    [[self navigationController] pushViewController:vc animated:YES];
+    [self.navigationController pushViewController:vc animated:YES];
 }
 
 

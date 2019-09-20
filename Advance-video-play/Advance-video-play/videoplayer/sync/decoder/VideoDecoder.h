@@ -10,12 +10,20 @@
 #import <CoreGraphics/CoreGraphics.h>
 #import <CoreVideo/CoreVideo.h>
 
-#include "libavformat/avformat.h"
-#include "libavcodec/avcodec.h"
-#include "libswscale/swscale.h"
-#include "libswresample/swresample.h"
-#include "libavutil/pixdesc.h"
-#include "libavutil/frame.h"
+#import <libavutil/pixdesc.h>
+#import <libavutil/frame.h>
+#import <libavformat/avformat.h>
+#import <libavcodec/avcodec.h>
+#import <libswscale/swscale.h>
+#import <libswresample/swresample.h>
+
+
+//#include "libavformat/avformat.h"
+//#include "libavcodec/avcodec.h"
+//#include "libswscale/swscale.h"
+//#include "libswresample/swresample.h"
+//#include "libavutil/pixdesc.h"
+//#include "libavutil/frame.h"
 
 typedef enum {
     AudioFrameType,

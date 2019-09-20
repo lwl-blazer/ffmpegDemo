@@ -19,11 +19,17 @@
     EAGLSharegroup *_shareGroup;
 }
 
+@property(nonatomic, assign) CGRect bounds;
+
 @end
 
 @implementation VideoPlayerViewController
 
-+ (instancetype)viewControllerWithContentPath:(NSString *)path contentFrame:(CGRect)frame usingHWCodec:(BOOL)usingHWCodec playerStateDelegate:(id)playerStateDelegate parameters:(NSDictionary *)parameters{
++ (instancetype)viewControllerWithContentPath:(NSString *)path
+                                 contentFrame:(CGRect)frame
+                                 usingHWCodec:(BOOL)usingHWCodec
+                          playerStateDelegate:(id)playerStateDelegate
+                                   parameters:(NSDictionary *)parameters{
     return [[VideoPlayerViewController alloc] initWithContentPath:path
                                                      contentFrame:frame
                                                      usingHWCodec:usingHWCodec
@@ -31,7 +37,12 @@
                                                        parameters:parameters];
 }
 
-+ (instancetype)viewControllerWithContentPath:(NSString *)path contentFrame:(CGRect)frame usingHWCodec:(BOOL)usingHWCodec playerStateDelegate:(id<PlayerStateDelegate>)playerStateDelegate parameters:(NSDictionary *)parameters outputEAGLContextShareGroup:(EAGLSharegroup *)sharegroup{
++ (instancetype)viewControllerWithContentPath:(NSString *)path
+                                 contentFrame:(CGRect)frame
+                                 usingHWCodec:(BOOL)usingHWCodec
+                          playerStateDelegate:(id<PlayerStateDelegate>)playerStateDelegate
+                                   parameters:(NSDictionary *)parameters
+                  outputEAGLContextShareGroup:(EAGLSharegroup *)sharegroup{
     return [[VideoPlayerViewController alloc] initWithContentPath:path
                                                      contentFrame:frame
                                                      usingHWCodec:usingHWCodec
@@ -40,7 +51,11 @@
                                       outputEAGLContextShareGroup:sharegroup];
 }
 
-- (instancetype)initWithContentPath:(NSString *)path contentFrame:(CGRect)frame usingHWCodec:(BOOL)usingHWCodec playerStateDelegate:(id)playerStateDelegate parameters:(NSDictionary *)parameters{
+- (instancetype)initWithContentPath:(NSString *)path
+                       contentFrame:(CGRect)frame
+                       usingHWCodec:(BOOL)usingHWCodec
+                playerStateDelegate:(id)playerStateDelegate
+                         parameters:(NSDictionary *)parameters{
     return [self initWithContentPath:path
                         contentFrame:frame
                         usingHWCodec:usingHWCodec
@@ -49,7 +64,12 @@
          outputEAGLContextShareGroup:nil];
 }
 
-- (instancetype)initWithContentPath:(NSString *)path contentFrame:(CGRect)frame usingHWCodec:(BOOL)usingHWCodec playerStateDelegate:(id)playerStateDelegate parameters:(NSDictionary *)parameters outputEAGLContextShareGroup:(EAGLSharegroup *)sharegroup{
+- (instancetype)initWithContentPath:(NSString *)path
+                       contentFrame:(CGRect)frame
+                       usingHWCodec:(BOOL)usingHWCodec
+                playerStateDelegate:(id)playerStateDelegate
+                         parameters:(NSDictionary *)parameters
+        outputEAGLContextShareGroup:(EAGLSharegroup  *)sharegroup{
     NSAssert(path.length > 0, @"empty path");
     self = [super initWithNibName:nil bundle:nil];
     if (self) {
@@ -60,17 +80,24 @@
         _playerStateDelegate = playerStateDelegate;
         _shareGroup = sharegroup;
         NSLog(@"Enter VideoPlayerViewController init, url: %@, h/w enable: %@", _videoFilePath, @(usingHWCodec));
-
         [self start];
     }
     return self;
 }
 
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.view = [[UIView alloc] initWithFrame:_contentFrame];
+    self.view.backgroundColor = [UIColor clearColor];
+}
+
+
+
 - (void)start{
     _synchronizer = [[AVSynchronizer alloc] initWithPlayerStateDelegate:_playerStateDelegate];
     __weak VideoPlayerViewController *weakSelf = self;
-    BOOL isIOS8OrUpper = ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0);
-    dispatch_async(dispatch_get_global_queue(isIOS8OrUpper ? QOS_CLASS_USER_INTERACTIVE: DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+    self.bounds = self.view.bounds;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         __strong VideoPlayerViewController *strongSelf = weakSelf;
         if (strongSelf) {
             NSError *error = nil;
@@ -90,13 +117,15 @@
             
             if (OPEN_SUCCESS == state) {
                 //启动AudioOutput与VideoOutput
-                strongSelf->_videoOutput = [strongSelf createVideoOutputInstance];
-                strongSelf->_videoOutput.contentMode = UIViewContentModeScaleAspectFit;
-                strongSelf->_videoOutput.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleBottomMargin;
                 dispatch_async(dispatch_get_main_queue(), ^{
+                    strongSelf->_videoOutput = [strongSelf createVideoOutputInstance];
+                    strongSelf->_videoOutput.contentMode = UIViewContentModeScaleAspectFit;
+                    strongSelf->_videoOutput.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleBottomMargin;
+                    
                     self.view.backgroundColor = [UIColor clearColor];
                     [self.view insertSubview:strongSelf->_videoOutput atIndex:0];
                 });
+                
                 
                 NSInteger audioChannels = [strongSelf->_synchronizer getAudioChannels];
                 NSInteger audioSampleRate = [strongSelf->_synchronizer getAudioSampleRate];
@@ -108,12 +137,12 @@
                                                                   bytesPerSample:bytesPerSample
                                                                filleDataDelegate:strongSelf];
                 [strongSelf->_audioOutput play];
-                strongSelf->_isPlaying = YES;
                 
+                
+                strongSelf->_isPlaying = YES;
                 if (strongSelf->_playerStateDelegate && [strongSelf->_playerStateDelegate respondsToSelector:@selector(openSucced)]) {
                     [strongSelf->_playerStateDelegate openSucced];
                 }
-                
             } else if (OPEN_FAILED == state) {
                 if (strongSelf->_playerStateDelegate && [strongSelf->_playerStateDelegate respondsToSelector:@selector(connectFailed)]) {
                     [strongSelf->_playerStateDelegate connectFailed];
@@ -123,6 +152,19 @@
     });
 }
 
+//创建视频界面
+- (VideoOutput *)createVideoOutputInstance{
+    NSInteger textureWidth = [_synchronizer getVideoFrameWidth];
+    NSInteger textureHeight = [_synchronizer getVideoFrameHeight];
+    return [[VideoOutput alloc] initWithFrame:self.bounds
+                                 textureWidth:textureWidth
+                                textureHeight:textureHeight
+                                 usingHWCodec:_usingHWCodec
+                                   shareGroup:_shareGroup];
+}
+
+
+
 - (void)restart{
     UIView *parentView = [self.view superview];
     [self.view removeFromSuperview];
@@ -131,26 +173,12 @@
     [parentView addSubview:self.view];
 }
 
-- (VideoOutput *)createVideoOutputInstance{
-    CGRect bounds = self.view.bounds;
-    NSInteger textureWidth = [_synchronizer getVideoFrameWidth];
-    NSInteger textureHeight = [_synchronizer getVideoFrameHeight];
-    return [[VideoOutput alloc] initWithFrame:bounds
-                                 textureWidth:textureWidth
-                                textureHeight:textureHeight
-                                 usingHWCodec:_usingHWCodec
-                                   shareGroup:_shareGroup];
-}
+
 
 - (VideoOutput *)getVideoOutputInstance{
     return _videoOutput;
 }
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    self.view = [[UIView alloc] initWithFrame:_contentFrame];
-    self.view.backgroundColor = [UIColor clearColor];
-}
 
 - (void)play{
     if (_isPlaying) {
@@ -211,6 +239,7 @@
     return image;
 }
 
+//根据音频驱动视频
 - (NSInteger)fillAudioData:(SInt16 *)sampleBuffer numFrames:(NSInteger)frameNum numChannels:(NSInteger)channels{
     if (_synchronizer && ![_synchronizer isPlayCompleted]) {
         [_synchronizer audioCallbackFillData:sampleBuffer

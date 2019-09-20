@@ -31,6 +31,8 @@
 @property(nonatomic, strong) NSLock *shouldEnableOpenGLLock;
 @property(nonatomic, strong) NSOperationQueue *renderOperationQueue;
 
+@property(nonatomic, weak) CAEAGLLayer *eaglLayer;
+
 @end
 
 @implementation VideoOutput
@@ -52,11 +54,22 @@
     return [CAEAGLLayer class];
 }
 
-- (instancetype)initWithFrame:(CGRect)frame textureWidth:(NSInteger)textureWidth textureHeight:(NSInteger)textureHeight usingHWCodec:(BOOL)usingHWCodec{
-    return [self initWithFrame:frame textureWidth:textureWidth textureHeight:textureHeight usingHWCodec:usingHWCodec shareGroup:nil];
+- (instancetype)initWithFrame:(CGRect)frame
+                 textureWidth:(NSInteger)textureWidth
+                textureHeight:(NSInteger)textureHeight
+                 usingHWCodec:(BOOL)usingHWCodec{
+    return [self initWithFrame:frame
+                  textureWidth:textureWidth
+                 textureHeight:textureHeight
+                  usingHWCodec:usingHWCodec
+                    shareGroup:nil];
 }
 
-- (instancetype)initWithFrame:(CGRect)frame textureWidth:(NSInteger)textureWidth textureHeight:(NSInteger)textureHeight usingHWCodec:(BOOL)usingHWCodec shareGroup:(EAGLSharegroup *)shareGroup{
+- (instancetype)initWithFrame:(CGRect)frame
+                 textureWidth:(NSInteger)textureWidth
+                textureHeight:(NSInteger)textureHeight
+                 usingHWCodec:(BOOL)usingHWCodec
+                   shareGroup:(EAGLSharegroup *)shareGroup{
     self = [super initWithFrame:frame];
     if (self) {
         _shouldEnableOpenGLLock = [NSLock new];
@@ -73,21 +86,22 @@
                                                      name:UIApplicationDidBecomeActiveNotification
                                                    object:nil];
         
-        CAEAGLLayer *eaglLayer = (CAEAGLLayer *)self.layer;
-        eaglLayer.opaque = YES;
-        eaglLayer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:NO], kEAGLDrawablePropertyRetainedBacking,
-                                        kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat, nil];
+        self.eaglLayer = (CAEAGLLayer *)self.layer;
+        self.eaglLayer.opaque = YES;
+        self.eaglLayer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:NO],
+                                        kEAGLDrawablePropertyRetainedBacking,
+                                        kEAGLColorFormatRGBA8,
+                                        kEAGLDrawablePropertyColorFormat, nil];
         
         _renderOperationQueue = [[NSOperationQueue alloc] init];
-        _renderOperationQueue.maxConcurrentOperationCount  = 1;
+        _renderOperationQueue.maxConcurrentOperationCount = 1; //同时执行的最大数量
         _renderOperationQueue.name = @"com.changba.video_player.videoRenderQueue";
         
         __weak VideoOutput *weakSelf = self;
-        [_renderOperationQueue addOperationWithBlock:^{
+        [_renderOperationQueue addOperationWithBlock:^{   //添加到队列中，自动异步执行
             if (!weakSelf) {
                 return;
             }
-            
             __strong VideoOutput *strongSelf = weakSelf;
             if (shareGroup) {
                 strongSelf->_context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2 sharegroup:shareGroup];
@@ -109,7 +123,7 @@
             }
             
             strongSelf->_filter = [self createImageProcessFilterInstance];
-            if (![strongSelf->_videoFrameCopier prepareRender:textureWidth height:textureHeight]) {
+            if (![strongSelf->_filter prepareRender:textureWidth height:textureHeight]) {
                 NSLog(@"_contrastEnhancerFilter prepareRender failed...");
             }
             
@@ -123,6 +137,7 @@
             [strongSelf ->_directPassRenderer setInputTexture:[strongSelf->_filter outputTextureID]];
             strongSelf.readyToRender = YES;
         }];
+        
     }
     return self;
 }
@@ -207,9 +222,8 @@ static const NSInteger kMaxOperationQueueCount = 3;
     glGenRenderbuffers(1, &_renderBuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, _displayFrameBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, _renderBuffer);
-    
-    [_context renderbufferStorage:GL_RENDERBUFFER fromDrawable:(CAEAGLLayer *)self.layer];
-    
+    [self->_context renderbufferStorage:GL_RENDERBUFFER fromDrawable:self.eaglLayer];
+   
     glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &_backingWidth);
     glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &_backingHeight);
     
