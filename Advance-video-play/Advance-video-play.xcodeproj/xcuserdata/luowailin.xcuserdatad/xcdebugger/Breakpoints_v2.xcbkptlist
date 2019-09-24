@@ -9,29 +9,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Advance-video-play/videoplayer/sync/AVSynchronizer.m"
-            timestampString = "590575235.568166"
+            filePath = "Advance-video-play/videoplayer/sync/decoder/VideoDecoder.m"
+            timestampString = "591014184.71085"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "322"
-            endingLineNumber = "322"
-            landmarkName = "-getCorrectVideoFrame"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Advance-video-play/videoplayer/sync/AVSynchronizer.m"
-            timestampString = "590575235.568266"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "305"
-            endingLineNumber = "305"
-            landmarkName = "-getCorrectVideoFrame"
+            startingLineNumber = "630"
+            endingLineNumber = "630"
+            landmarkName = "-handleVideoFrame"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

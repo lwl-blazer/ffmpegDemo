@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		252FD692233A289A00811E0E /* music.flv in Resources */ = {isa = PBXBuildFile; fileRef = 252FD691233A289A00811E0E /* music.flv */; };
+		252FD694233A291400811E0E /* music2.flv in Resources */ = {isa = PBXBuildFile; fileRef = 252FD693233A291300811E0E /* music2.flv */; };
 		2548844B2328CCFB00ACDCEF /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 2548844A2328CCFB00ACDCEF /* AppDelegate.m */; };
 		2548844E2328CCFB00ACDCEF /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2548844D2328CCFB00ACDCEF /* ViewController.m */; };
 		254884512328CCFB00ACDCEF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2548844F2328CCFB00ACDCEF /* Main.storyboard */; };
@@ -46,7 +48,6 @@
 		254A25F12330E15700E393F8 /* LoadingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 254A25F02330E15700E393F8 /* LoadingView.m */; };
 		25AA617D2331B9C7000E6AD4 /* libiconv.2.4.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 25AA617C2331B9C7000E6AD4 /* libiconv.2.4.0.tbd */; };
 		25B583BF23331715008D3756 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 25B583BE23331715008D3756 /* libz.tbd */; };
-		25B583C1233317B7008D3756 /* music.flv in Resources */ = {isa = PBXBuildFile; fileRef = 25B583C0233317B7008D3756 /* music.flv */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +68,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		252FD691233A289A00811E0E /* music.flv */ = {isa = PBXFileReference; lastKnownFileType = file; path = music.flv; sourceTree = "<group>"; };
+		252FD693233A291300811E0E /* music2.flv */ = {isa = PBXFileReference; lastKnownFileType = file; path = music2.flv; sourceTree = "<group>"; };
 		254884462328CCFB00ACDCEF /* Advance-video-play.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Advance-video-play.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		254884492328CCFB00ACDCEF /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		2548844A2328CCFB00ACDCEF /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -131,7 +134,6 @@
 		254A25F02330E15700E393F8 /* LoadingView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LoadingView.m; sourceTree = "<group>"; };
 		25AA617C2331B9C7000E6AD4 /* libiconv.2.4.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.2.4.0.tbd; path = usr/lib/libiconv.2.4.0.tbd; sourceTree = SDKROOT; };
 		25B583BE23331715008D3756 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
-		25B583C0233317B7008D3756 /* music.flv */ = {isa = PBXFileReference; lastKnownFileType = file; path = music.flv; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -214,7 +216,6 @@
 				254884542328CCFD00ACDCEF /* LaunchScreen.storyboard */,
 				254884572328CCFD00ACDCEF /* Info.plist */,
 				254884582328CCFD00ACDCEF /* main.m */,
-				25B583C0233317B7008D3756 /* music.flv */,
 			);
 			path = "Advance-video-play";
 			sourceTree = "<group>";
@@ -341,6 +342,8 @@
 		2548849F2328CF8900ACDCEF /* resource */ = {
 			isa = PBXGroup;
 			children = (
+				252FD693233A291300811E0E /* music2.flv */,
+				252FD691233A289A00811E0E /* music.flv */,
 			);
 			path = resource;
 			sourceTree = "<group>";
@@ -476,10 +479,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				25B583C1233317B7008D3756 /* music.flv in Resources */,
 				254884562328CCFD00ACDCEF /* LaunchScreen.storyboard in Resources */,
 				254884532328CCFD00ACDCEF /* Assets.xcassets in Resources */,
 				254884512328CCFB00ACDCEF /* Main.storyboard in Resources */,
+				252FD694233A291400811E0E /* music2.flv in Resources */,
+				252FD692233A289A00811E0E /* music.flv in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

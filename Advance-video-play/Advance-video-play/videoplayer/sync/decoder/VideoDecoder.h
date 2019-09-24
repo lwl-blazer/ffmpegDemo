@@ -17,14 +17,6 @@
 #import <libswscale/swscale.h>
 #import <libswresample/swresample.h>
 
-
-//#include "libavformat/avformat.h"
-//#include "libavcodec/avcodec.h"
-//#include "libswscale/swscale.h"
-//#include "libswresample/swresample.h"
-//#include "libavutil/pixdesc.h"
-//#include "libavutil/frame.h"
-
 typedef enum {
     AudioFrameType,
     VideoFrameType,

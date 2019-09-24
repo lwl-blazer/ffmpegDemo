@@ -330,7 +330,7 @@ float lastPosition = -1.0;
         }
         _currentVideoFrame = frame;
     } else {
-        NSLog(@"Frame is NULL");
+        //NSLog(@"Frame is NULL");
     }
     
     if (fabs(_currentVideoFrame.position - lastPosition) > 0.01f) {
@@ -455,14 +455,14 @@ float lastPosition = -1.0;
         _bufferedTotalTime = [[NSDate date] timeIntervalSince1970] - _bufferedBeginTime;
         if (_bufferedTotalTime > TIMEOUT_BUFFER) {
             _bufferedTotalTime = 0;
+            __weak typeof(self) weakSelf = self;
             dispatch_async(dispatch_get_main_queue(), ^{
 #ifdef DEBUG
                 NSLog(@"AVSynchronizer restart after timeout");
 #endif
-                
-                if (_playerStateDelegate && [_playerStateDelegate respondsToSelector:@selector(restart)]) {
+                if (weakSelf.playerStateDelegate && [weakSelf.playerStateDelegate respondsToSelector:@selector(restart)]) {
                     NSLog(@"=============================== AVSynchronizer restart");
-                    [_playerStateDelegate restart];
+                    [weakSelf.playerStateDelegate restart];
                 }
             });
             return;
@@ -487,6 +487,7 @@ float lastPosition = -1.0;
             }
         }
     }
+    
     
     if (_decoder.validAudio) {
         @synchronized (_audioFrames) {
