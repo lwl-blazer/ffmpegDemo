@@ -147,7 +147,7 @@ static void *decodeFirstBufferRunLoop(void *ptr){
 }
 
 //主要负责解码音视频压缩数据成为原始数据，并且封装成自定义的结构体，最终全部放到一个数组中，然后返回给调用端
-- (void)decodeFrames{
+- (void)decodeFrames{ /**videoDecoderThread线程中执行的代码*/
     const CGFloat duration = 0.0f;
     BOOL good = YES;
     while (good) {
@@ -278,10 +278,10 @@ static void *decodeFirstBufferRunLoop(void *ptr){
 }
 
 - (void)startDecodeFirstBufferThread{
+    //初始化线程， 互斥锁，条件变量
     pthread_mutex_init(&decodeFirstBufferLock, NULL);
     pthread_cond_init(&decodeFirstBufferCondition, NULL);
     isDecodingFirstBuffer = true;
-    
     pthread_create(&decodeFirstBufferThread, NULL, decodeFirstBufferRunLoop, (__bridge void *)self);
 }
 
@@ -289,9 +289,12 @@ static void *decodeFirstBufferRunLoop(void *ptr){
     NSLog(@"AVSynchronizer::startDecoderThread ...");
     isOnDecoding = true;
     isDestroyed = false;
+    
+    //初始化线程，互斥锁，条件变量
     pthread_mutex_init(&videoDecoderLock, NULL);
     pthread_cond_init(&videoDecoderCondition, NULL);
     isInitializeDecodeThread = true;
+    //参数1:返回最后创建线程的id  参数2:指定线程的属性(detach state, 是否joinable, cancel state, cancel type) 参数3:线程函数指针 参数4:传给线程函数的参数
     pthread_create(&videoDecoderThread, NULL, runDecoderThread, (__bridge void *)self);
 }
 
@@ -346,7 +349,8 @@ float lastPosition = -1.0;
 
 - (void)audioCallbackFillData:(SInt16 *)outData
                     numFrames:(UInt32)numFrames
-                  numChannels:(UInt32)numChannels{
+                  numChannels:(UInt32)numChannels{ /**
+                                                    AURemoteIO::IOThread中  是Audio Unit的工作线程*/
     [self checkPlayState];
     if (_buffered) {
         memset(outData, 0, numFrames * numChannels * sizeof(SInt16));
@@ -477,8 +481,18 @@ float lastPosition = -1.0;
     }
 }
 
-- (BOOL)addFrames:(NSArray *)frames duration:(CGFloat)duration{
+
+- (BOOL)addFrames:(NSArray *)frames duration:(CGFloat)duration{/**videoDecoderThread线程*/
     
+    /** @synchronized()
+     * @synchronized(obj){}指令是使用的obj为该锁的唯一标识，禁止同一时间不同的线程同时访问obj对象。但只能当标识相同的时候才为满足互斥。就是说下面的代码会同时执行，因为标识不一样(_videoFrames和_audioFrames)
+     *
+     * 优点:
+         我们不需要在代码中显式创建锁对象，便可以实现锁的机制
+     *
+     * 缺点:
+          但作为一种预防措施，@synchronized()块会隐式的添加一个异常处理例程来保护代码，该处理例程会在异常抛出的时候自动的释放互斥锁。所以如果不想让隐式的异常处理例程序带来额外的开销，可以考虑使用锁对象
+     */
     if (_decoder.validVideo) {
         @synchronized (_videoFrames) {
             for (Frame *frame in frames) {
@@ -643,3 +657,33 @@ float lastPosition = -1.0;
 
 
 @end
+
+
+/**
+ * autoreleasepool{} 在ARC环境下使用作用;
+ * 主线程或者GCD机制中的线程，这些线程默认都有Autorelease Pool,每次执行Event Loop时，就会将其清空。因此，不需要自己来创建。
+ *
+ * 每一个线程都会维护自己的Autorelease Pool堆栈。换句话说Autorelease Pool是与线程紧密相关的，每个Autorelease Pool只对应一个线程
+ *
+ * 对于每个RunLoop，系统会隐式创建一个Autorelease pool,这样所有的release pool会构成一个像Call stack一样的栈式结构，在每一个RunLoop结束的时候，当前栈顶的Autorelease Pool会被销毁，这样这个pool里所有的对象都会被release掉
+ *
+ * 使用场景:
+     1.你编写是命令行工具的代码，而不是基于UI框架的代码
+     2.你需要写一个循环，里面会创建很多临时对象
+          .这时候你可以在循环内部的代码块里使用一个@autoreleasePool{} 这样这些对象就能在一次迭代完成后被释放掉。这种方式可以降低内存最大占用
+     3.当你大量使用辅助线程
+          .你需要在线程的任务代码中创建自己的@autoreleasePool{}
+     4.长时间在后台运行的任务
+     5.创建了新的线程 (非Cocoa程序创建线程时才需要)
+ *
+ * 要点:
+     1.Autorelease Pool 排布在栈中，对象收到autorelease消息后，系统将其放入最顶端的池里
+     2.合理运用Autorelease Pool 可降低应用程序的内存峰值
+ *
+ * 问题:
+ *   1.Autorelease对象什么时候释放？
+        在没有手加Autorelease Pool的情况下，Autorelease对象是在当前的runloop迭代结束时释放的，而它能够释放的原因是系统在每个runloop迭代中都加入了自动释放池Push和Pop
+ */
+
+
+

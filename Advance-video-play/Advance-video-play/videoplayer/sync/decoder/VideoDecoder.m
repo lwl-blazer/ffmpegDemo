@@ -393,9 +393,14 @@ static int interrupt_callback(void *ctx){
     
     AVFormatContext *formatCtx = avformat_alloc_context();
     
-    //设置中断处理
+    /**超时设置
+     * FFmpeg的API中的超时设置，如果是网络媒体文件资源的话
+     * 首先要在建立连接通道之前为AVFormatContext类型的结构体interrupt_callback变量赋值即设置回调函数
+     * 接下来FFmpeg将在以后需要用到该连接通道读取数据的时候(寻找流信息阶段，实际的read_frame阶段)由另外一个线程调用这个回调函数,询问是否达到超时的条件，如果返回1则代表超时，FFmpeg会主动断开该连接通道。返回0则代表不超时，FFmpeg则不会做任何处理。所以如果网络不好的情况下，在我们关闭资源的时候就会有可能出现阻塞很长的时间的情况，所以开发者可以在超时回调中设置1，并且可以很快的关闭掉连接通道，然后释放掉整个资源了
+     *
+     */
     AVIOInterruptCB int_cb = {interrupt_callback, (__bridge void *)(self)};
-    formatCtx->interrupt_callback = int_cb;
+    formatCtx->interrupt_callback = int_cb; //超时设置回调函数
     int openInputErrCode = 0;
     
     //打开
@@ -790,6 +795,7 @@ static int interrupt_callback(void *ctx){
 
 //step 3 关闭文件
 - (void)closeFile{
+    //销毁资源与打开流阶段恰恰相反，首先要销毁音频相关的，再销毁视频相关的
     NSLog(@"Enter close File...");
     if (_buriedPoint.failOpenType == 1) {
         _buriedPoint.duration = ([[NSDate date] timeIntervalSince1970] * 1000 - _buriedPoint.beginOpen) / 1000.0f;
