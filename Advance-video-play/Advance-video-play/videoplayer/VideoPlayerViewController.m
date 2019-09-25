@@ -94,6 +94,7 @@
 
 
 - (void)start{
+    //AVSynchronizer 音视频同步模块 
     _synchronizer = [[AVSynchronizer alloc] initWithPlayerStateDelegate:_playerStateDelegate];
     __weak VideoPlayerViewController *weakSelf = self;
     self.bounds = self.view.bounds;
@@ -255,5 +256,7 @@
     return 1;
 }
 
-
+- (void)dealloc{
+    NSLog(@"dealloc");
+}
 @end

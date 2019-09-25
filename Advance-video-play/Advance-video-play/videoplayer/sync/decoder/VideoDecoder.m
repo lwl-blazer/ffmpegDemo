@@ -186,6 +186,8 @@ static int interrupt_callback(void *ctx){
     return _interrupted;
 }
 
+
+//step 1: 负责建立与媒体资源的连接通道，并且分配一些全局需要用的资源，将建立连接的通道与分配的资源的结果返回调用端
 - (BOOL)openFile:(NSString *)path
        parameter:(NSDictionary *)parameters
            error:(NSError * _Nullable __autoreleasing *)perror{
@@ -208,12 +210,12 @@ static int interrupt_callback(void *ctx){
     
     avformat_network_init();
     _buriedPoint.beginOpen = [[NSDate date] timeIntervalSince1970] * 1000;
-    int openInputErrCode = [self openInput:path parameter:parameters];
+    int openInputErrCode = [self openInput:path parameter:parameters]; //step 1
     if (openInputErrCode > 0) {
         _buriedPoint.successOpen = ([[NSDate date] timeIntervalSince1970] * 1000 - _buriedPoint.beginOpen) / 1000.0;
         _buriedPoint.failOpen = 0.0f;
         _buriedPoint.failOpenType = 1;
-        
+        //step 2 解码器
         BOOL openVideoStataus = [self openVideoStream];
         BOOL openAudioStatus = [self openAudioStream];
         
@@ -306,7 +308,6 @@ static int interrupt_callback(void *ctx){
     for (NSNumber *n in _audioStreams) {
         const NSUInteger iStream = [n integerValue];
         
-       
         AVCodecContext *codecCtx = avcodec_alloc_context3(NULL);
         avcodec_parameters_to_context(codecCtx, _formatCtx->streams[iStream]->codecpar);
         AVCodec *codec = avcodec_find_decoder(codecCtx->codec_id);
@@ -326,6 +327,15 @@ static int interrupt_callback(void *ctx){
         SwrContext *swrContext = NULL;
         if (![self audioCodecIsSupported:codecCtx]) {
             NSLog(@"because of audio Codec is Not Supported so we will init swresampler...");
+            /** libswresample
+             * SwrContext 重采样 针对音频的采样率、sample format、声道数等参数进行转换，一般改变有：sample rate(采样率) sample format(采样格式) channel layout(通道布局，可以通过此参数获取声道数)
+             * 常用函数:
+             *  1.swr_alloc()   申请一个SwrContext结构体
+             *  2.swr_init()    当设置好相关参数后，使用此函数来初始化SwrContext结构体
+             *  3.swr_alloc_set_opts()   分配SwrContext并设置、重置常用参数
+             *  4.swr_convert()     将输入的音频按照定义的参数进行转换
+             *  5.swr_free()   释放SwrContext
+             */
             
             swrContext = swr_alloc_set_opts(NULL,
                                             av_get_default_channel_layout(codecCtx->channels),
@@ -388,6 +398,7 @@ static int interrupt_callback(void *ctx){
     formatCtx->interrupt_callback = int_cb;
     int openInputErrCode = 0;
     
+    //打开
     if ((openInputErrCode = [self openFormatInput:&formatCtx path:path parameter:parameters]) != 0) {
         NSLog(@"Video decoder open input file failed... videoSourceURI is %@ openInputErr is %s", path, av_err2str(openInputErrCode));
         if (formatCtx) {
@@ -396,6 +407,7 @@ static int interrupt_callback(void *ctx){
         return openInputErrCode;
     }
     
+    //探测
     [self initAnalyzeDurationAndProbesize:formatCtx parameter:parameters];
     int findStreamErrCode = 0;
     double startFindStreamTimeMills = CFAbsoluteTimeGetCurrent() * 1000;
@@ -463,6 +475,7 @@ static int interrupt_callback(void *ctx){
     return _connectionRetry <= NET_WORK_STREAM_RETRY_TIME;
 }
 
+//解码视频帧成裸流数据 再封装成自定义结构体VideoFrame
 - (VideoFrame *)decodeVideo:(AVPacket)packet
                  packetSize:(int)pktSize
       decodeVideoErrorState:(int *)decodeVideoErrorState{
@@ -504,6 +517,7 @@ static int interrupt_callback(void *ctx){
     return frame;
 }
 
+//step 2 解码
 - (NSArray *)decodeFrames:(CGFloat)minDuration
     decodeVideoErrorState:(int *)decodeVideoErrorState{
     if (_videoStreamIndex == -1 && _audioStreamIndex == -1) {
@@ -543,6 +557,7 @@ static int interrupt_callback(void *ctx){
             if (len < 0) {
                 NSLog(@"decode audio error, skip packet");
             } else {
+                //AVPacket中可能包含多个音频帧，所以要用While直至把消耗干净了
                 while (avcodec_receive_frame(_audioCondecCtx, _audioFrame) == 0) {
                     AudioFrame *frame = [self handleAudioFrame];
                     if (frame) {
@@ -605,6 +620,7 @@ static int interrupt_callback(void *ctx){
     return _buriedPoint;
 }
 
+//处理视频裸数据  是否需要进行格式转换
 - (VideoFrame *)handleVideoFrame{
     if (!_videoFrame->data[0]) {
         return nil;
@@ -627,12 +643,13 @@ static int interrupt_callback(void *ctx){
                                       _videoCodecCtx->height/2);
         
     } else {
-        if (!_swrContext && ![self setupScaler]) {
+        if (!_swsContext && ![self setupScaler]) {
             NSLog(@"Faile setup video scaler");
             return nil;
         }
         
-        /** libswscale常用的函数数量很少，一般情况下就3个
+        /** SwsContext  处理图片像素数据的类库， 图片像素格式的转换，图片的拉伸 libswscale
+         * libswscale常用的函数数量很少，一般情况下就3个
          * 1.sws_getContext()   初始化一个swsContext  也可以用sws_getCachedContext()取代
          * 2.sws_scale()   处理图像数据
          * 3.sws_freeContext()   释放一个swsContext
@@ -703,6 +720,7 @@ static int interrupt_callback(void *ctx){
     return frame;
 }
 
+//处理音频裸数据 是否需要格式转换
 - (AudioFrame *)handleAudioFrame{
     if (!_audioFrame->data[0]) {
         return nil;
@@ -715,8 +733,8 @@ static int interrupt_callback(void *ctx){
     
     if (_swrContext) {
         const NSUInteger ratio = 2;
-        const int bufSize = av_samples_get_buffer_size(NULL, (int)numChannels, (int)(_audioFrame->nb_samples * ratio), AV_SAMPLE_FMT_S16, 1);
-        if (!_swrBuffer || _swrBufferSize < bufSize) {
+        const int bufSize = av_samples_get_buffer_size(NULL, (int)numChannels, (int)(_audioFrame->nb_samples * ratio), AV_SAMPLE_FMT_S16, 1); //根据音频的格式 是需要多少bufferSize
+        if (!_swrBuffer || _swrBufferSize < bufSize) { //是否需要重新扩容内存空间   为什么_swrBuffer是写的全局变量，可能是因为_swrBuffer需要申请堆空间
             _swrBufferSize = bufSize;
             _swrBuffer = realloc(_swrBuffer, _swrBufferSize);
         }
@@ -770,6 +788,7 @@ static int interrupt_callback(void *ctx){
     [_buriedPoint.bufferStatusRecords addObject:[NSString stringWithFormat:@"%@_%.3f", statusFlag, timeInterval]];
 }
 
+//step 3 关闭文件
 - (void)closeFile{
     NSLog(@"Enter close File...");
     if (_buriedPoint.failOpenType == 1) {
@@ -778,6 +797,7 @@ static int interrupt_callback(void *ctx){
     
     [self interrupt];
     
+    //首先要销毁音频相关资源
     [self closeAudioStream];
     [self closeVideoStream];
     

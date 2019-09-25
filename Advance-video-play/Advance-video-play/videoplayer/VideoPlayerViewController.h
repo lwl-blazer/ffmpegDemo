@@ -12,7 +12,7 @@
 #import "AudioOutput.h"
 
 NS_ASSUME_NONNULL_BEGIN
-
+//调度器----包括了音视频同步模块、音频输出模块、视频输出模块
 @interface VideoPlayerViewController : UIViewController
 
 @property(nonatomic, strong) AVSynchronizer *synchronizer;
@@ -20,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, assign) BOOL usingHWCodec;
 @property(nonatomic, weak) id<PlayerStateDelegate> playerStateDelegate;
 
+//初始化方法
 + (instancetype)viewControllerWithContentPath:(NSString *)path
                                  contentFrame:(CGRect)frame
                                  usingHWCodec:(BOOL)usingHWCodec
@@ -46,10 +47,16 @@ NS_ASSUME_NONNULL_BEGIN
                          parameters:(NSDictionary *)parameters
         outputEAGLContextShareGroup:(EAGLSharegroup *)sharegroup;
 
+//播放
 - (void)play;
+//暂停
 - (void)pause;
+//停止
 - (void)stop;
+//继续播放
 - (void)restart;
+
+
 - (BOOL)isPlaying;
 
 - (UIImage *)movieSnapshot;

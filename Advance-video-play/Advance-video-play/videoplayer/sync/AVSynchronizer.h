@@ -42,7 +42,7 @@ typedef enum OpenState{
 
 @end
 
-
+//音视频同步模块(封装了输入模块、音频队列、视频队列):为外界提供获取音频、视频数据的接口，这两个接口必须保证音视频同步，内部将负责解码线程的运行和暂停的维护
 @interface AVSynchronizer : NSObject
 
 @property(nonatomic, weak) id<PlayerStateDelegate>playerStateDelegate;

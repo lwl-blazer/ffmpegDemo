@@ -127,16 +127,23 @@
 }
 
 - (void)onCompletion{
+     __weak typeof(self) weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        [strongSelf->_playerViewController restart];
+        /*
         [[LoadingView shareLoadingView] close];
-        
+        __weak typeof(self) weakSelf = self;
         UIAlertController *alertCtn = [UIAlertController alertControllerWithTitle:@"提示信息"
                                                                           message:@"视频播放完毕了"
                                                                    preferredStyle:UIAlertControllerStyleAlert];
-        UIAlertAction *action = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel
-                                                       handler:NULL];
+        UIAlertAction *action = [UIAlertAction actionWithTitle:@"重新播放" style:UIAlertActionStyleCancel
+                                                       handler:^(UIAlertAction * _Nonnull action) {
+                                                           __strong typeof(weakSelf) strongSelf = weakSelf;
+                                                           [strongSelf->_playerViewController restart];
+                                                       }];
         [alertCtn addAction:action];
-        [self presentViewController:alertCtn animated:YES completion:NULL];
+        [self presentViewController:alertCtn animated:YES completion:NULL];*/
     });
 }
 

@@ -146,6 +146,7 @@ static void *decodeFirstBufferRunLoop(void *ptr){
     }
 }
 
+//主要负责解码音视频压缩数据成为原始数据，并且封装成自定义的结构体，最终全部放到一个数组中，然后返回给调用端
 - (void)decodeFrames{
     const CGFloat duration = 0.0f;
     BOOL good = YES;

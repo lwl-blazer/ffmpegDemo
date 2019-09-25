@@ -106,7 +106,7 @@ NS_ASSUME_NONNULL_BEGIN
 #define MAX_ANALYZE_DURATION_ARRAY @"MAX_ANALYZE_DURATION_ARRAY"
 #endif
 
-
+//输入模块: 协议层解析 格式解封装 解码 主要是向AVSynchronizer提供接口:打开文件资源(网络或本地)、关闭文件资源、解码出一定时间长度的音视频帧
 @interface VideoDecoder : NSObject
 {
     AVFormatContext *_formatCtx;
@@ -171,3 +171,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 NS_ASSUME_NONNULL_END
+
+/** VideoDecoder的工作流程图
+ * 建立连接、准备资源阶段
+ * 不断读取数据进行解封装、解码、处理数据阶段      (这个阶段是循环的)
+ * 释放资源阶段
+ */
