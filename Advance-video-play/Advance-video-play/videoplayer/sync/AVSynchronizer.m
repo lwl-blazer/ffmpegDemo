@@ -89,35 +89,16 @@ static BOOL isNetworkPath(NSString *path){
     return YES;
 }
 
-//开始跑解码线程
-static void *runDecoderThread(void *ptr){
-    AVSynchronizer *synchronizer = (__bridge AVSynchronizer *)ptr;
-    [synchronizer run];
-    return NULL;
-}
-
-- (BOOL)isPlayCompleted{
-    return _completion;
-}
-
-- (void)run{
-    while (isOnDecoding) {
-        pthread_mutex_lock(&videoDecoderLock);
-        pthread_cond_wait(&videoDecoderCondition, &videoDecoderLock);
-        pthread_mutex_unlock(&videoDecoderLock);
-        [self decodeFrames];
-    }
-}
-
+//开始跑第一次解码程
 static void *decodeFirstBufferRunLoop(void *ptr){
     AVSynchronizer *synchronizer = (__bridge AVSynchronizer *)ptr;
     [synchronizer decodeFirstBuffer];
     return NULL;
 }
 
-- (void)decodeFirstBuffer{
+- (void)decodeFirstBuffer{ /** decodeFirstBufferThread线程 */
     double startDecodeFirstBufferTimeMills = CFAbsoluteTimeGetCurrent() * 1000;
-    [self decodeFrameWIthDuration:FIRST_BUFFER_DURATION];
+    [self decodeFrameWithDuration:FIRST_BUFFER_DURATION];
     int wasteTimeMills = CFAbsoluteTimeGetCurrent() * 1000 - startDecodeFirstBufferTimeMills;
     NSLog(@"Decode First Buffer waste TimeMills is %d", wasteTimeMills);
     
@@ -125,10 +106,33 @@ static void *decodeFirstBufferRunLoop(void *ptr){
     pthread_cond_signal(&decodeFirstBufferCondition);
     pthread_mutex_unlock(&decodeFirstBufferLock);
     
-    isDecodingFirstBuffer = false;
+    isDecodingFirstBuffer = false; //找到
 }
 
-- (void)decodeFrameWIthDuration:(CGFloat)duration{
+
+//开始跑解码线程
+static void *runDecoderThread(void *ptr){
+    AVSynchronizer *synchronizer = (__bridge AVSynchronizer *)ptr;
+    [synchronizer run];
+    return NULL;
+}
+
+- (void)run{
+    while (isOnDecoding) {
+        pthread_mutex_lock(&videoDecoderLock);
+        pthread_cond_wait(&videoDecoderCondition, &videoDecoderLock); //等待 decodeFirstBufferThread 解码完成发送signal信号 和 signalDecoderThread方法的发送signal信号
+        pthread_mutex_unlock(&videoDecoderLock);
+        [self decodeFrames];
+        /** 线程1
+         * videoDecoderThread & videoDecoderLock & videoDecoderCondition
+         * 即为播放器的后台解码分配的一个线程
+         * 工作内容:
+         * 用于解析协议，处理解封装以及解码，并最终将裸数据放到音频和视频的队列中，这个模块为输入模块
+         */
+    }
+}
+
+- (void)decodeFrameWithDuration:(CGFloat)duration{
     BOOL good = YES;
     while (good) {
         good = NO;
@@ -164,6 +168,44 @@ static void *decodeFirstBufferRunLoop(void *ptr){
     }
 }
 
+- (BOOL)addFrames:(NSArray *)frames duration:(CGFloat)duration{/**videoDecoderThread线程*/
+    
+    /** @synchronized()
+     * @synchronized(obj){}指令是使用的obj为该锁的唯一标识，禁止同一时间不同的线程同时访问obj对象。但只能当标识相同的时候才为满足互斥。就是说下面的代码会同时执行，因为标识不一样(_videoFrames和_audioFrames)
+     *
+     * 优点:
+     我们不需要在代码中显式创建锁对象，便可以实现锁的机制
+     *
+     * 缺点:
+     但作为一种预防措施，@synchronized()块会隐式的添加一个异常处理例程来保护代码，该处理例程会在异常抛出的时候自动的释放互斥锁。所以如果不想让隐式的异常处理例程序带来额外的开销，可以考虑使用锁对象
+     */
+    if (_decoder.validVideo) {
+        @synchronized (_videoFrames) {
+            for (Frame *frame in frames) {
+                if (frame.type == VideoFrameType || frame.type == iOSCVVideoFrameType) {
+                    [_videoFrames addObject:frame];
+                }
+            }
+        }
+    }
+    
+    
+    if (_decoder.validAudio) {
+        @synchronized (_audioFrames) {
+            for (Frame *frame in frames) {
+                if (frame.type == AudioFrameType) {
+                    [_audioFrames addObject:frame];
+                    _bufferedDuration += frame.duration;
+                }
+            }
+        }
+    }
+    
+    return _bufferedDuration < duration;
+}
+
+
+
 - (id)initWithPlayerStateDelegate:(id<PlayerStateDelegate>)playerStateDelegate{
     self = [super init];
     if (self) {
@@ -172,6 +214,7 @@ static void *decodeFirstBufferRunLoop(void *ptr){
     return self;
 }
 
+//给 videoDecoderLock的锁发送 signal信号 再时行run
 - (void)signalDecoderThread{
     if (NULL == _decoder || isDestroyed) {
         return;
@@ -277,6 +320,14 @@ static void *decodeFirstBufferRunLoop(void *ptr){
     return OPEN_SUCCESS;
 }
 
+- (void)createDecoderInstance{
+    if (_usingHWCodec) {
+        _decoder = [[VideoToolboxDecoder alloc] init];
+    } else {
+        _decoder = [[VideoDecoder alloc] init];
+    }
+}
+
 - (void)startDecodeFirstBufferThread{
     //初始化线程， 互斥锁，条件变量
     pthread_mutex_init(&decodeFirstBufferLock, NULL);
@@ -298,6 +349,8 @@ static void *decodeFirstBufferRunLoop(void *ptr){
     pthread_create(&videoDecoderThread, NULL, runDecoderThread, (__bridge void *)self);
 }
 
+
+#pragma mark -- 音视频同步
 static int count = 0;
 static int invalidGetCount = 0;
 float lastPosition = -1.0;
@@ -475,71 +528,16 @@ float lastPosition = -1.0;
     }
     
     if (!isDecodingFirstBuffer && (0 == leftVideoFrames || 0 == leftAudioFrames || !(_bufferedDuration > _minBufferedDuration))) {
+#ifdef DEBUG
+        NSLog(@"AVSynchronizer _bufferedDuration is %.3f _minBufferedDuration is %.3f", _bufferedDuration, _minBufferedDuration);
+#endif
         [self signalDecoderThread];
     } else if (_bufferedDuration >= _maxBufferedDuration) {
         [_decoder addBufferStatusRecord:@"F"];
     }
 }
 
-
-- (BOOL)addFrames:(NSArray *)frames duration:(CGFloat)duration{/**videoDecoderThread线程*/
-    
-    /** @synchronized()
-     * @synchronized(obj){}指令是使用的obj为该锁的唯一标识，禁止同一时间不同的线程同时访问obj对象。但只能当标识相同的时候才为满足互斥。就是说下面的代码会同时执行，因为标识不一样(_videoFrames和_audioFrames)
-     *
-     * 优点:
-         我们不需要在代码中显式创建锁对象，便可以实现锁的机制
-     *
-     * 缺点:
-          但作为一种预防措施，@synchronized()块会隐式的添加一个异常处理例程来保护代码，该处理例程会在异常抛出的时候自动的释放互斥锁。所以如果不想让隐式的异常处理例程序带来额外的开销，可以考虑使用锁对象
-     */
-    if (_decoder.validVideo) {
-        @synchronized (_videoFrames) {
-            for (Frame *frame in frames) {
-                if (frame.type == VideoFrameType || frame.type == iOSCVVideoFrameType) {
-                    [_videoFrames addObject:frame];
-                }
-            }
-        }
-    }
-    
-    
-    if (_decoder.validAudio) {
-        @synchronized (_audioFrames) {
-            for (Frame *frame in frames) {
-                if (frame.type == AudioFrameType) {
-                    [_audioFrames addObject:frame];
-                    _bufferedDuration += frame.duration;
-                }
-            }
-        }
-    }
-    
-    return _bufferedDuration < duration;
-}
-
-- (void)createDecoderInstance{
-    if (_usingHWCodec) {
-        _decoder = [[VideoToolboxDecoder alloc] init];
-    } else {
-        _decoder = [[VideoDecoder alloc] init];
-    }
-}
-
-- (BOOL)isOpenInputSuccess{
-    BOOL ret = NO;
-    if (_decoder) {
-        ret = [_decoder isOpenInputSuccess];
-    }
-    return ret;
-}
-
-- (void)interrupt{
-    if (_decoder) {
-        [_decoder interrupt];
-    }
-}
-
+#pragma mark -- 销毁操作相关
 - (void)closeFile{
     if (_decoder) {
         [_decoder interrupt];
@@ -577,8 +575,11 @@ float lastPosition = -1.0;
         NSLog(@"Begin Wait Decode First Buffer...");
         double startWaitDecodeFirstBufferTimeMills = CFAbsoluteTimeGetCurrent() * 1000;
         pthread_mutex_lock(&decodeFirstBufferLock);
-        pthread_cond_wait(&decodeFirstBufferCondition, &decodeFirstBufferLock);
+        pthread_cond_wait(&decodeFirstBufferCondition, &decodeFirstBufferLock); //必须等到 decodeFirstBufferCondition 发送signal信号
         pthread_mutex_unlock(&decodeFirstBufferLock);
+        
+        pthread_cond_destroy(&decodeFirstBufferCondition);
+        pthread_mutex_destroy(&decodeFirstBufferLock);
         
         int wasteTimeMills = CFAbsoluteTimeGetCurrent() * 1000 - startWaitDecodeFirstBufferTimeMills;
         NSLog(@" Wait Decode First Buffer waste TimeMills is %d", wasteTimeMills);
@@ -599,9 +600,31 @@ float lastPosition = -1.0;
     pthread_cond_signal(&videoDecoderCondition);
     pthread_mutex_unlock(&videoDecoderLock);
     
+    /** 阻塞是线程之间同步的一种方法
+     * pthread_join(pthread_t threadid, void **value_ptr)  函数会让调用它的线程等待threadid线程运行结束之后再运行， value_ptr存放了其它线程的返回值。
+     */
     pthread_join(videoDecoderThread, &status);
     pthread_mutex_destroy(&videoDecoderLock);
     pthread_cond_destroy(&videoDecoderCondition);
+}
+
+#pragma mark -- Get
+- (BOOL)isOpenInputSuccess{
+    BOOL ret = NO;
+    if (_decoder) {
+        ret = [_decoder isOpenInputSuccess];
+    }
+    return ret;
+}
+
+- (void)interrupt{
+    if (_decoder) {
+        [_decoder interrupt];
+    }
+}
+
+- (BOOL)isPlayCompleted{
+    return _completion;
 }
 
 - (NSInteger)getAudioSampleRate{

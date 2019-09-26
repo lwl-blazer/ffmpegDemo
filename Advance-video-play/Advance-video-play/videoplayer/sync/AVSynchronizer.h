@@ -64,6 +64,7 @@ typedef enum OpenState{
                     numFrames:(UInt32)numFrames
                   numChannels:(UInt32)numChannels;
 
+//获取音频当前对应的正常的视频帧
 - (VideoFrame *)getCorrectVideoFrame;
 
 - (void)run;
