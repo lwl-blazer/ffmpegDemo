@@ -183,6 +183,7 @@ static void CheckStatus(OSStatus status, NSString *message, BOOL fatal);
 - (void)makeNodeConnections{
     OSStatus status = noErr;
     
+    //将_convertNode 连接 _ioNode   为什么AUGraph知道_ioNode是输出呢，因为在初始化_ioNode的时候componentType为kAudioUnitType_Output
     status = AUGraphConnectNodeInput(_auGraph, _convertNode, 0, _ioNode, 0);
     CheckStatus(status, @"Could not connect I/O node input to mixer node input", YES);
     
