@@ -44,13 +44,16 @@ static void CheckStatus(OSStatus status, NSString *message, BOOL fatal);
         bytesPerSample:(NSInteger)bytePerSample filleDataDelegate:(id<FillDataDelegate>)fillAudioDataDelegate{
     self = [super init];
     if (self) {
+        //给AVAudioSession设置基本的参数
         [[ELAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord];
         [[ELAudioSession sharedInstance] setPreferredSampleRate:sampleRate];
         [[ELAudioSession sharedInstance] setActive:YES];
         [[ELAudioSession sharedInstance] addRouteChangeListener];
         
+        //设置音频被中断的监听器
         [self addAudioSessionInterruptedObserver];
         
+        //构建AUGraph
         _outData = (SInt16 *)calloc(8192, sizeof(SInt16));
         _fillAudioDataDelegate = fillAudioDataDelegate;
         _sampleRate = sampleRate;
@@ -60,6 +63,11 @@ static void CheckStatus(OSStatus status, NSString *message, BOOL fatal);
     return self;
 }
 
+/** 构造AUGraph
+ *
+ * 注意点:
+ *  应配置一个ConvertNode将客户端代码填充的SInt16格式的音频数据转换为RemoteIONode可以播放的Float32格式的音频数据(采样率，声道数以及表示格式应对应上)，这一点非常关键
+ */
 - (void)createAudioUnitGraph{
     OSStatus status = noErr;
     
@@ -94,6 +102,7 @@ static void CheckStatus(OSStatus status, NSString *message, BOOL fatal);
     status = AUGraphAddNode(_auGraph, &ioDescription, &_ioNode);
     CheckStatus(status, @"Could not add I/O node to AUGraph", YES);
     
+    //注意点--1:初始化convertNode  addNode上
     AudioComponentDescription convertDescription;
     bzero(&convertDescription, sizeof(convertDescription));
     ioDescription.componentManufacturer = kAudioUnitManufacturer_Apple;
@@ -110,10 +119,12 @@ static void CheckStatus(OSStatus status, NSString *message, BOOL fatal);
     status = AUGraphNodeInfo(_auGraph, _ioNode, NULL, &_ioUnit);
     CheckStatus(status, @"Could not retrieve node info for I/O node", YES);
     
+    //注意点--2:附加在_convertUnit上
     status = AUGraphNodeInfo(_auGraph, _convertNode, NULL, &_convertUnit);
     CheckStatus(status, @"Could not retrieve node info for Convert node", YES);
 }
 
+//注意点--3:让音频数据(采样率，声道数以及表示格式)对应上
 - (void)setAudioUnitProperties{
     OSStatus status = noErr;
     AudioStreamBasicDescription streamFormat = [self nonInterleavedPCMFormatWithChannels:_channels];
@@ -132,11 +143,25 @@ static void CheckStatus(OSStatus status, NSString *message, BOOL fatal);
     _clientFormat16int.mBitsPerChannel = 8 * bytesPerSample;
     _clientFormat16int.mSampleRate = _sampleRate;
     
+    //设置_convertUnit需要转换的输出的格式
     status = AudioUnitSetProperty(_convertUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 0, &streamFormat, sizeof(streamFormat));
     CheckStatus(status, @"augraph recorder normal unit set client format error", YES);
     
+    //设置_convertUnit输入的格式
     status = AudioUnitSetProperty(_convertUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input, 0, &_clientFormat16int, sizeof(_clientFormat16int));
     CheckStatus(status, @"augraph recorder normal unit set client format error", YES);
+    
+    /**
+     * 使用属性配置Audio Units
+     * kAudioOutputUnitProperty_EnableIO
+         用于在I/O Unit上启用或禁用输入或输出。 默认情况下，输出已启用但输入已禁用
+     * kAudioUnitProperty_ElementCount
+         配置mixer unit上的输入elemnts的数量
+     * kAudioUnitProperty_MaximumFramesPerSlice
+         为了指定音频数据的最大帧数，audio unit应该准备好响应于回调函数调用而产生。对于大多数音频设备，在大多数情况下，你必须按照参考文档中的说明设置此属性。如果不这样做，屏幕锁定时你的音频将停止
+     * kAudioUnitProperty_StreamFormat
+         指定特定Audio unit输入或输出总线的音频流数据格式
+     */
 }
 
 - (AudioStreamBasicDescription)nonInterleavedPCMFormatWithChannels:(UInt32)channels {
@@ -144,15 +169,14 @@ static void CheckStatus(OSStatus status, NSString *message, BOOL fatal);
     
     AudioStreamBasicDescription asbd;
     bzero(&asbd, sizeof(asbd));
+    asbd.mFormatID = kAudioFormatLinearPCM; //格式
+    asbd.mFormatFlags = kAudioFormatFlagsNativeFloatPacked | kAudioFormatFlagIsNonInterleaved; //标签格式
+    asbd.mBytesPerPacket = bytesPerSample;  //每个Packet的Bytes数量
+    asbd.mFramesPerPacket = 1;   //每个Packet的帧数
+    asbd.mBytesPerFrame = bytesPerSample;    //每帧的Byte数
+    asbd.mChannelsPerFrame = channels;      //声道数
+    asbd.mBitsPerChannel = 8 * bytesPerSample;  //每采样点占用位数
     asbd.mSampleRate = _sampleRate;
-    asbd.mFormatID = kAudioFormatLinearPCM;
-    asbd.mFormatFlags = kAudioFormatFlagsNativeFloatPacked | kAudioFormatFlagIsNonInterleaved;
-    asbd.mBitsPerChannel = 8 * bytesPerSample;
-    asbd.mBytesPerFrame = bytesPerSample;
-    asbd.mBytesPerPacket = bytesPerSample;
-    asbd.mFramesPerPacket = 1;
-    asbd.mChannelsPerFrame = channels;
-    
     return asbd;
 }
 
@@ -162,6 +186,7 @@ static void CheckStatus(OSStatus status, NSString *message, BOOL fatal);
     status = AUGraphConnectNodeInput(_auGraph, _convertNode, 0, _ioNode, 0);
     CheckStatus(status, @"Could not connect I/O node input to mixer node input", YES);
     
+    //注意点--5:为ConvertNode配置上InputCallback,
     AURenderCallbackStruct callbackStruct;
     callbackStruct.inputProc = &InputRenderCallback;
     callbackStruct.inputProcRefCon = (__bridge void *)self;
@@ -169,6 +194,7 @@ static void CheckStatus(OSStatus status, NSString *message, BOOL fatal);
     CheckStatus(status, @"Could not set render callback on mixer input scope, element 1", YES);
 }
 
+//销毁
 - (void)destoryAudioUnitGraph{
     AUGraphStop(_auGraph);
     AUGraphUninitialize(_auGraph);
@@ -284,3 +310,12 @@ static void CheckStatus(OSStatus status, NSString *message, BOOL fatal)
             exit(-1);
     }
 }
+
+
+/** 整个音频输出模块的工作流程
+ * 1.启动播放(AUGraph Start方法)，启动了之后，就会从RemoteIO这个AudioUnit开始播放音频数据
+ *
+ * 2.如果RemoteIO需要音频数据，就向它的前一级AudioUnit即ConvertNode去获取数据
+ *
+ * 3. 而ConvertNode则会寻找自己的InputCallback，在InputCallback的实现中其将从delegate(即VideoPlayerController)处获取数据
+ */

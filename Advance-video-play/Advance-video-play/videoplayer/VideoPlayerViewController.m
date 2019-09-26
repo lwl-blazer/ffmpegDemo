@@ -239,7 +239,7 @@
     UIGraphicsEndImageContext();
     return image;
 }
-
+#pragma mark -- FillDataDelegate
 //根据音频驱动视频
 - (NSInteger)fillAudioData:(SInt16 *)sampleBuffer numFrames:(NSInteger)frameNum numChannels:(NSInteger)channels{
     if (_synchronizer && ![_synchronizer isPlayCompleted]) {
