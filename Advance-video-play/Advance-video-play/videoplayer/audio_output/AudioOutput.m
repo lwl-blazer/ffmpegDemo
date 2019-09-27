@@ -45,7 +45,7 @@ static void CheckStatus(OSStatus status, NSString *message, BOOL fatal);
     self = [super init];
     if (self) {
         //给AVAudioSession设置基本的参数
-        [[ELAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord];
+        [[ELAudioSession sharedInstance] setCategory:AVAudioSessionCategorySoloAmbient]; //AVAudioSessionCategoryPlayAndRecord
         [[ELAudioSession sharedInstance] setPreferredSampleRate:sampleRate];
         [[ELAudioSession sharedInstance] setActive:YES];
         [[ELAudioSession sharedInstance] addRouteChangeListener];

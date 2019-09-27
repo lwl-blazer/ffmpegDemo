@@ -49,6 +49,15 @@ const NSTimeInterval AUSAudioSessionLatency_LowLatency = 0.0058;
         NSLog(@"Error when setting sample rate on audio session:%@", error.localizedDescription);
     }
     
+    /** actvie 为YES 激活Session   active为NO 解除Session的激活状态
+     * 因为AVAudioSession会影响其他APP的表现，当自己APP的Session被激活，其它APP的就会被解除激活
+     *
+     * 如何要让自己的Session解除激活后恢复其他App Session的激活状态呢
+         可以使用-(BOOL)setActive:(BOOL)active withOptions:(AVAudioSessionSetActiveOptions)options error:(NSError **)outError;
+         options 传入 AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation即可
+     *
+     * 当然也可以通过otherAudioPlaying变量来提前判断当前是否有其他APP在播放音频
+     */
     if (![self.audioSession setActive:active error:&error]) {
         NSLog(@"Error when setting active state of audio session:%@", error.localizedDescription);
     }
@@ -65,6 +74,35 @@ const NSTimeInterval AUSAudioSessionLatency_LowLatency = 0.0058;
     }
 }
 
+/**
+ * 中断
+ * 1.系统中断响应  (电话，闹钟，其它启动其他APP影响的)
+       正常的表现是先暂停 待恢复的时候再继续
+     通知:
+      AVAudioSessionInterruptionNotification  一般性中断(电话、闹钟等)，userinfo主要包含两个主键:
+           AVAudioSessionInterruptionTypeKey 取值为AVAudioSessionInterruptionTypeBegan 表示中断开始 取值为AVAudioSessionInterruptionTypeEnd表示中断结束，我们可以继续采集和播放
+           AVAudioSessionInterruptionOptionKey : 当前只有一种值AVAudioSessionInterruptionOptionShouldResum 表示此时也应该恢复播放和采集
+ 
+      AVAudioSessionSilenceSecondaryAudioHintNotification 中断(其他APP占据AudioSession的时候用) userinfo键包括:
+         AVAudioSessionSilenceSecondaryAudioHintTypeKey:
+           AVAudioSessionSilenceSecondaryAudioHintTypeBegin 表示其他App开始占据Session
+           AVAudioSessionSilenceSecondaryAudioHintTypeEnd  表示其他App开始释放Session
+ 
+      AVAudioSessionRouteChangeNotification  外设改变中断(插拔耳机) userinfo键包括:
+           AVAudioSessionRouteChangeReasonKey  表示改变的原因
+           AVAudioSessionSilenceSecondaryAudioHintTypeKey:
+                 AVAudioSessionRouteChangeReasonUnkown 未知原因
+                 AVAudioSessionRouteChangeReasonNewDeviceAvailable     有新设备可用
+                 AVAudioSessionRouteChangeReasonOldDeviceUnavailable   老设备不可用
+                 AVAudioSessionRouteChangeReasonCategoryChange       类别改变了
+                 AVAudioSessionRouteChangeReasonOverride        App重置了输出设置
+                 AVAudioSessionRouteChnageReasonWakeFromSleep    从睡眠状态呼醒
+                 AVAudioSessionRouteChangeReasonNoSuitableRouteForCategory   当前Category下没有合适的设备
+                 AVAudioSessionRouteChangeReasonRouteConfigurationChange Router的配置改变了
+ 
+ 
+       在iOS13中这一块可能还有改变，因为有一个共用音频
+ */
 - (void)addRouteChangeListener{
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onNotificationAudioRouteChange:) name:AVAudioSessionRouteChangeNotification
