@@ -77,15 +77,18 @@
         _shouldEnableOpenGL = [UIApplication sharedApplication].applicationState == UIApplicationStateActive;
         [_shouldEnableOpenGLLock unlock];
         
+        //如果App进入后台之后，就不能再进行OpenGL ES的渲染操作 在下面的两个监听中，维护一个BOOL变量， 在线程的绘制过程中应该先判定这个变量是否为YES,是YES进行绘制，否则不进行绘制
+        //WillResignActiveNotification 即当App从活跃状态变为非活跃状态的时候，或者即将进入后台的时候，
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(applicationWillResignActive:)
                                                      name:UIApplicationWillResignActiveNotification
                                                    object:nil];
+        //DidBecomeActiveNotification 即当App从后台到前台
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(applicationDidBecomeActive:)
                                                      name:UIApplicationDidBecomeActiveNotification
                                                    object:nil];
-        
+    
         self.eaglLayer = (CAEAGLLayer *)self.layer;
         self.eaglLayer.opaque = YES;
         self.eaglLayer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:NO],
@@ -93,26 +96,46 @@
                                         kEAGLColorFormatRGBA8,
                                         kEAGLDrawablePropertyColorFormat, nil];
         
+        /**
+         * 采用NSOperationQueue来实现，也就是把OpenGL ES的所有操作都封装在NSOperationQueue中来完成，
+         *
+         * 为什么要采用这种线程模型，而不是GCD
+         * 由于某些低端设备(iPod,iPhone4)，在一次OpenGL的绘制中耗费的时间可能会比较多，如果使用的是GCD的线程模型，那么会导致DispatchQueue里面的Operation超过定义的阈值(Threshold)时，清空最久的Operation,只保留最新的绘制操作，这样才能完成正常的播放
+         *
+         * GCD 和 NSOperation的区别
+         * 1.GCD是C语言， NSOperation底层由GCD封装
+         * 2.NSOperationQueue支持KVO， 可以监测operation是否正在执行(isExecuted) 是否结束(isFinished) 是否取消(isCanceld)
+         * 3.GCD只支持FIFO的队列，而NSOperationQueue可以调整队列的执行顺序(可以通过调整权重)
+         *
+         * 使用NSOperationQueue的情况:
+         *   各个操作之间有依赖关系、操作需要取消暂停、并发管理、控制操作之间优先级、限制同时能执行的线程数量、让线程在某时刻停止/继续
+         *
+         * 使用GCD的情况:
+         *    一般的需求很简单的多线程操作，用GCD都可以，简单高效
+         */
         _renderOperationQueue = [[NSOperationQueue alloc] init];
         _renderOperationQueue.maxConcurrentOperationCount = 1; //同时执行的最大数量
         _renderOperationQueue.name = @"com.changba.video_player.videoRenderQueue";
         
         __weak VideoOutput *weakSelf = self;
+        //将OpenGL ES的上下文构建以及OpenGL ES的渲染Program的构建作为一个Block直接加入到该Queue中。
         [_renderOperationQueue addOperationWithBlock:^{   //添加到队列中，自动异步执行
             if (!weakSelf) {
                 return;
             }
             __strong VideoOutput *strongSelf = weakSelf;
+            //1.创建EAGLContext上下文
             if (shareGroup) {
                 strongSelf->_context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2 sharegroup:shareGroup];
             } else {
                 strongSelf->_context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
             }
-            
+            //2.为该NSOperationQueue线程绑定OpenGL ES上下文
             if (!strongSelf->_context || ![EAGLContext setCurrentContext:strongSelf->_context]) {
                 NSLog(@"Setup EAGLContext Failed...");
             }
             
+            //3.创建FrameBuffer和RenderBuffer
             if (![strongSelf createDisplayFramebuffer]) {
                 NSLog(@"create Dispaly Framebuffer failed...");
             }
@@ -158,7 +181,7 @@
     }
 }
 
-
+//最核心代码-----渲染
 static int count = 0;
 static const NSInteger kMaxOperationQueueCount = 3;
 
@@ -169,6 +192,7 @@ static const NSInteger kMaxOperationQueueCount = 3;
     }
     
     @synchronized (self.renderOperationQueue) {
+        //这段代码是运用NSOperation最重要的原因.....
         NSInteger operationCount = _renderOperationQueue.operationCount;
         if (operationCount > kMaxOperationQueueCount) {
             [_renderOperationQueue.operations enumerateObjectsUsingBlock:^(__kindof NSOperation * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {

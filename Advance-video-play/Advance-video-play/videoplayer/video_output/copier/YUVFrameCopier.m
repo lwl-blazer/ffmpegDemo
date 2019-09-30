@@ -28,6 +28,7 @@ NSString *const yuvFragmentShaderString = SHADER_STRING
  uniform sampler2D s_texture_u;
  uniform sampler2D s_texture_v;
  
+ //把YUV420P转换RGBA格式
  void main(){
      highp float y = texture2D(inputImageTexture, v_texcoord).r;
      highp float u = texture2D(s_texture_u, v_texcoord).r - 0.5;
