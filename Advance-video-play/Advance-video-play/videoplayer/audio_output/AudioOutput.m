@@ -129,7 +129,12 @@ static void CheckStatus(OSStatus status, NSString *message, BOOL fatal);
     OSStatus status = noErr;
     AudioStreamBasicDescription streamFormat = [self nonInterleavedPCMFormatWithChannels:_channels];
     
-    status = AudioUnitSetProperty(_ioUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, inputElement, &streamFormat, sizeof(streamFormat));
+    status = AudioUnitSetProperty(_ioUnit,
+                                  kAudioUnitProperty_StreamFormat,
+                                  kAudioUnitScope_Output, //输出
+                                  inputElement,
+                                  &streamFormat,   //输出的格式
+                                  sizeof(streamFormat));
     CheckStatus(status, @"Could not set stream format on I/O unit output scope", YES);
     
     AudioStreamBasicDescription _clientFormat16int;
@@ -144,11 +149,21 @@ static void CheckStatus(OSStatus status, NSString *message, BOOL fatal);
     _clientFormat16int.mSampleRate = _sampleRate;
     
     //设置_convertUnit需要转换的输出的格式
-    status = AudioUnitSetProperty(_convertUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 0, &streamFormat, sizeof(streamFormat));
+    status = AudioUnitSetProperty(_convertUnit,
+                                  kAudioUnitProperty_StreamFormat,
+                                  kAudioUnitScope_Output, //输出
+                                  0,
+                                  &streamFormat,
+                                  sizeof(streamFormat));
     CheckStatus(status, @"augraph recorder normal unit set client format error", YES);
     
     //设置_convertUnit输入的格式
-    status = AudioUnitSetProperty(_convertUnit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input, 0, &_clientFormat16int, sizeof(_clientFormat16int));
+    status = AudioUnitSetProperty(_convertUnit,
+                                  kAudioUnitProperty_StreamFormat,
+                                  kAudioUnitScope_Input, //输入
+                                  0,
+                                  &_clientFormat16int,
+                                  sizeof(_clientFormat16int));
     CheckStatus(status, @"augraph recorder normal unit set client format error", YES);
     
     /**
