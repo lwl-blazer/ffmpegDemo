@@ -23,7 +23,7 @@ NSString *const kDirectPassVertexShaderString = SHADER_STRING
 NSString *const kDirectPassFragmentShaderString = SHADER_STRING
 (
  varying highp vec2 textureCoordinate;
- uniform sampler2D inputImageTexture;
+ uniform sampler2D inputImageTexture; 
  void main(){
      gl_FragColor = texture2D(inputImageTexture, textureCoordinate);
  }

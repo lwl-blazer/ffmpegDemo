@@ -21,6 +21,7 @@ NSString *const yuvVertexShaderString = SHADER_STRING
  }
  );
 
+
 NSString *const yuvFragmentShaderString = SHADER_STRING
 (
  varying highp vec2 v_texcoord;
@@ -136,12 +137,13 @@ NSString *const yuvFragmentShaderString = SHADER_STRING
          1.0f,  1.0f,
     };
     
+    //原始纹理坐标 是倒的
     GLfloat noRotationTextureCoordinates[] = {
         0.0f, 1.0f,
         1.0f, 1.0f,
         0.0f, 0.0f,
         1.0f, 0.0f,
-    };
+    }; //计算机图像二维纹理坐标
     
     glVertexAttribPointer(filterPositionAttribute, 2, GL_FLOAT, 0, 0, imageVertices);
     glEnableVertexAttribArray(filterPositionAttribute);
@@ -168,6 +170,7 @@ NSString *const yuvFragmentShaderString = SHADER_STRING
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+//生成和绑定纹理
 - (void)genInputTexture:(int)frameWidth height:(int)frameHeight{
     glGenTextures(3, _inputTextures);
     for (int i = 0; i < 3; i++) {
@@ -177,11 +180,21 @@ NSString *const yuvFragmentShaderString = SHADER_STRING
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         
+        //根据数据生成纹理  注意最后一个参数为0 应该是生成空白纹理 占位的意思
         glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, frameWidth, frameHeight, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, 0);
     }
 }
 
+//YUV数据的填充
 - (void)uploadTexture:(VideoFrame *)videoFrame width:(int)frameWidth height:(int)frameHeight{
+    /** glPixelStorei(GLenum pname, GLfloat param)
+     * 设置像素存储模式(像素数据在存储空间中的布局方式)
+     * 也分解包和打包
+     * 参数1：设置打包和解包参数的名称
+     * 参数2：对应pname的取值
+     *
+     * 默认情况下4字节对齐 即一行的图像数据字节数必须是4的整数倍，
+     */
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     const UInt8 *pixels[3] = {videoFrame.luma.bytes, videoFrame.chromaB.bytes, videoFrame.chromaR.bytes};
     const NSUInteger widths[3] = {frameWidth, frameWidth / 2 , frameWidth / 2};
@@ -189,7 +202,10 @@ NSString *const yuvFragmentShaderString = SHADER_STRING
     
     for (int i = 0; i < 3; i++) {
         glBindTexture(GL_TEXTURE_2D, _inputTextures[i]);
+        
+        //根据数据生成纹理   跟上面的生成纹理唯一的区别是最后一个参数是数据
         glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, (int)widths[i], (int)heights[i], 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels[i]);
+        //GL_LUMINANCE  也就是单颜色通道
     }
 }
 

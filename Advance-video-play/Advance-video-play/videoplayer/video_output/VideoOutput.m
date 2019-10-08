@@ -134,11 +134,13 @@
             if (!strongSelf->_context || ![EAGLContext setCurrentContext:strongSelf->_context]) {
                 NSLog(@"Setup EAGLContext Failed...");
             }
+            //上面的两步就已经建立好了EAGL和OpenGL ES的连接， 第3步是另一端的连接(EAGL和Layer(设备的屏幕))，
             
             //3.创建FrameBuffer和RenderBuffer
             if (![strongSelf createDisplayFramebuffer]) {
                 NSLog(@"create Dispaly Framebuffer failed...");
             }
+            //当全部连接完成以后，绘制完一帧之后，调用 presentRenderbuffer: 这样就可以将绘制的结果显示到屏幕上了。
             
             [strongSelf createCopierInstance:usingHWCodec];
             if (![strongSelf->_videoFrameCopier prepareRender:textureWidth height:textureHeight]) {
@@ -149,7 +151,6 @@
             if (![strongSelf->_filter prepareRender:textureWidth height:textureHeight]) {
                 NSLog(@"_contrastEnhancerFilter prepareRender failed...");
             }
-            
             [strongSelf->_filter setInputTexture:[strongSelf->_videoFrameCopier outputTextureID]];
             
             strongSelf->_directPassRenderer = [[DirectPassRenderer alloc] init];
@@ -194,7 +195,7 @@ static const NSInteger kMaxOperationQueueCount = 3;
     @synchronized (self.renderOperationQueue) {
         //这段代码是运用NSOperation最重要的原因.....
         NSInteger operationCount = _renderOperationQueue.operationCount;
-        if (operationCount > kMaxOperationQueueCount) {
+        if (operationCount > kMaxOperationQueueCount) { //是否需要清除一些前面的Operation 只保留kMaxOperationQueueCount
             [_renderOperationQueue.operations enumerateObjectsUsingBlock:^(__kindof NSOperation * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
                 if (idx < operationCount - kMaxOperationQueueCount) {
                     [obj cancel];
@@ -204,6 +205,7 @@ static const NSInteger kMaxOperationQueueCount = 3;
             }];
         }
         
+        //添加
         __weak VideoOutput *weakSelf = self;
         [_renderOperationQueue addOperationWithBlock:^{
             if (!weakSelf) {
@@ -213,6 +215,15 @@ static const NSInteger kMaxOperationQueueCount = 3;
             __strong VideoOutput *strongSelf = weakSelf;
             [strongSelf.shouldEnableOpenGLLock lock];
             if (!strongSelf.readyToRender || !strongSelf.shouldEnableOpenGL) {
+                /**
+                 * glFinish 和 glFlush
+                 * 提交给OpenGL的绘图指令并不会马上发送给图形硬件执行，而是放到一个缓冲区里，等缓冲区满了之后再将这些指令发送给图形硬件执行，所以指令较少或较简单时是无法填满缓冲区的，这些指令自然不能马上执行以达到所需效果。因此每次写完绘图代码，需要让其立即完成效果时，开发者都需要在代码后添加 glFinish() 或 glFlush()
+                 * 作用:
+                 *    将缓冲区中指令(无论是否为满)立刻发送给图形硬件执行
+                 * 区别：
+                 * glFlush(): 发送完后立即返回
+                 * glFinish(): 但是要等待图形硬件执行完成之后才返回这些指令
+                 */
                 glFinish();
                 [strongSelf.shouldEnableOpenGLLock unlock];
                 return;
@@ -227,32 +238,42 @@ static const NSInteger kMaxOperationQueueCount = 3;
             [EAGLContext setCurrentContext:strongSelf->_context];
             
             [strongSelf->_videoFrameCopier renderWithTexId:frame];
-            [strongSelf->_filter renderWithWidth:frameWidth height:frameHeight position:frame.position];
             
+            [strongSelf->_filter renderWithWidth:frameWidth height:frameHeight position:frame.position];
             glBindFramebuffer(GL_FRAMEBUFFER, strongSelf->_displayFrameBuffer);
+            
             [strongSelf->_directPassRenderer renderWithWidth:strongSelf->_backingWidth
-                                                      height:strongSelf->_backingHeight position:frame.position];
+                                                      height:strongSelf->_backingHeight
+                                                    position:frame.position];
             glBindRenderbuffer(GL_RENDERBUFFER, strongSelf->_renderBuffer);
             [strongSelf->_context presentRenderbuffer:GL_RENDERBUFFER];
         }];
     }
 }
 
-
+//创建FrameBuffer和RenderBuffer
 - (BOOL)createDisplayFramebuffer{
     BOOL ret = YES;
     
+    //1.创建帧缓冲区、绘制缓冲区
     glGenFramebuffers(1, &_displayFrameBuffer);
     glGenRenderbuffers(1, &_renderBuffer);
+    
+    //2.绑定帧缓冲区和绘制缓冲区到渲染管线
     glBindFramebuffer(GL_FRAMEBUFFER, _displayFrameBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, _renderBuffer);
+    
+    //3.为绘制缓冲区分配存储区，此处将CAEAGLLayer的绘制存储区作为绘制缓冲区的存储区
     [self->_context renderbufferStorage:GL_RENDERBUFFER fromDrawable:self.eaglLayer];
    
+    //4.获取绘制缓冲区的像素宽度、高度
     glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &_backingWidth);
     glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &_backingHeight);
     
+    //5.将绘制缓冲区绑定到帧缓冲区
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, _renderBuffer);
     
+    //6.检查FrameBuffer的status
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (status != GL_FRAMEBUFFER_COMPLETE) {
         NSLog(@"failed to make complete framebuffer object %x", status);

@@ -20,6 +20,15 @@ NSString *const contrastVertexShaderString = SHADER_STRING
  }
 );
 
+/**
+ * 纹理单元 Texture Unit  sampler2D
+ * 为什么sampler2D变量是个uniform，却不用glUniform给它赋值。
+ * 使用glUniformli 我们可以给纹理采样器分配一个位置值，这样，能够在一个片元着色器中设置多个纹理。一个纹理的位置值通常称为一个纹理单元
+ *
+ * 纹理单元的主要目的是让我们能够在着色器中可以使用多于一个的纹理。通过把纹理单元赋值给采样器，我们可以一次绑定多个纹理，只要我们激活对应的纹理单元，就可以使用了
+ */
+
+
 NSString *const contrastFragmentShaderString = SHADER_STRING
 (
  precision mediump float;
@@ -27,6 +36,7 @@ NSString *const contrastFragmentShaderString = SHADER_STRING
  varying vec2 v_texcoord;
  void main(){
      lowp vec4 textureColor = texture2D(inputImageTexture, v_texcoord);
+    //颜色的改变 颜色的加深
      gl_FragColor = vec4((textureColor.rgb - 0.36 * (textureColor.rgb - vec3(0.63)) * (textureColor.rgb - vec3(0.63))), textureColor.w);
  }
  );
@@ -119,7 +129,7 @@ NSString *const contrastFragmentShaderString = SHADER_STRING
         1.0f, 0.0f,
         0.0f, 1.0f,
         1.0f, 1.0f,
-    };
+    }; //OpenGL二维纹理坐标  此坐标和计算机图像二维纹理坐标 正好是旋转180度
     
     glVertexAttribPointer(filterPositionAttribute, 2, GL_FLOAT, 0, 0, imageVertices);
     glEnableVertexAttribArray(filterPositionAttribute);
