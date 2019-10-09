@@ -102,7 +102,7 @@ NSString *const contrastFragmentShaderString = SHADER_STRING
 }
 
 - (GLint)outputTextureID{
-    return _contrastTextureID;
+    return _contrastTextureID;   //给DirectPassRenderer去进行纹理的数据处理
 }
 
 - (void)renderWithWidth:(NSInteger)width height:(NSInteger)height position:(float)position{
@@ -129,7 +129,7 @@ NSString *const contrastFragmentShaderString = SHADER_STRING
         1.0f, 0.0f,
         0.0f, 1.0f,
         1.0f, 1.0f,
-    }; //OpenGL二维纹理坐标  此坐标和计算机图像二维纹理坐标 正好是旋转180度
+    }; //OpenGL二维纹理坐标  此坐标和计算机图像二维纹理坐标 正好是旋转180度   还有一种解释就是 OpenGL要求y轴0.0坐标是在图片的底部的，但是图片的y轴0.0坐标通常在顶部解决的方法是翻转y轴
     
     glVertexAttribPointer(filterPositionAttribute, 2, GL_FLOAT, 0, 0, imageVertices);
     glEnableVertexAttribArray(filterPositionAttribute);

@@ -137,11 +137,13 @@
             //上面的两步就已经建立好了EAGL和OpenGL ES的连接， 第3步是另一端的连接(EAGL和Layer(设备的屏幕))，
             
             //3.创建FrameBuffer和RenderBuffer
-            if (![strongSelf createDisplayFramebuffer]) {
+            if (![strongSelf createDisplayFramebuffer]) { //
                 NSLog(@"create Dispaly Framebuffer failed...");
             }
             //当全部连接完成以后，绘制完一帧之后，调用 presentRenderbuffer: 这样就可以将绘制的结果显示到屏幕上了。
             
+            //当创建完FrameBuffer和RenderBuffer,后期的处理都是在帧缓冲上进行的
+            //纹理的一系列处理----利用GLSL
             [strongSelf createCopierInstance:usingHWCodec];
             if (![strongSelf->_videoFrameCopier prepareRender:textureWidth height:textureHeight]) {
                 NSLog(@"_videoFrameFastCopier prepareRender failed...");
@@ -235,16 +237,20 @@ static const NSInteger kMaxOperationQueueCount = 3;
             int frameWidth = (int)[frame width];
             int frameHeight = (int)[frame height];
             
+            //step1:准备渲染
             [EAGLContext setCurrentContext:strongSelf->_context];
             
+            //step2: 渲染FRAMEBUFFER ----视频帧
             [strongSelf->_videoFrameCopier renderWithTexId:frame];
-            
             [strongSelf->_filter renderWithWidth:frameWidth height:frameHeight position:frame.position];
-            glBindFramebuffer(GL_FRAMEBUFFER, strongSelf->_displayFrameBuffer);
             
+            //step3:渲染手机屏幕大小的FRAMEBUFFER
+            glBindFramebuffer(GL_FRAMEBUFFER, strongSelf->_displayFrameBuffer);
             [strongSelf->_directPassRenderer renderWithWidth:strongSelf->_backingWidth
                                                       height:strongSelf->_backingHeight
                                                     position:frame.position];
+            
+            //step4:渲染缓冲的数据写入
             glBindRenderbuffer(GL_RENDERBUFFER, strongSelf->_renderBuffer);
             [strongSelf->_context presentRenderbuffer:GL_RENDERBUFFER];
         }];
@@ -264,7 +270,7 @@ static const NSInteger kMaxOperationQueueCount = 3;
     glBindRenderbuffer(GL_RENDERBUFFER, _renderBuffer);
     
     //3.为绘制缓冲区分配存储区，此处将CAEAGLLayer的绘制存储区作为绘制缓冲区的存储区
-    [self->_context renderbufferStorage:GL_RENDERBUFFER fromDrawable:self.eaglLayer];
+    [self->_context renderbufferStorage:GL_RENDERBUFFER fromDrawable:self.eaglLayer];   //相当于Open GL中的glRenderbufferStorage
    
     //4.获取绘制缓冲区的像素宽度、高度
     glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &_backingWidth);
@@ -287,6 +293,14 @@ static const NSInteger kMaxOperationQueueCount = 3;
     }
     
     return ret;
+/** 渲染缓冲对象 GL_RENDERBUFFER
+ *
+ * 渲染缓冲对象是一个真正的缓冲，即一系列的字节、整数、像素等，渲染缓冲对象附加的好处是，它会将数据存储为OpenGL原生的渲染格式，它是为离屏渲染到帧缓冲优化过的。
+ * 渲染缓冲对象直接将所有的渲染数据储存到它的缓冲中，不会做任何针对纹理格式的转换，让它变为一个更快的可写储存介质。然而，渲染缓冲对象通常都是只写的，所以你不能读取它们（比如使用纹理访问）。当然你仍然还是能够使用glReadPixels来读取它，这会从当前绑定的帧缓冲，而不是附件本身，中返回特定区域的像素。
+ *
+ * 因为它的数据已经是原生的格式了，当写入或者复制它的数据到其它缓冲中时是非常快的。所以，交换缓冲这样的操作在使用渲染缓冲对象时会非常快。我们在每个渲染迭代最后使用的glfwSwapBuffers(在iOS的中presentRenderbuffer底层实现就是调用此函数)，也可以通过渲染缓冲对象实现：只需要写入一个渲染缓冲图像，并在最后交换到另外一个渲染缓冲就可以了。渲染缓冲对象对这种操作非常完美。
+ */
+
 }
 
 - (void)destroy{

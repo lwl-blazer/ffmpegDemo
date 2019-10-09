@@ -74,6 +74,14 @@ NSString *const yuvFragmentShaderString = SHADER_STRING
         glGenFramebuffers(1, &_framebuffer);
         glBindFramebuffer(GL_FRAMEBUFFER, _framebuffer);
         
+        /** 纹理附件
+         * 当把一个纹理附加到帧缓冲的时候，所有的渲染指令将会写入到这个纹理中，就想它是一个普通的颜色/深度或模板缓冲一样。使用纹理的优点是，所有渲染操作的结果将会被储存在一个纹理图像中，我们之后可以在着色器中很方便地使用它
+         *
+         * 主要的区别: glTexImage2D() 最后一个参数dataw传递了0 也就是NULL， 对于这个纹理我们只是仅仅分配内存而没有填充它。填充这个纹理将会在我们渲染到帧缓存之后进行。同样注意我们并不需要关心环绕方式或多级渐远纹理，
+         *
+         * glFramebufferTexture2D附加到帧缓冲上，注意参数的问题很多处理形式，详情参考:https://learnopengl-cn.github.io/04%20Advanced%20OpenGL/05%20Framebuffers/
+         *
+         */
         glActiveTexture(GL_TEXTURE1);
         glGenTextures(1, &_outputTextureID);
         glBindTexture(GL_TEXTURE_2D, _outputTextureID);
@@ -82,8 +90,7 @@ NSString *const yuvFragmentShaderString = SHADER_STRING
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, (int)frameWidth, (int)frameHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, 0);
-        
-        NSLog(@"width=%d, height=%d", (int)frameWidth, (int)frameHeight);
+        //NSLog(@"width=%d, height=%d", (int)frameWidth, (int)frameHeight);
         
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _outputTextureID, 0);
         
@@ -154,6 +161,7 @@ NSString *const yuvFragmentShaderString = SHADER_STRING
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, _inputTextures[0]);
     glUniform1i(filterInputTextureUniform, 0);
+    
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, _inputTextures[1]);
     glUniform1i(_chromaBInputTextureUniform, 1);
