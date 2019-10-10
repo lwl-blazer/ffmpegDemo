@@ -10,7 +10,6 @@
 		252FD692233A289A00811E0E /* music.flv in Resources */ = {isa = PBXBuildFile; fileRef = 252FD691233A289A00811E0E /* music.flv */; };
 		252FD694233A291400811E0E /* music2.flv in Resources */ = {isa = PBXBuildFile; fileRef = 252FD693233A291300811E0E /* music2.flv */; };
 		2548844B2328CCFB00ACDCEF /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 2548844A2328CCFB00ACDCEF /* AppDelegate.m */; };
-		2548844E2328CCFB00ACDCEF /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2548844D2328CCFB00ACDCEF /* ViewController.m */; };
 		254884512328CCFB00ACDCEF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2548844F2328CCFB00ACDCEF /* Main.storyboard */; };
 		254884532328CCFD00ACDCEF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 254884522328CCFD00ACDCEF /* Assets.xcassets */; };
 		254884562328CCFD00ACDCEF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 254884542328CCFD00ACDCEF /* LaunchScreen.storyboard */; };
@@ -48,6 +47,8 @@
 		254A25F12330E15700E393F8 /* LoadingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 254A25F02330E15700E393F8 /* LoadingView.m */; };
 		25AA617D2331B9C7000E6AD4 /* libiconv.2.4.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 25AA617C2331B9C7000E6AD4 /* libiconv.2.4.0.tbd */; };
 		25B583BF23331715008D3756 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 25B583BE23331715008D3756 /* libz.tbd */; };
+		25E1D238234F0A7A002F2EC1 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2548844D2328CCFB00ACDCEF /* ViewController.m */; };
+		25E1D23A234F21F1002F2EC1 /* mark in Resources */ = {isa = PBXBuildFile; fileRef = 25E1D239234F21F1002F2EC1 /* mark */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -134,6 +135,7 @@
 		254A25F02330E15700E393F8 /* LoadingView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LoadingView.m; sourceTree = "<group>"; };
 		25AA617C2331B9C7000E6AD4 /* libiconv.2.4.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.2.4.0.tbd; path = usr/lib/libiconv.2.4.0.tbd; sourceTree = SDKROOT; };
 		25B583BE23331715008D3756 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		25E1D239234F21F1002F2EC1 /* mark */ = {isa = PBXFileReference; lastKnownFileType = text; path = mark; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -344,6 +346,7 @@
 			children = (
 				252FD693233A291300811E0E /* music2.flv */,
 				252FD691233A289A00811E0E /* music.flv */,
+				25E1D239234F21F1002F2EC1 /* mark */,
 			);
 			path = resource;
 			sourceTree = "<group>";
@@ -480,6 +483,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				254884562328CCFD00ACDCEF /* LaunchScreen.storyboard in Resources */,
+				25E1D23A234F21F1002F2EC1 /* mark in Resources */,
 				254884532328CCFD00ACDCEF /* Assets.xcassets in Resources */,
 				254884512328CCFB00ACDCEF /* Main.storyboard in Resources */,
 				252FD694233A291400811E0E /* music2.flv in Resources */,
@@ -512,11 +516,11 @@
 				254884AF2328CFF600ACDCEF /* AVSynchronizer.m in Sources */,
 				254884A92328CFC900ACDCEF /* AVAudioSession+RouteUtils.m in Sources */,
 				254884CD2328D23300ACDCEF /* ContrastEnhancerFilter.m in Sources */,
-				2548844E2328CCFB00ACDCEF /* ViewController.m in Sources */,
 				254884592328CCFD00ACDCEF /* main.m in Sources */,
 				254884C42328D1A700ACDCEF /* YUVFrameCopier.m in Sources */,
 				254A25F12330E15700E393F8 /* LoadingView.m in Sources */,
 				254A25EE2330E03F00E393F8 /* ELVideoViewPlayController.m in Sources */,
+				25E1D238234F0A7A002F2EC1 /* ViewController.m in Sources */,
 				254884C72328D1C600ACDCEF /* YUVFrameFastCopier.m in Sources */,
 				254884BB2328D0AC00ACDCEF /* VideoDecoder.m in Sources */,
 				254884A32328CF8A00ACDCEF /* CommonUtil.m in Sources */,

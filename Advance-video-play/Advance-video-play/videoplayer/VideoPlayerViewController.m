@@ -121,7 +121,7 @@
                 dispatch_async(dispatch_get_main_queue(), ^{
                     strongSelf->_videoOutput = [strongSelf createVideoOutputInstance];
                     strongSelf->_videoOutput.contentMode = UIViewContentModeScaleAspectFit;
-                    strongSelf->_videoOutput.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleBottomMargin;
+//                    strongSelf->_videoOutput.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleBottomMargin;
                     
                     self.view.backgroundColor = [UIColor clearColor];
                     [self.view insertSubview:strongSelf->_videoOutput atIndex:0];
@@ -257,7 +257,5 @@
     return 1;
 }
 
-- (void)dealloc{
-    NSLog(@"dealloc");
-}
+
 @end

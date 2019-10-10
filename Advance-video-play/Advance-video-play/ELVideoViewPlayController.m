@@ -23,6 +23,11 @@
     [super viewDidLoad];
 }
 
+- (void)viewDidAppear:(BOOL)animated{
+    [super viewDidAppear:animated];
+    self.navigationController.navigationBarHidden = YES;
+}
+
 + (instancetype)viewControllerWithContentPath:(NSString *)path
                                  contentFrame:(CGRect)frame
                                  usingHWCodec:(BOOL)usingHWCodec

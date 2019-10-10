@@ -668,6 +668,7 @@ static int interrupt_callback(void *ctx){
                   _videoCodecCtx->height,
                   data,
                   linesize);
+        
         frame.luma = copyFrameData(data[0],
                                    linesize[0],
                                    _videoCodecCtx->width,
@@ -705,7 +706,8 @@ static int interrupt_callback(void *ctx){
                                       _videoCodecCtx->height / 2);*/
         
     }
-    frame.width = _videoCodecCtx->width;
+    
+    frame.width = _videoCodecCtx->width ;
     frame.height = _videoCodecCtx->height;
     frame.linesize = _videoFrame->linesize[0];
     frame.type = VideoFrameType;
@@ -880,12 +882,14 @@ static int interrupt_callback(void *ctx){
     /** 创建缩放图片或转换图片格式上下文
      * sws_getCachedContext()首先会到缓存里找，有就直接返回当前的，没有就创建一个新的
      */
+    int w = 812;
+    int h = 375;
     _swsContext = sws_getCachedContext(_swsContext,
                                        _videoCodecCtx->width,
                                        _videoCodecCtx->height,
                                        _videoCodecCtx->pix_fmt,
-                                       _videoCodecCtx->width,
-                                       _videoCodecCtx->height,
+                                       w,
+                                       h,
                                        AV_PIX_FMT_YUV420P,
                                        SWS_FAST_BILINEAR,   // 可以使用各种不同的算法来对图像进行处理。  对比的地址:https://blog.csdn.net/leixiaohua1020/article/details/12029505
                                        NULL, NULL, NULL);
