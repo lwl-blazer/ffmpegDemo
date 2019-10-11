@@ -412,7 +412,7 @@ float lastPosition = -1.0;
     
     @autoreleasepool {
         while (numFrames > 0) {
-            if (!_currentAudioFrame) {
+            if (!_currentAudioFrame) { //如果当前没有音频帧或已经拷完了，
                 //从队列中取出音频数据
                 @synchronized (_audioFrames) {
                     NSUInteger count = _audioFrames.count;
@@ -430,19 +430,27 @@ float lastPosition = -1.0;
             }
             
             if (_currentAudioFrame) {
+                //数据的移位 +意思是向右移_currentAudioFramePos位
                 const void *bytes = (Byte *)_currentAudioFrame.bytes + _currentAudioFramePos;
+                
+                //本次拷贝起点的位置
                 const NSUInteger bytesLeft = (_currentAudioFrame.length - _currentAudioFramePos);
+                //一帧的大小  根据声道
                 const NSUInteger frameSizeOf = numChannels * sizeof(SInt16);
+                //本次需要copy的size
                 const NSUInteger bytesToCopy = MIN(numFrames * frameSizeOf, bytesLeft);
+                //本次能copy多少帧
                 const NSUInteger framesToCopy = bytesToCopy / frameSizeOf;
                 
                 memcpy(outData, bytes, bytesToCopy);
+                
+                //本次循环已经拷了多少帧,还剩多少针
                 numFrames -= framesToCopy;
                 outData += framesToCopy * numChannels;
                 
-                if (bytesToCopy < bytesLeft) {
+                if (bytesToCopy < bytesLeft) { //当前的_currentAudioFrame 还没有拷完
                     _currentAudioFramePos += bytesToCopy;
-                } else {
+                } else { //已经拷完
                     _currentAudioFrame = nil;
                 }
             } else {

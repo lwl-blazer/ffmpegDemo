@@ -277,7 +277,7 @@ static void CheckStatus(OSStatus status, NSString *message, BOOL fatal);
                  flags:(AudioUnitRenderActionFlags *)flags{
     @autoreleasepool {
         for (int iBuffer = 0; iBuffer < ioData->mNumberBuffers; ++iBuffer) {
-            memset(ioData->mBuffers[iBuffer].mData, 0, ioData->mBuffers[iBuffer].mDataByteSize);
+            memset(ioData->mBuffers[iBuffer].mData, 0, ioData->mBuffers[iBuffer].mDataByteSize); //把ioData中的AudioBuffer的mData按size置成0
         }
         
         if (_fillAudioDataDelegate) {

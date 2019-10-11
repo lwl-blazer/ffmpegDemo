@@ -244,9 +244,12 @@
 //根据音频驱动视频
 - (NSInteger)fillAudioData:(SInt16 *)sampleBuffer numFrames:(NSInteger)frameNum numChannels:(NSInteger)channels{
     if (_synchronizer && ![_synchronizer isPlayCompleted]) {
+        //音频
         [_synchronizer audioCallbackFillData:sampleBuffer
                                    numFrames:(UInt32)frameNum
                                  numChannels:(UInt32)channels];
+        
+        //视频
         VideoFrame *videoFrame = [_synchronizer getCorrectVideoFrame];
         if (videoFrame) {
             [_videoOutput presentVideoFrame:videoFrame];
