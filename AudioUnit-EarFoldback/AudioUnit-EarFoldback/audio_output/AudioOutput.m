@@ -17,7 +17,20 @@ static const NSUInteger bufferCount = 3;
 static const UInt32 inBufferByteSize = 2048;
 
 static void CheckStatus(OSStatus status, NSString *message, BOOL fatal) {
-    
+    if (status != noErr) {
+        char fourCC[16];
+        *(UInt32 *)fourCC = CFSwapInt32HostToBig(status);
+        fourCC[4] = '\0';
+        if (isprint(fourCC[0]) && isprint(fourCC[1]) && isprint(fourCC[2]) && isprint(fourCC[4])) {
+            NSLog(@"%@:%s", message, fourCC);
+        } else {
+            NSLog(@"%@:%d", message, (int)status);
+        }
+        
+        if (fatal) {
+            exit(-1);
+        }
+    }
 };
 
 static OSStatus handleInputBuffer(void *inRefCon,
@@ -25,26 +38,27 @@ static OSStatus handleInputBuffer(void *inRefCon,
                                   const AudioTimeStamp *inTimeStamp,
                                   UInt32 inBusNumber,
                                   UInt32 inNumberFrames,
-                                  AudioBufferList *ioData){
-    return noErr;
-};
+                                  AudioBufferList *ioData);
 
 static void bufferCallback(void *inUserData,
                            AudioQueueRef inAQ,
                            AudioQueueBufferRef buffer){
-    
+    NSLog(@"BufferCallback is working");
 };
 
 
 @interface AudioOutput (){
     //音频缓存
     AudioQueueBufferRef audioQueueBuffers[3];
+    AudioComponent _audioComponent;
+    AudioComponentInstance _audioUnit;
+    AudioStreamBasicDescription _asbd;
+    //播放音频队列
+    AudioQueueRef _audioQueue;
 }
-@property(nonatomic, assign) AudioComponent audioComponent;
-@property(nonatomic, assign) AudioComponentInstance audioUnit;
-@property(nonatomic, assign) AudioStreamBasicDescription asbd;
-//播放音频队列
-@property(nonatomic, assign) AudioQueueRef audioQueue;
+
+
+@property(nonatomic, assign) int index;
 
 @end
 
@@ -56,7 +70,7 @@ static void bufferCallback(void *inUserData,
         [[ELAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord];
         [[ELAudioSession sharedInstance] setActive:YES];
         [[ELAudioSession sharedInstance] addRouteChangeListener];
-        
+
         [self addAudioSessionInterruptedObserver];
         [self configSession];
     }
@@ -71,6 +85,7 @@ static void bufferCallback(void *inUserData,
     acd.componentManufacturer = kAudioUnitManufacturer_Apple;
     acd.componentFlags = 0;
     acd.componentFlagsMask = 0;
+    _audioComponent = AudioComponentFindNext(NULL, &acd);
     
     OSStatus status = noErr;
     status = AudioComponentInstanceNew(_audioComponent, &_audioUnit);
@@ -151,7 +166,7 @@ static void bufferCallback(void *inUserData,
     
     AudioQueueSetParameter(_audioQueue,
                            kAudioQueueParam_Volume,
-                           0.5);
+                           0.8);
 }
 
 
@@ -182,6 +197,53 @@ static void bufferCallback(void *inUserData,
             break;
     }
 }
+
+static OSStatus handleInputBuffer(void *inRefCon,
+                                  AudioUnitRenderActionFlags *ioActionFlags,
+                                  const AudioTimeStamp *inTimeStamp,
+                                  UInt32 inBusNumber,
+                                  UInt32 inNumberFrames,
+                                  AudioBufferList *ioData){
+    
+    AudioOutput *output = (__bridge AudioOutput *)inRefCon;
+    AudioBufferList bufferList;
+    bufferList.mNumberBuffers = 1;
+    bufferList.mBuffers[0].mData = NULL;
+    bufferList.mBuffers[0].mDataByteSize = 0;
+    
+    AudioUnitRender(output->_audioUnit,
+                    ioActionFlags,
+                    inTimeStamp,
+                    inBusNumber,
+                    inNumberFrames,
+                    &bufferList);
+    
+    
+    void *data = malloc(bufferList.mBuffers[0].mDataByteSize);
+    memcpy(data, bufferList.mBuffers[0].mData, bufferList.mBuffers[0].mDataByteSize);
+    
+    AudioQueueBufferRef audioBuffer = NULL;
+    if (output.index == 2) {
+        output.index = 0;
+    }
+    
+    audioBuffer = output->audioQueueBuffers[output.index];
+    output.index ++;
+    audioBuffer->mAudioDataByteSize = bufferList.mBuffers[0].mDataByteSize;
+    memset(audioBuffer->mAudioData, 0, bufferList.mBuffers[0].mDataByteSize);
+    memcpy(audioBuffer->mAudioData, data, bufferList.mBuffers[0].mDataByteSize);
+    
+    
+    AudioQueueEnqueueBuffer(output->_audioQueue,
+                            audioBuffer,
+                            0,
+                            NULL);
+    
+    free(data);
+    return noErr;
+};
+
+
 
 #pragma mark -- public method
 - (BOOL)start{

@@ -24,7 +24,7 @@
     self = [super init];
     if (self) {
         _preferredSampleRate = 44100.0;
-        _audioSession = [[AVAudioSession alloc] init];
+        _audioSession = [AVAudioSession sharedInstance];
     }
     return self;
 }

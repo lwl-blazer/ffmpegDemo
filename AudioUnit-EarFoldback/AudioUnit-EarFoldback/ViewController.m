@@ -7,8 +7,12 @@
 //
 
 #import "ViewController.h"
+#import "AudioOutput.h"
 
 @interface ViewController ()
+
+@property(nonatomic, strong) AudioOutput *output;
+@property (weak, nonatomic) IBOutlet UIButton *recordButton;
 
 @end
 
@@ -17,6 +21,18 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor redColor];
+    
+    self.output = [[AudioOutput alloc] init];
+    [self.recordButton setTitle:@"停止录音" forState:UIControlStateSelected];
+}
+
+- (IBAction)recordAction:(UIButton *)sender {
+    if (sender.selected) {
+        [self.output stop];
+    } else {
+        [self.output start];
+    }
+    sender.selected = !sender.selected;
 }
 
 
