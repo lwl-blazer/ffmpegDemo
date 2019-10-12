@@ -76,6 +76,7 @@ static void CheckStatus(OSStatus status, NSString *message, BOOL fatal);
     
     [self addAudioUnitNodes];
     
+    //打开AUGraph --- 其实打开的过程也是间接实例化AUGraph中所有的AUNode,注意，必须获取AudioUnit之前打开整个Node
     status = AUGraphOpen(_auGraph);
     CheckStatus(status, @"Could not open AUGraph", YES);
     
@@ -113,13 +114,15 @@ static void CheckStatus(OSStatus status, NSString *message, BOOL fatal);
     CheckStatus(status, @"Could not add Convert node to AUGraph", YES);
 }
 
+
 - (void)getUnitsFromNodes{
     OSStatus status = noErr;
     
+    //通过AUGraphNodeInfo()函数获取对audio unit实例的引用
     status = AUGraphNodeInfo(_auGraph, _ioNode, NULL, &_ioUnit);
     CheckStatus(status, @"Could not retrieve node info for I/O node", YES);
     
-    //注意点--2:附加在_convertUnit上
+    //注意点--2:_convertUnit引用
     status = AUGraphNodeInfo(_auGraph, _convertNode, NULL, &_convertUnit);
     CheckStatus(status, @"Could not retrieve node info for Convert node", YES);
 }

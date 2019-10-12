@@ -48,3 +48,42 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 NS_ASSUME_NONNULL_END
+
+
+/** Audio Unit概念点
+ * AUGraph:
+ *    包含和管理Audio Unit的组织者
+ *
+ * AUNode/AudioComponent:
+ *    是AUGraph音频处理环节中的一个节点
+ * AudioUint:
+ *    音频处理组件，是对音频处理节点的实例描述者和操控者
+ *
+ * 比如:
+ *   一个演唱会的舞台上，有录制歌声与乐器的麦克风，从麦克风到输出音响之间，还串接了大大小小的效果器。在这个过程中，无论是麦克风、音响、效果器，都是不同的AUNode.AUNode是这些器材的实体。如果我们要操作或改变这些器材的属性(操控界面)，就是用AudioUnit.最后便构成整个舞台，便是AUGraph.
+ *
+ * AUNode和AudioComponent的区别:
+ *   器材除了放在舞台(AUGraph)上使用，也可以单独拿来使用。当我们要在AUGraph中使用某个器材，我们就会使用AUNode.
+ *   也可以单独使用，就是AudioComponent. 但无论是操作AUNode或AudioComponent，都还得透过AudioUnit这一层操作
+ *
+ * iOS提供了四大类别7种不同的AudioUnit
+ *   AudioComponentDescription对象来描述一个具体的AudioUnit
+ *   typedef struct AudioComponentDescription {
+ *       OSType componentType;   --  AudioUnit主要四种大类型  均衡器/混音/输入输出/格式转换
+ *
+ *       OSType componentSubType; -- 四大类型对应的子类型
+ *
+ *       OSType componentManufacturer;   固定: kAudioUnitManufacturer_Apple
+ *
+ *       UInt32 componentFlags;   -- 一般设置为0
+ *
+ *       UInt32 componentFlagsMask;  -- 一般设置为0
+ *
+ * }AudioComponentDescription;
+ *
+ *
+ * Audio Units的Scopes,Elements
+ * 
+ *
+ *
+ */

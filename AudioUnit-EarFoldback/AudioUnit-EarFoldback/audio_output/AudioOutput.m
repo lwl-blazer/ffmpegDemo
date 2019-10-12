@@ -57,7 +57,6 @@ static void bufferCallback(void *inUserData,
     AudioQueueRef _audioQueue;
 }
 
-
 @property(nonatomic, assign) int index;
 
 @end
@@ -78,16 +77,18 @@ static void bufferCallback(void *inUserData,
 }
 
 - (void)configSession{
-    //创建AudioUnit
+    //创建AudioUnit的方式有两种:裸创建方式,AUGraph创建方式;这里使用的是第一种
     AudioComponentDescription acd = {0};
     acd.componentType = kAudioUnitType_Output;
     acd.componentSubType = kAudioUnitSubType_RemoteIO;
     acd.componentManufacturer = kAudioUnitManufacturer_Apple;
     acd.componentFlags = 0;
     acd.componentFlagsMask = 0;
+    //1.创建AudioComponent(就是根据AudioUnit的描述，找出实际的AudioUnit类型)
     _audioComponent = AudioComponentFindNext(NULL, &acd);
     
     OSStatus status = noErr;
+    //2.根据类型创建出这个AudioUnit实例
     status = AudioComponentInstanceNew(_audioComponent, &_audioUnit);
     CheckStatus(status, @"create failed", YES);
     
