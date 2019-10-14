@@ -98,6 +98,7 @@ static void CheckStatus(OSStatus status, NSString *message, BOOL fatal);
     bzero(&ioDescription, sizeof(ioDescription));
     ioDescription.componentManufacturer = kAudioUnitManufacturer_Apple;
     ioDescription.componentType = kAudioUnitType_Output;
+    //RemoteIO 是AudioUnit与硬件IO相关的一个Unit, I代表输入端(一般指麦克风) O代表输出端(一般指扬声器或耳机)
     ioDescription.componentSubType = kAudioUnitSubType_RemoteIO;
     
     status = AUGraphAddNode(_auGraph, &ioDescription, &_ioNode);
@@ -134,9 +135,9 @@ static void CheckStatus(OSStatus status, NSString *message, BOOL fatal);
     
     status = AudioUnitSetProperty(_ioUnit,
                                   kAudioUnitProperty_StreamFormat,
-                                  kAudioUnitScope_Output, //输出
-                                  inputElement,
-                                  &streamFormat,   //输出的格式
+                                  kAudioUnitScope_Output, //Output Scope
+                                  inputElement,  //Element 1
+                                  &streamFormat,   //格式
                                   sizeof(streamFormat));
     CheckStatus(status, @"Could not set stream format on I/O unit output scope", YES);
     
@@ -154,18 +155,18 @@ static void CheckStatus(OSStatus status, NSString *message, BOOL fatal);
     //设置_convertUnit需要转换的输出的格式
     status = AudioUnitSetProperty(_convertUnit,
                                   kAudioUnitProperty_StreamFormat,
-                                  kAudioUnitScope_Output, //输出
-                                  0,
-                                  &streamFormat,
+                                  kAudioUnitScope_Output, //Output Scope
+                                  0,   //Element 0
+                                  &streamFormat,  //格式
                                   sizeof(streamFormat));
     CheckStatus(status, @"augraph recorder normal unit set client format error", YES);
     
     //设置_convertUnit输入的格式
     status = AudioUnitSetProperty(_convertUnit,
                                   kAudioUnitProperty_StreamFormat,
-                                  kAudioUnitScope_Input, //输入
-                                  0,
-                                  &_clientFormat16int,
+                                  kAudioUnitScope_Input, //Input Scope
+                                  0, //Element 0
+                                  &_clientFormat16int,   //格式
                                   sizeof(_clientFormat16int));
     CheckStatus(status, @"augraph recorder normal unit set client format error", YES);
     
@@ -180,6 +181,7 @@ static void CheckStatus(OSStatus status, NSString *message, BOOL fatal);
      * kAudioUnitProperty_StreamFormat
          指定特定Audio unit输入或输出总线的音频流数据格式
      */
+    
 }
 
 - (AudioStreamBasicDescription)nonInterleavedPCMFormatWithChannels:(UInt32)channels {
@@ -188,6 +190,16 @@ static void CheckStatus(OSStatus status, NSString *message, BOOL fatal);
     AudioStreamBasicDescription asbd;
     bzero(&asbd, sizeof(asbd));
     asbd.mFormatID = kAudioFormatLinearPCM; //格式
+    /** 理解mFormatFlags
+     * mFormatFlags --- 用来描述声音表示格式的参数
+     * kAudioFormatFlagsNativeFloatPacked 是指定每个sample的表示格式是Float格式 类似每个sample都使用两个字节(SInt16)来表示
+     *
+     * 实际的音频数据会存储在一个AudioBufferList结构中的变量mBuffers中
+     * kAudioFormatFlagIsNonInterleaved(非交错) 对于音频来讲就是左右声道是非交错存放的   左声道就会在mBuffers[0]里面，右声道就会在mBuffers[1]里面。
+          如果是指定的是Interleaved的话，那么左右声道就会交错排列在mBuffers[0]里面，
+     *
+     * mBytesPerFrame 和 mBytesPerPactket的赋值，这里需要根据mFormatFlags的值来进行分配，如果是NonInterleaved的情况下，就赋值为bytesPerSample(因为左右声道是分开存放的)，如果是Interleaved的话，那应该是bytesPerSample * channels(因为左右声道是交错存放的)这样才能表示一个Frame里面到底有多少个byte
+     */
     asbd.mFormatFlags = kAudioFormatFlagsNativeFloatPacked | kAudioFormatFlagIsNonInterleaved; //标签格式
     asbd.mBytesPerPacket = bytesPerSample;  //每个Packet的Bytes数量
     asbd.mFramesPerPacket = 1;   //每个Packet的帧数
@@ -198,19 +210,35 @@ static void CheckStatus(OSStatus status, NSString *message, BOOL fatal);
     return asbd;
 }
 
+//构建一个AUGraph的连接方式:
 - (void)makeNodeConnections{
     OSStatus status = noErr;
     
+    //方式1:直接连接 AUGraphConnectNodeInput
     //将_convertNode 连接 _ioNode   为什么AUGraph知道_ioNode是输出呢，因为在初始化_ioNode的时候componentType为kAudioUnitType_Output
     status = AUGraphConnectNodeInput(_auGraph, _convertNode, 0, _ioNode, 0);
     CheckStatus(status, @"Could not connect I/O node input to mixer node input", YES);
-    
+
     //注意点--5:为ConvertNode配置上InputCallback,
     AURenderCallbackStruct callbackStruct;
     callbackStruct.inputProc = &InputRenderCallback;
     callbackStruct.inputProcRefCon = (__bridge void *)self;
-    status = AudioUnitSetProperty(_convertUnit, kAudioUnitProperty_SetRenderCallback, kAudioUnitScope_Input, 0, &callbackStruct, sizeof(callbackStruct));
+    //方式2:回调连接
+    status = AudioUnitSetProperty(_convertUnit,
+                                  kAudioUnitProperty_SetRenderCallback,
+                                  kAudioUnitScope_Input,
+                                  0,
+                                  &callbackStruct,
+                                  sizeof(callbackStruct));
     CheckStatus(status, @"Could not set render callback on mixer input scope, element 1", YES);
+    /**
+     * AUGraph的场景
+     *
+     * 控制流:
+     * rendCallback <--- convertUnit  <--- ioUnit
+     * Audio Data流:
+     * rendCallBack ---> convertUnit --->ioUnit
+     */
 }
 
 //销毁
