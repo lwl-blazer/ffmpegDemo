@@ -225,7 +225,7 @@ static void CheckStatus(OSStatus status, NSString *message, BOOL fatal);
     callbackStruct.inputProcRefCon = (__bridge void *)self;
     //方式2:回调连接
     status = AudioUnitSetProperty(_convertUnit,
-                                  kAudioUnitProperty_SetRenderCallback,
+                                  kAudioUnitProperty_SetRenderCallback,    //与kAudioOutputUnitProperty_SetInputCallback的区别
                                   kAudioUnitScope_Input,
                                   0,
                                   &callbackStruct,

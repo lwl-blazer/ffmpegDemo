@@ -96,8 +96,8 @@ static void bufferCallback(void *inUserData,
     UInt32 flagOne = 1;
     AudioUnitSetProperty(_audioUnit,
                          kAudioOutputUnitProperty_EnableIO,
-                         kAudioUnitScope_Input,
-                         1,
+                         kAudioUnitScope_Input,  //Input Scope
+                         1, //Element1
                          &flagOne,
                          sizeof(flagOne));
     
@@ -115,8 +115,8 @@ static void bufferCallback(void *inUserData,
     
     AudioUnitSetProperty(_audioUnit,
                          kAudioUnitProperty_StreamFormat,
-                         kAudioUnitScope_Output,
-                         1,
+                         kAudioUnitScope_Output, //Output Scope
+                         1, //Element1
                          &asbd,
                          sizeof(asbd));
     
@@ -125,11 +125,20 @@ static void bufferCallback(void *inUserData,
     cb.inputProcRefCon = (__bridge void *)(self);
     cb.inputProc = handleInputBuffer;
     AudioUnitSetProperty(_audioUnit,
-                         kAudioOutputUnitProperty_SetInputCallback,
+                         kAudioOutputUnitProperty_SetInputCallback, //input
                          kAudioUnitScope_Group,
-                         1,
+                         1, //Element1
                          &cb,
                          sizeof(cb));
+    /** kAudioOutputUnitProperty_SetInputCallback 与 kAudioUnitProperty_SetRenderCallback的区别
+     *
+     * kAudioUnitProperty_SetRenderCallback 是audio unit需要数据，向Host请求数据
+     * kAudioOutputUnitProperty_SetInputCallback 是audio unit通知
+     *
+     * global scope: kAudioUnitScope_Group
+     *  作为整体应用于audio unit 并且不与任何特定音频相关联，它只有一个element,该范围适用于个别属性，比如每片的最大帧数(kAudioUnitProperty_MaximumFramesPerSlices)
+     */
+    
     
     //初始化
     status = AudioUnitInitialize(_audioUnit);
