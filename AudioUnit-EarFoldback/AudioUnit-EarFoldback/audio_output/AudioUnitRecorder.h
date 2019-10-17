@@ -1,8 +1,8 @@
 //
-//  AudioOutput.h
+//  AudioUnitRecorder.h
 //  AudioUnit-EarFoldback
 //
-//  Created by luowailin on 2019/10/11.
+//  Created by luowailin on 2019/10/17.
 //  Copyright © 2019 luowailin. All rights reserved.
 //
 
@@ -10,11 +10,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface AudioOutput : NSObject
+@interface AudioUnitRecorder : NSObject
 
-- (BOOL)start;
+- (instancetype)initWithPath:(NSString *)path;
+
+- (void)start;
 - (void)stop;
-- (void)changeVolume:(int)volume;
 
 @end
 

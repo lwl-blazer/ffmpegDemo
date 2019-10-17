@@ -101,8 +101,8 @@
 		2548848E2328CDE500ACDCEF /* libavdevice.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavdevice.a; path = "../../FFmpeg-iOS/lib/libavdevice.a"; sourceTree = "<group>"; };
 		2548848F2328CDE500ACDCEF /* libavformat.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavformat.a; path = "../../FFmpeg-iOS/lib/libavformat.a"; sourceTree = "<group>"; };
 		254884902328CDE500ACDCEF /* libavcodec.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavcodec.a; path = "../../FFmpeg-iOS/lib/libavcodec.a"; sourceTree = "<group>"; };
-		254884A12328CF8A00ACDCEF /* CommonUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommonUtil.m; sourceTree = "<group>"; };
-		254884A22328CF8A00ACDCEF /* CommonUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonUtil.h; sourceTree = "<group>"; };
+		254884A12328CF8A00ACDCEF /* CommonUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CommonUtil.m; path = "../../../AudioUnit-EarFoldback/AudioUnit-EarFoldback/audio_output/CommonUtil.m"; sourceTree = "<group>"; };
+		254884A22328CF8A00ACDCEF /* CommonUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CommonUtil.h; path = "../../../AudioUnit-EarFoldback/AudioUnit-EarFoldback/audio_output/CommonUtil.h"; sourceTree = "<group>"; };
 		254884A42328CFAC00ACDCEF /* AudioOutput.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AudioOutput.h; sourceTree = "<group>"; };
 		254884A52328CFAC00ACDCEF /* AudioOutput.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioOutput.m; sourceTree = "<group>"; };
 		254884A72328CFC900ACDCEF /* AVAudioSession+RouteUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AVAudioSession+RouteUtils.h"; sourceTree = "<group>"; };

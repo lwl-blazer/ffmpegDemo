@@ -7,11 +7,14 @@
 //
 
 #import "ViewController.h"
-#import "AudioOutput.h"
+#import "CommonUtil.h"
+#import "AudioQuqeueOutput.h"
+#import "AudioUnitRecorder.h"
 
 @interface ViewController ()
 
-@property(nonatomic, strong) AudioOutput *output;
+@property(nonatomic, strong) AudioQuqeueOutput *audioQueueOutput;
+@property(nonatomic, strong) AudioUnitRecorder *audioRecoder;
 @property (weak, nonatomic) IBOutlet UIButton *recordButton;
 
 @end
@@ -22,16 +25,23 @@
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor redColor];
     
-    self.output = [[AudioOutput alloc] init];
-    [self.recordButton setTitle:@"停止录音" forState:UIControlStateSelected];
+//    self.audioQueueOutput = [[AudioQuqeueOutput alloc] init];
+//    [self.recordButton setTitle:@"停止录音" forState:UIControlStateSelected];
+    
+    self.audioRecoder = [[AudioUnitRecorder alloc] initWithPath:[CommonUtil bundlePath:@"recorder" type:@"pcm"]];
 }
 
 - (IBAction)recordAction:(UIButton *)sender {
-    if (sender.selected) {
-        [self.output stop];
-    } else {
-        [self.output start];
-    }
+//    if (sender.selected) {
+//        [self.audioQueueOutput stop];
+//    } else {
+//        [self.audioQueueOutput start];
+//    }
+        if (sender.selected) {
+            [self.audioRecoder stop];
+        } else {
+            [self.audioRecoder start];
+        }
     sender.selected = !sender.selected;
 }
 

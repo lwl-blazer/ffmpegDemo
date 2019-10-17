@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		25826D4B2358453D008EC315 /* AudioUnitRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = 25826D4A2358453D008EC315 /* AudioUnitRecorder.m */; };
+		25826D4E235868BC008EC315 /* CommonUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 25826D4C235868BC008EC315 /* CommonUtil.m */; };
 		25BD383E23505E970040CBF8 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 25BD383D23505E970040CBF8 /* AppDelegate.m */; };
 		25BD384423505E970040CBF8 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 25BD384323505E970040CBF8 /* ViewController.m */; };
 		25BD384723505E970040CBF8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 25BD384523505E970040CBF8 /* Main.storyboard */; };
@@ -17,7 +19,7 @@
 		25BD386423505E9C0040CBF8 /* AudioUnit_EarFoldbackUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 25BD386323505E9C0040CBF8 /* AudioUnit_EarFoldbackUITests.m */; };
 		25BD3874235061890040CBF8 /* AVAudioSession+RouteUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 25BD3873235061890040CBF8 /* AVAudioSession+RouteUtils.m */; };
 		25BD387723506B6C0040CBF8 /* ELAudioSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 25BD387623506B6C0040CBF8 /* ELAudioSession.m */; };
-		25BD387A235073E40040CBF8 /* AudioOutput.m in Sources */ = {isa = PBXBuildFile; fileRef = 25BD3879235073E40040CBF8 /* AudioOutput.m */; };
+		25BD387A235073E40040CBF8 /* AudioQuqeueOutput.m in Sources */ = {isa = PBXBuildFile; fileRef = 25BD3879235073E40040CBF8 /* AudioQuqeueOutput.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +40,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		25826D492358453D008EC315 /* AudioUnitRecorder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AudioUnitRecorder.h; sourceTree = "<group>"; };
+		25826D4A2358453D008EC315 /* AudioUnitRecorder.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioUnitRecorder.m; sourceTree = "<group>"; };
+		25826D4C235868BC008EC315 /* CommonUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommonUtil.m; sourceTree = "<group>"; };
+		25826D4D235868BC008EC315 /* CommonUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonUtil.h; sourceTree = "<group>"; };
 		25BD383923505E970040CBF8 /* AudioUnit-EarFoldback.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "AudioUnit-EarFoldback.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		25BD383C23505E970040CBF8 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		25BD383D23505E970040CBF8 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -58,8 +64,8 @@
 		25BD3873235061890040CBF8 /* AVAudioSession+RouteUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "AVAudioSession+RouteUtils.m"; sourceTree = "<group>"; };
 		25BD387523506B6C0040CBF8 /* ELAudioSession.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ELAudioSession.h; sourceTree = "<group>"; };
 		25BD387623506B6C0040CBF8 /* ELAudioSession.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ELAudioSession.m; sourceTree = "<group>"; };
-		25BD3878235073E40040CBF8 /* AudioOutput.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AudioOutput.h; sourceTree = "<group>"; };
-		25BD3879235073E40040CBF8 /* AudioOutput.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioOutput.m; sourceTree = "<group>"; };
+		25BD3878235073E40040CBF8 /* AudioQuqeueOutput.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AudioQuqeueOutput.h; sourceTree = "<group>"; };
+		25BD3879235073E40040CBF8 /* AudioQuqeueOutput.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioQuqeueOutput.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,12 +151,16 @@
 		25BD3871235061360040CBF8 /* audio_output */ = {
 			isa = PBXGroup;
 			children = (
+				25826D4C235868BC008EC315 /* CommonUtil.m */,
+				25826D4D235868BC008EC315 /* CommonUtil.h */,
 				25BD3872235061890040CBF8 /* AVAudioSession+RouteUtils.h */,
 				25BD3873235061890040CBF8 /* AVAudioSession+RouteUtils.m */,
 				25BD387523506B6C0040CBF8 /* ELAudioSession.h */,
 				25BD387623506B6C0040CBF8 /* ELAudioSession.m */,
-				25BD3878235073E40040CBF8 /* AudioOutput.h */,
-				25BD3879235073E40040CBF8 /* AudioOutput.m */,
+				25BD3878235073E40040CBF8 /* AudioQuqeueOutput.h */,
+				25BD3879235073E40040CBF8 /* AudioQuqeueOutput.m */,
+				25826D492358453D008EC315 /* AudioUnitRecorder.h */,
+				25826D4A2358453D008EC315 /* AudioUnitRecorder.m */,
 			);
 			path = audio_output;
 			sourceTree = "<group>";
@@ -286,10 +296,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				25BD384423505E970040CBF8 /* ViewController.m in Sources */,
-				25BD387A235073E40040CBF8 /* AudioOutput.m in Sources */,
+				25BD387A235073E40040CBF8 /* AudioQuqeueOutput.m in Sources */,
 				25BD383E23505E970040CBF8 /* AppDelegate.m in Sources */,
+				25826D4B2358453D008EC315 /* AudioUnitRecorder.m in Sources */,
 				25BD3874235061890040CBF8 /* AVAudioSession+RouteUtils.m in Sources */,
 				25BD387723506B6C0040CBF8 /* ELAudioSession.m in Sources */,
+				25826D4E235868BC008EC315 /* CommonUtil.m in Sources */,
 				25BD384F23505E9C0040CBF8 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

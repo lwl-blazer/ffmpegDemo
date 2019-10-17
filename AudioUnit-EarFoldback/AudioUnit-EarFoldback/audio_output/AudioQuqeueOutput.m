@@ -6,7 +6,7 @@
 //  Copyright © 2019 luowailin. All rights reserved.
 //
 
-#import "AudioOutput.h"
+#import "AudioQuqeueOutput.h"
 #import <AudioToolbox/AudioToolbox.h>
 #import <Accelerate/Accelerate.h>
 #import "ELAudioSession.h"
@@ -47,7 +47,7 @@ static void bufferCallback(void *inUserData,
 };
 
 
-@interface AudioOutput (){
+@interface AudioQuqeueOutput (){
     //音频缓存
     AudioQueueBufferRef audioQueueBuffers[3];
     AudioComponent _audioComponent;
@@ -61,7 +61,7 @@ static void bufferCallback(void *inUserData,
 
 @end
 
-@implementation AudioOutput
+@implementation AudioQuqeueOutput
 
 - (instancetype)init{
     self = [super init];
@@ -218,7 +218,7 @@ static OSStatus handleInputBuffer(void *inRefCon,
                                   UInt32 inNumberFrames,
                                   AudioBufferList *ioData){
     
-    AudioOutput *output = (__bridge AudioOutput *)inRefCon;
+    AudioQuqeueOutput *output = (__bridge AudioQuqeueOutput *)inRefCon;
     AudioBufferList bufferList;
     bufferList.mNumberBuffers = 1;
     bufferList.mBuffers[0].mData = NULL;

@@ -9,6 +9,10 @@
 #import "ELAudioSession.h"
 #import "AVAudioSession+RouteUtils.h"
 
+const NSTimeInterval AUSAudioSessionLatency_Background = 0.0929;
+const NSTimeInterval AUSAudioSessionLatency_Default = 0.0232;
+const NSTimeInterval AUSAudioSessionLatency_LowLatency = 0.0058;
+
 @implementation ELAudioSession
 
 + (ELAudioSession *)sharedInstance{

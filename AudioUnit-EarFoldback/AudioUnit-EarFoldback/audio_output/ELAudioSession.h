@@ -11,6 +11,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern const NSTimeInterval AUSAudioSessionLatency_Background;
+extern const NSTimeInterval AUSAudioSessionLatency_Default;
+extern const NSTimeInterval AUSAudioSessionLatency_LowLatency;
+
 @interface ELAudioSession : NSObject
 
 @property(nonatomic, strong) AVAudioSession *audioSession;
