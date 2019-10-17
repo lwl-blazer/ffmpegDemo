@@ -95,7 +95,7 @@ static void bufferCallback(void *inUserData,
     //设置参数属性
     UInt32 flagOne = 1;
     AudioUnitSetProperty(_audioUnit,
-                         kAudioOutputUnitProperty_EnableIO,
+                         kAudioOutputUnitProperty_EnableIO,    //kAudioOutputUnitProperty_EnableIO 用于在I/O unit上启用或禁用输入或输出，默认情况下，输出已启用但输入已禁用
                          kAudioUnitScope_Input,  //Input Scope
                          1, //Element1
                          &flagOne,
@@ -113,8 +113,9 @@ static void bufferCallback(void *inUserData,
     asbd.mBytesPerPacket = asbd.mFramesPerPacket * asbd.mBytesPerFrame;
     asbd.mReserved = 0;
     
+    //输出的格式
     AudioUnitSetProperty(_audioUnit,
-                         kAudioUnitProperty_StreamFormat,
+                         kAudioUnitProperty_StreamFormat,  //kAudioUnitProperty_StreamFormat 指定特定audio unit输入或输出总线的音频流数据格式
                          kAudioUnitScope_Output, //Output Scope
                          1, //Element1
                          &asbd,
@@ -125,7 +126,7 @@ static void bufferCallback(void *inUserData,
     cb.inputProcRefCon = (__bridge void *)(self);
     cb.inputProc = handleInputBuffer;
     AudioUnitSetProperty(_audioUnit,
-                         kAudioOutputUnitProperty_SetInputCallback, //input
+                         kAudioOutputUnitProperty_SetInputCallback, //kAudioOutputUnitProperty_SetInputCallback 设置声音输出回调函数。当speaker需要数据时就会调用回调函数去获取数据。它是 "拉" 数据的概念。
                          kAudioUnitScope_Group,
                          1, //Element1
                          &cb,
@@ -140,7 +141,7 @@ static void bufferCallback(void *inUserData,
      */
     
     
-    //初始化
+    //初始化Audio Unit
     status = AudioUnitInitialize(_audioUnit);
     CheckStatus(status, @"initialize AudioUnit faile", YES);
     
@@ -157,6 +158,7 @@ static void bufferCallback(void *inUserData,
     _asbd.mBytesPerFrame = asbd.mBytesPerFrame;
     _asbd.mBytesPerPacket = asbd.mBytesPerPacket;
     
+    //创建AudioQueue
     AudioQueueNewOutput(&_asbd,
                         bufferCallback,
                         (__bridge void *)(self),
@@ -165,7 +167,7 @@ static void bufferCallback(void *inUserData,
                         0,
                         &_audioQueue);
     
-    //初始化音频缓冲区
+    //在Audio Queue启动之后，通过AudioQueueAllocateBuffer生成若干个AudioQueueBufferRef结构(初始化音频缓冲区)
     for (int i = 0; i < bufferCount; i++) {
         status = AudioQueueAllocateBuffer(_audioQueue,
                                           inBufferByteSize,
@@ -208,6 +210,7 @@ static void bufferCallback(void *inUserData,
     }
 }
 
+//需要数据时候会调用
 static OSStatus handleInputBuffer(void *inRefCon,
                                   AudioUnitRenderActionFlags *ioActionFlags,
                                   const AudioTimeStamp *inTimeStamp,
@@ -221,6 +224,9 @@ static OSStatus handleInputBuffer(void *inRefCon,
     bufferList.mBuffers[0].mData = NULL;
     bufferList.mBuffers[0].mDataByteSize = 0;
     
+    /**注意这个函数
+     * AudioUnitRender 获得录制的采样数据
+     * 采样到数据后，直接使用AudioQueueEnqueueBuffer把buffer插入Audio Queue中*/
     AudioUnitRender(output->_audioUnit,
                     ioActionFlags,
                     inTimeStamp,
@@ -271,3 +277,22 @@ static OSStatus handleInputBuffer(void *inRefCon,
 }
 
 @end
+
+/** Audio Queue
+ *
+ * 工作模式:
+ *  Audio Queue在内部有一套缓冲队列(Buffer Queue)机制。
+ *  在AudioQueue启动之后需要通过AudioQueueAllocateBuffer生成若干个AudioQueueBufferRef结构，这些Buffer将用来存储即将要播放的音频数据，并且这些Buffer是受生成他们的AudioQueue实例管理的，内存空间也已经被分配（按照Allocate方法的参数），当AudioQueue被Dispose时这些Buffer也会随之被销毁。
+ * 当有音频数据需要被播放时首先需要被memcpy到AudioQueueBufferRef的mAudioData中（mAudioData所指向的内存已经被分配，之前AudioQueueAllocateBuffer所做的工作），并给mAudioDataByteSize字段赋值传入的数据大小。
+ * 完成之后需要调用AudioQueueEnqueueBuffer把存有音频数据的Buffer插入到AudioQueue内置的Buffer队列中。
+ *
+ * 在Buffer队列中有buffer存在的情况下调用AudioQueueStart，此时AudioQueue就回按照Enqueue顺序逐个使用Buffer队列中的buffer进行播放，每当一个Buffer使用完毕之后就会从Buffer队列中被移除并且在使用者指定的RunLoop上触发一个回调来告诉使用者，某个AudioQueueBufferRef对象已经使用完成，你可以继续重用这个对象来存储后面的音频数据。如此循环往复音频数据就会被逐个播放直到结束
+ *
+ * 比较有价值的参数属性:
+ *
+ * kAudioQueueProperty_IsRunning监听它可以知道当前AudioQueue是否在运行
+ * kAudioQueueProperty_MagicCookie部分音频格式需要设置magicCookie，这个cookie可以从AudioFileStream和AudioFile中获取。
+ * kAudioQueueParam_Volume，它可以用来调节AudioQueue的播放音量，注意这个音量是AudioQueue的内部播放音量和系统音量相互独立设置并且最后叠加生效。
+ * kAudioQueueParam_VolumeRampTime 参数和Volume参数配合使用可以实现音频播放淡入淡出的效果；
+ * kAudioQueueParam_PlayRate参数可以调整播放速率；
+ */

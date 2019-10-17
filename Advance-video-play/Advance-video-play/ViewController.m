@@ -26,8 +26,6 @@ NSString * const MAX_BUFFERED_DURATION = @"Max Buffered Duration";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
-    
     _requestHeader = [NSMutableDictionary dictionary];
     _requestHeader[MIN_BUFFERED_DURATION] = @(2.0f);
     _requestHeader[MAX_BUFFERED_DURATION] = @(4.0f);
