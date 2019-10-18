@@ -108,9 +108,9 @@ static const AudioUnitElement inputElement = 1;
     AudioComponentDescription ioDescription;
     //bzero(void *s, int n) 将内存块(字符串)的前n个字节清零
     bzero(&ioDescription, sizeof(ioDescription));
-    ioDescription.componentManufacturer = kAudioUnitManufacturer_Apple;
     ioDescription.componentType = kAudioUnitType_Output;
     ioDescription.componentSubType = kAudioUnitSubType_RemoteIO;
+    ioDescription.componentManufacturer = kAudioUnitManufacturer_Apple;
     status = AUGraphAddNode(_auGraph,
                             &ioDescription,
                             &_ioNode);
@@ -126,6 +126,22 @@ static const AudioUnitElement inputElement = 1;
                             &_convertNode);
     CheckStatus(status, @"create convert node faile", YES);
     
+    /** kAudioUnitType_Mixer 主要提供Mix多路声音的功能。
+     * 其子类型及用途如下:
+     *  3D Mixer:  无法在移动设备上使用
+     *
+     * multiChannelMixer: kAudioUnitSubType_MultiChannelMixer 它是多路声音混音的效果器，可以接收多路音频的输入，还可以分别调整每一路音频的增益与开关，并将多路音频合并成一路，该效果器在处理音频的图状结构中非常有用
+     *
+     * 对于这个类型可以有多个输入，但是只有一个输出
+     *
+     * 属性有哪些:
+     * kAudioUnitProperty_ElementCount给Mixer设置多个输入源
+     * 还可以给每个输入源设置格式
+     * kAudioUnitProperty_SampleRate 设置sampleRate
+     *
+     * 参考管方混音例子:https://developer.apple.com/library/archive/samplecode/iOSMultichannelMixerTest/Introduction/Intro.html
+     *
+     */
     AudioComponentDescription mixerDescription;
     bzero(&mixerDescription, sizeof(mixerDescription));
     mixerDescription.componentType = kAudioUnitType_Mixer;
@@ -137,6 +153,7 @@ static const AudioUnitElement inputElement = 1;
     CheckStatus(status, @"create mixer node faile", YES);
 }
 
+//获取Audio Unit 从 AUNode中
 - (void)getUnitsFromNodes{
     OSStatus status = noErr;
     status = AUGraphNodeInfo(_auGraph, _ioNode,
@@ -168,18 +185,29 @@ static const AudioUnitElement inputElement = 1;
                                   sizeof(stereoStreamFormat));
     CheckStatus(status, @"Could not set stream format on I/O unit output scope", YES);
     
-    UInt32 enableIO = 1;
+    //这个就是启用麦克风
+    UInt32 enableIO = 1;  //to enable input
     status = AudioUnitSetProperty(_ioUnit,
-                                  kAudioOutputUnitProperty_EnableIO,
+                                  kAudioOutputUnitProperty_EnableIO,    //kAudioOutputUnitProperty_EnableIO 启用或禁用
                                   kAudioUnitScope_Input,
                                   inputElement,
                                   &enableIO,
                                   sizeof(enableIO));
     CheckStatus(status, @"Could not enable I/O on I/O unit input scope", YES);
     
+    /* 关掉输出
+    UInt32 disableIO = 0; //to disable output
+    AudioUnitElement outputElement = 0;
+    status = AudioUnitSetProperty(_ioUnit,
+                                  kAudioOutputUnitProperty_EnableIO,
+                                  kAudioUnitScope_Output,
+                                  outputElement,
+                                  &disableIO,
+                                  sizeof(disableIO));*/
+    
     UInt32 mixerElementCount = 1;
     status = AudioUnitSetProperty(_mixerUnit,
-                                  kAudioUnitProperty_ElementCount,
+                                  kAudioUnitProperty_ElementCount,  //kAudioUnitProperty_ElementCount
                                   kAudioUnitScope_Input,
                                   0,
                                   &mixerElementCount,
@@ -196,15 +224,22 @@ static const AudioUnitElement inputElement = 1;
     
     UInt32 maximumFramesPerSlice = 4096;
     AudioUnitSetProperty(_ioUnit,
-                         kAudioUnitProperty_MaximumFramesPerSlice,
-                         kAudioUnitScope_Global,
+                         kAudioUnitProperty_MaximumFramesPerSlice,    // kAudioUnitProperty_MaximumFramesPerSlice 每片最大的帧数  在调用AudioUnitRender回调的时候需要准备的大小, 官方文档建议设置成4096
+                         kAudioUnitScope_Global,   //global scope 整应用于Audio Unit并且不会与特定音频流相关联。它只有一个element， 只适合于个别属性
                          0,
                          &maximumFramesPerSlice,
                          sizeof(maximumFramesPerSlice));
     
+    
+    /** AudioStreamBasicDescription(ASBD)
+     * 音频值在您的应用程序以及你的应用程序和音频硬件之间移动的流是 AudioStreamBasicDescription
+     */
     UInt32 bytesPerSample = sizeof(SInt32);
-    AudioStreamBasicDescription _clientFormat32float;
+//    UInt32 bytesPerSample = sizeof(AudioUnitSampleType);
+    AudioStreamBasicDescription _clientFormat32float; //设置ASBD
     _clientFormat32float.mFormatID = kAudioFormatLinearPCM;
+    
+    
     _clientFormat32float.mFormatFlags = kAudioFormatFlagsNativeFloatPacked | kAudioFormatFlagIsNonInterleaved;
     _clientFormat32float.mBytesPerPacket = bytesPerSample;
     _clientFormat32float.mFramesPerPacket = 1;
@@ -247,12 +282,16 @@ static OSStatus renderCallback(void *inRefCon,
                                AudioBufferList *ioData){
     OSStatus result = noErr;
     __unsafe_unretained AudioUnitRecorder *recorder = (__bridge AudioUnitRecorder *)inRefCon;
+    
+    //去Mixer Unit里面要数据，通过调用AudioUnitRender的方式来驱动Mixer Unit获取数据，得到数据之后放入ioData中,从而填充回调方法的中的参数
     AudioUnitRender(recorder->_mixerUnit,
                     ioActionFlags,
                     inTimeStamp,
                     0,
                     inNuberFrames,
                     ioData);
+    
+    //利用ExtAudioFile将这段声音编码并写入本地磁盘的一个文件中
     result = ExtAudioFileWriteAsync(recorder->finalAudioFile,
                                     inNuberFrames,
                                     ioData);
@@ -261,7 +300,8 @@ static OSStatus renderCallback(void *inRefCon,
 
 - (AudioStreamBasicDescription )noninterleavedPCMFormatWithChannels:(UInt32)channels{
     
-    UInt32 bytesPerSample = sizeof(Float32);
+    UInt32 bytesPerSample = sizeof(SInt32);
+    //UInt32 bytesPerSample = sizeof(AudioUnitSampleType);
     
     AudioStreamBasicDescription asbd;
     bzero(&asbd, sizeof(asbd));
@@ -269,13 +309,13 @@ static OSStatus renderCallback(void *inRefCon,
     asbd.mSampleRate = _sampleRate;
     asbd.mFormatID = kAudioFormatLinearPCM;
     
-    asbd.mFormatFlags = kAudioFormatFlagsNativeFloatPacked | kAudioFormatFlagIsNonInterleaved;
+    //asbd.mFormatFlags = kAudioFormatFlagsAudioUnitCanonical | kAudioFormatFlagIsNonInterleaved; 等于下面的一句
+    asbd.mFormatFlags = kAudioFormatFlagIsSignedInteger | kAudioFormatFlagsNativeEndian | kAudioFormatFlagIsPacked | kAudioFormatFlagIsNonInterleaved;
     asbd.mBitsPerChannel = 8 * bytesPerSample;
     asbd.mBytesPerFrame = bytesPerSample;
     asbd.mBytesPerPacket = bytesPerSample;
     asbd.mFramesPerPacket = 1;
     asbd.mChannelsPerFrame = channels;
-    
     return asbd;
 }
 
@@ -298,6 +338,7 @@ static OSStatus renderCallback(void *inRefCon,
     AURenderCallbackStruct finalRenderCallback;
     finalRenderCallback.inputProc = &renderCallback;
     finalRenderCallback.inputProcRefCon = (__bridge void *)self;
+    //AUGraphSetNodeInputCallback 连接Audio Unit Input Bus的回调函数
     status = AUGraphSetNodeInputCallback(_auGraph,
                                          _ioNode,
                                          0,
