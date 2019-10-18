@@ -75,10 +75,11 @@ static const AudioUnitElement inputElement = 1;
         _sampleRate = 44100.0;
         _destinationFilePath = path;
         
+        NSLog(@"%@", path);
         [[ELAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord];
-       // [[ELAudioSession sharedInstance] setPreferredSampleRate:_sampleRate];
+        [[ELAudioSession sharedInstance] setPreferredSampleRate:_sampleRate];
         [[ELAudioSession sharedInstance] setActive:YES];
-        //[[ELAudioSession sharedInstance] addRouteChangeListener];
+        [[ELAudioSession sharedInstance] addRouteChangeListener];
         [self addAudioSessionInterruptedObserver];
         [self createAudioUnitGraph];
     }
@@ -201,7 +202,7 @@ static const AudioUnitElement inputElement = 1;
                          &maximumFramesPerSlice,
                          sizeof(maximumFramesPerSlice));
     
-    UInt32 bytesPerSample = sizeof(AudioUnitSampleType);
+    UInt32 bytesPerSample = sizeof(SInt32);
     AudioStreamBasicDescription _clientFormat32float;
     _clientFormat32float.mFormatID = kAudioFormatLinearPCM;
     _clientFormat32float.mFormatFlags = kAudioFormatFlagsNativeFloatPacked | kAudioFormatFlagIsNonInterleaved;
@@ -271,7 +272,8 @@ static OSStatus renderCallback(void *inRefCon,
     asbd.mFormatFlags = kAudioFormatFlagsNativeFloatPacked | kAudioFormatFlagIsNonInterleaved;
     asbd.mBitsPerChannel = 8 * bytesPerSample;
     asbd.mBytesPerFrame = bytesPerSample;
-    asbd.mBytesPerPacket = 1;
+    asbd.mBytesPerPacket = bytesPerSample;
+    asbd.mFramesPerPacket = 1;
     asbd.mChannelsPerFrame = channels;
     
     return asbd;

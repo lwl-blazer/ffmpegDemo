@@ -26,24 +26,19 @@
     self.view.backgroundColor = [UIColor redColor];
     
 //    self.audioQueueOutput = [[AudioQuqeueOutput alloc] init];
-//    [self.recordButton setTitle:@"停止录音" forState:UIControlStateSelected];
-    
-    self.audioRecoder = [[AudioUnitRecorder alloc] initWithPath:[CommonUtil bundlePath:@"recorder" type:@"pcm"]];
+    self.audioRecoder = [[AudioUnitRecorder alloc] initWithPath:[CommonUtil documentsPath:@"recorder.caf"]];
 }
 
 - (IBAction)recordAction:(UIButton *)sender {
-//    if (sender.selected) {
-//        [self.audioQueueOutput stop];
-//    } else {
-//        [self.audioQueueOutput start];
-//    }
-        if (sender.selected) {
-            [self.audioRecoder stop];
-        } else {
-            [self.audioRecoder start];
-        }
-    sender.selected = !sender.selected;
+    
+    //        [self.audioQueueOutput start];
+    [self.audioRecoder start];
+    
 }
 
+- (IBAction)stop:(UIButton *)sender {
+    //        [self.audioQueueOutput stop];
+    [self.audioRecoder stop];
+}
 
 @end
