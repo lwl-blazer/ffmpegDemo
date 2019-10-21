@@ -177,6 +177,7 @@ static const AudioUnitElement inputElement = 1;
 - (void)setAudioUnitProperties{
     OSStatus status = noErr;
     AudioStreamBasicDescription stereoStreamFormat = [self noninterleavedPCMFormatWithChannels:2];
+    //RemoteIO这个AudioUnit比较特别，Input-Element实际上使用的是麦克风，而OutputElement使用的是扬声器  使用属性：kAudioOutputUnitProperty_EnableIO启用RemoteIO的InputElement
     status = AudioUnitSetProperty(_ioUnit,
                                   kAudioUnitProperty_StreamFormat,
                                   kAudioUnitScope_Output,
@@ -185,7 +186,7 @@ static const AudioUnitElement inputElement = 1;
                                   sizeof(stereoStreamFormat));
     CheckStatus(status, @"Could not set stream format on I/O unit output scope", YES);
     
-    //这个就是启用麦克风
+    //这个就是启用麦克风 (就是启用RemoteIO这个AudiuUnit的InputElement)
     UInt32 enableIO = 1;  //to enable input
     status = AudioUnitSetProperty(_ioUnit,
                                   kAudioOutputUnitProperty_EnableIO,    //kAudioOutputUnitProperty_EnableIO 启用或禁用
@@ -325,7 +326,7 @@ static OSStatus renderCallback(void *inRefCon,
                                      _ioNode,
                                      1,
                                      _convertNode,
-                                     0);
+                                     0); //注意这里不是连接到_convertNode的 InputElement 而且 OutputElement
     CheckStatus(status, @"Could not connect I/O node input to convert node input", YES);
     
     status = AUGraphConnectNodeInput(_auGraph,
@@ -347,8 +348,9 @@ static OSStatus renderCallback(void *inRefCon,
 }
 
 
-
+//准备文件的写入
 - (void)prepareFinalWriteFile{
+    //使用一个iOS更高级的API来写文件，即ExtAudioFile，iOS提供的这个API只需要设置好输入格式、输出格式以及输出文件路径和文件格式就可以了
     AudioStreamBasicDescription destinationFormat;
     memset(&destinationFormat, 0, sizeof(destinationFormat));
     
@@ -412,6 +414,7 @@ static OSStatus renderCallback(void *inRefCon,
                 @"ExtAudioFileSetProperty on extAudioFile Faild",
                 YES);
     
+    //写入数据 ExtAudioFileWriteAsync
     CheckStatus(ExtAudioFileWriteAsync(finalAudioFile,
                                        0,
                                        NULL),
@@ -475,6 +478,8 @@ static OSStatus renderCallback(void *inRefCon,
 - (void)stop{
     OSStatus status = AUGraphStop( _auGraph);
     CheckStatus(status, @"Could not stop AUGraph", YES);
+    
+    //停止写入
     ExtAudioFileDispose(finalAudioFile);
 }
 
