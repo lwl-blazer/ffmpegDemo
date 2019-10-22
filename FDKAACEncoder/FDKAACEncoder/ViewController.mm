@@ -26,29 +26,27 @@
     } else {
         self.view.backgroundColor = [UIColor redColor];
     }
-    
-    UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
-    [button setTitle:@"Encode" forState:UIControlStateNormal];
-    button.frame = CGRectMake(100, 200, 90, 40);
-    [self.view addSubview:button];
-    [button addTarget:self action:@selector(buttonAction) forControlEvents:UIControlEventTouchUpInside];
 }
 
-- (void)buttonAction{
-    NSLog(@"FDK AAC encoder Test");
-    NSString *pcmFilePath = [CommonUtil bundlePath:@"vocal" type:@"pcm"];
+- (IBAction)encodeAction:(UIButton *)sender {
+    
+    NSString *pcmFilePath = [CommonUtil bundlePath:@"recorder" type:@"pcm"];
     NSString *aacFilePath = [CommonUtil documentsPath:@"test.aac"];
     
     AudioEncoder *encoder = new AudioEncoder();
     int bitsPerSample = 16;
-    const char *codec_name = [@"libfdk_aac" cStringUsingEncoding:NSUTF8StringEncoding];
+    const char *codec_name = [@"aac" cStringUsingEncoding:NSUTF8StringEncoding];
     int bitRate = 128 * 1024;
     int channels = 2;
     int sampleRate = 44100;
+    int ret = encoder->init(bitRate, channels, sampleRate, bitsPerSample, [aacFilePath cStringUsingEncoding:NSUTF8StringEncoding], codec_name);
+    if (ret < 0) {
+        NSLog(@"init encoder error");
+        return;
+    }
     
-    encoder->init(bitRate, channels, sampleRate, bitsPerSample, [aacFilePath cStringUsingEncoding:NSUTF8StringEncoding], codec_name);
+    
     int bufferSize = 1024 * 256;
-    
     byte *buffer = new byte[bufferSize];
     
     FILE *pcmFileHandle = fopen([pcmFilePath cStringUsingEncoding:NSUTF8StringEncoding], "rb");
@@ -63,5 +61,6 @@
     encoder->destroy();
     delete encoder;
 }
+
 
 @end

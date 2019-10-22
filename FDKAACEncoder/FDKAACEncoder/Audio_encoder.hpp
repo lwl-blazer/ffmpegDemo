@@ -18,8 +18,6 @@
 #endif
 
 #define byte uint8_t
-#define MAX(a, b) (((a) > (b)) ? (a) : (b))
-#define MIN(a, b) (((b) < (b)) ? (a) : (b))
 
 #define LOGI(...) printf(" "); printf(__VA_ARGS__); printf("\t - <%s> \n", LOG_TAG);
 
@@ -40,7 +38,9 @@ extern "C" {
 #define PUBLISH_BITE_RATE 64000
 #endif
 
+/** 利用FFmpeg 对音频进行编码操作 方便拓展 可以使用Android和iOS */
 class AudioEncoder{
+private:
     AVFormatContext *avFormatContext;
     AVCodecContext *avCodecContext;
     AVStream *audioStream;
@@ -75,9 +75,21 @@ public:
     AudioEncoder();
     virtual ~AudioEncoder();
     
+    /** 初始化
+     * @param bitRate 比特率  ---最终编码出来的文件的码率
+     * @param channels 声道数
+     * @param sampleRate 采样率
+     * @param bitsPerSample 每个采样的bit大小
+     * @param accFilePath 最终编码的文件路径
+     * @param codec_name 编码器名字
+     */
     int init(int bitRate, int channels, int sampleRate, int bitsPerSample, const char *accFilePath, const char *codec_name);
     int init(int bitRate, int channels, int bitsPerSample, const char *aacFilePath, const char *codec_name);
+    
+    //编码
     void encode(byte *buffer, int size);
+    
+    //销毁
     void destroy();
 };
 
