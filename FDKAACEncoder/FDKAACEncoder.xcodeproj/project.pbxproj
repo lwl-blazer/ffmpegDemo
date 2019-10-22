@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		256263E9235ECA4A0069CAF7 /* recorder.pcm in Resources */ = {isa = PBXBuildFile; fileRef = 256263E8235ECA4A0069CAF7 /* recorder.pcm */; };
-		256263ED235EF8A70069CAF7 /* music2.aac in Resources */ = {isa = PBXBuildFile; fileRef = 256263EC235EF8A70069CAF7 /* music2.aac */; };
 		25674CBC235D52AD00EF9311 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 25674CBB235D52AD00EF9311 /* AppDelegate.m */; };
 		25674CC2235D52AD00EF9311 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 25674CC1235D52AD00EF9311 /* ViewController.mm */; };
 		25674CC5235D52AD00EF9311 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 25674CC3235D52AD00EF9311 /* Main.storyboard */; };
@@ -53,7 +52,6 @@
 
 /* Begin PBXFileReference section */
 		256263E8235ECA4A0069CAF7 /* recorder.pcm */ = {isa = PBXFileReference; lastKnownFileType = file; path = recorder.pcm; sourceTree = "<group>"; };
-		256263EC235EF8A70069CAF7 /* music2.aac */ = {isa = PBXFileReference; lastKnownFileType = file; path = music2.aac; sourceTree = "<group>"; };
 		25674CB7235D52AD00EF9311 /* FDKAACEncoder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FDKAACEncoder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		25674CBA235D52AD00EF9311 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		25674CBB235D52AD00EF9311 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -151,7 +149,6 @@
 		25674CB9235D52AD00EF9311 /* FDKAACEncoder */ = {
 			isa = PBXGroup;
 			children = (
-				256263EC235EF8A70069CAF7 /* music2.aac */,
 				256263E8235ECA4A0069CAF7 /* recorder.pcm */,
 				25674D0E235DAED500EF9311 /* CommonUtil.h */,
 				25674D0D235DAED500EF9311 /* CommonUtil.m */,
@@ -314,7 +311,6 @@
 				256263E9235ECA4A0069CAF7 /* recorder.pcm in Resources */,
 				25674CCA235D52B000EF9311 /* LaunchScreen.storyboard in Resources */,
 				25674CC7235D52B000EF9311 /* Assets.xcassets in Resources */,
-				256263ED235EF8A70069CAF7 /* music2.aac in Resources */,
 				25674CC5235D52AD00EF9311 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
