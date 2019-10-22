@@ -26,7 +26,7 @@
     self.view.backgroundColor = [UIColor redColor];
     
 //    self.audioQueueOutput = [[AudioQuqeueOutput alloc] init];
-    self.audioRecoder = [[AudioUnitRecorder alloc] initWithPath:[CommonUtil documentsPath:@"recorder.caf"]];
+    self.audioRecoder = [[AudioUnitRecorder alloc] initWithPath:[CommonUtil documentsPath:@"recorder.pcm"]];
 }
 
 - (IBAction)recordAction:(UIButton *)sender {
