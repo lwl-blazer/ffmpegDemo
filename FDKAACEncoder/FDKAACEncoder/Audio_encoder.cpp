@@ -38,8 +38,8 @@ int AudioEncoder::alloc_audio_stream(const char *codec_name){
     }
     
     //分配Codec相关内容
-    /** avCodecContext = avcodec_alloc_context3(codec); //用这个创建出错
-    avcodec_parameters_to_context(avCodecContext, audioStream->codecpar); */
+     /**avCodecContext = avcodec_alloc_context3(codec); //用这个创建出错
+    avcodec_parameters_to_context(avCodecContext, audioStream->codecpar);*/
     avCodecContext = audioStream->codec;
 
     avCodecContext->codec_type = AVMEDIA_TYPE_AUDIO;
@@ -165,13 +165,14 @@ int AudioEncoder::alloc_avframe(){
     input_frame->format = preferedSampleFMT;
     input_frame->channel_layout = preferedChannels == 1 ? AV_CH_LAYOUT_MONO : AV_CH_LAYOUT_STEREO;
     input_frame->sample_rate = preferedSampleRate;
+    //av_samples_get_buffer_size 这个方法主要是计算编码每一帧输入给编码器需要多少个字节。
     buffer_size = av_samples_get_buffer_size(nullptr,
                                              av_get_channel_layout_nb_channels(input_frame->channel_layout),
                                              input_frame->nb_samples,
                                              preferedSampleFMT,
                                              0); //计算buffer_Size = frame_size * sizeof(SInt16) * channels 其中frame_size 就是AVCodecContext中的frame_size
     
-    //重采样
+    //重采样的构造
     samples = (uint8_t *)av_malloc(buffer_size);
     samplesCursor = 0;
     if (!samples) {
@@ -180,7 +181,7 @@ int AudioEncoder::alloc_avframe(){
     }
     
     LOGI("allocate %d bytes for samples buffer\n", buffer_size);
-    
+    //samples 的缓冲数据赋值给input_frame
     ret = avcodec_fill_audio_frame(input_frame,
                                    av_get_channel_layout_nb_channels(input_frame->channel_layout),
                                    preferedSampleFMT,
@@ -197,13 +198,13 @@ int AudioEncoder::alloc_avframe(){
         }
         
         convert_data = (uint8_t **)calloc(avCodecContext->channels, sizeof(*convert_data));
-        
         av_samples_alloc(convert_data,
                          nullptr,
                          avCodecContext->channels,
                          avCodecContext->frame_size,
                          avCodecContext->sample_fmt,
                          0);
+        
         swrBufferSize = av_samples_get_buffer_size(nullptr,
                                                    avCodecContext->channels,
                                                    avCodecContext->frame_size,
@@ -301,11 +302,13 @@ int AudioEncoder::init(int bitRate, int channels, int sampleRate, int bitsPerSam
     this->alloc_audio_stream(codec_name);
     av_dump_format(avFormatContext, 0, accFilePath, 1);
     
+    //将音频文件的头部信息写入
     if (avformat_write_header(avFormatContext, nullptr) != 0) {
         LOGI("Could not write header\n");
         return -1;
     }
     
+    //写入成功后做好标记，写入尾部av_write_trailer 如果没有写入头部，直接写入尾部的话，会crash掉
     this->isWriteHeaderSuccess = true;
     this->alloc_avframe();
     return 1;
@@ -319,7 +322,7 @@ void AudioEncoder::encode(uint8_t *buffer, int size){
     int bufferCursor = 0;
     int bufferSize = size;
     while (bufferSize >= (buffer_size - samplesCursor)) {
-        int cpySize = buffer_size - samplesCursor;
+        int cpySize = buffer_size - samplesCursor; //每一帧的大小  buffer_size - samplesCursor
         memcpy(samples + samplesCursor, buffer + bufferCursor, cpySize);
         bufferCursor += cpySize;
         bufferSize -= cpySize;
@@ -334,11 +337,11 @@ void AudioEncoder::encode(uint8_t *buffer, int size){
 }
 
 void AudioEncoder::encodePacket(){
-    int ret, got_output;
+    int ret;
     AVPacket pkt;
-    av_init_packet(&pkt);
-    
     AVFrame *encode_frame;
+    
+    //重采样
     if (swrContext) {
         swr_convert(swrContext,
                     convert_data,
@@ -347,7 +350,7 @@ void AudioEncoder::encodePacket(){
                     avCodecContext->frame_size);
         
         int length = avCodecContext->frame_size * av_get_bytes_per_sample(avCodecContext->sample_fmt);
-        for (int k = 0; k < 2; ++ k) {
+        for (int k = 0; k < 2; ++ k) {   //AVFrame中的data [0][1]
             for (int j = 0; j < length; ++j) {
                 swrFrame->data[k][j] = convert_data[k][j];
             }
@@ -357,14 +360,17 @@ void AudioEncoder::encodePacket(){
         encode_frame = input_frame;
     }
     
-    
+    av_init_packet(&pkt);
     pkt.stream_index = 0;
     pkt.duration = (int)AV_NOPTS_VALUE;
     pkt.pts = pkt.dts = 0;
-    pkt.data = samples;
+    pkt.data = samples; //把从pcm文件中读取到的数据赋值给packet  其实就是一帧数据
     pkt.size = buffer_size;
     
-    ret = avcodec_encode_audio2(avCodecContext, &pkt, encode_frame, &got_output);
+    
+    
+    //进行编码
+    /*ret = avcodec_encode_audio2(avCodecContext, &pkt, encode_frame, &got_output);
     if (ret < 0) {
         LOGI("Error encoding audio frame\n");
         return;
@@ -382,7 +388,21 @@ void AudioEncoder::encodePacket(){
          av_interleaved_write_frame(avFormatContext, &pkt);
     }
     
-    av_free_packet(&pkt);
+    av_free_packet(&pkt);*/
+    
+    ret = avcodec_send_frame(avCodecContext, encode_frame);
+    if (ret < 0) {
+        LOGI("Error encoding audio frame\n");
+    } else {
+        ret = avcodec_receive_packet(avCodecContext, &pkt);
+        if (ret == 0) {
+            pkt.flags |= AV_PKT_FLAG_KEY;
+            this->duration = pkt.pts * av_q2d(audioStream->time_base); //
+            //此函数负责交错的输出一个媒体包，如果调用者无法保证来自各个媒体流的包正确交流，则最好调用此函数输出媒体包，反之，可以调用av_write_frame以提高性能
+             av_interleaved_write_frame(avFormatContext, &pkt);
+        }
+    }
+    av_packet_unref(&pkt);
 }
 
 
