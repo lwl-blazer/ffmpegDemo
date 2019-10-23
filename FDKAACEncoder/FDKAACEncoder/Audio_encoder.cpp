@@ -38,8 +38,10 @@ int AudioEncoder::alloc_audio_stream(const char *codec_name){
     }
     
     //分配Codec相关内容
-    //avCodecContext = avcodec_alloc_context3(codec); //用这个创建出错
+    /** avCodecContext = avcodec_alloc_context3(codec); //用这个创建出错
+    avcodec_parameters_to_context(avCodecContext, audioStream->codecpar); */
     avCodecContext = audioStream->codec;
+
     avCodecContext->codec_type = AVMEDIA_TYPE_AUDIO;
     avCodecContext->sample_rate = audioSampleRate;
     if (publishBitRate > 0) {
@@ -52,11 +54,21 @@ int AudioEncoder::alloc_audio_stream(const char *codec_name){
     avCodecContext->channel_layout = preferedChannels == 1 ? AV_CH_LAYOUT_MONO : AV_CH_LAYOUT_STEREO;
     avCodecContext->channels = av_get_channel_layout_nb_channels(avCodecContext->channel_layout);
     avCodecContext->profile = FF_PROFILE_AAC_LOW;
-    
     LOGI("audioChannels is %d", audioChannels);
     LOGI("avcodecContext->channels is %d", avCodecContext->channels);
-    
     avCodecContext->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+    /**填充AVCodecContext的属性
+     * 比较重要的一定要填充:
+     * code_type AVMEDIA_TYPE_AUDIO代表是音频类型
+     * bit_rate
+     * sample_rate
+     * channels
+     * channel_layout  表达的意义跟channels是一样的，只不过可选值是两个常量 AV_CH_LAYOUT_MONO 单声道 AV_CH_LAYOUT_STEREO 立体声
+     * sample_fmt  AV_SAMPLE_FMT_S16 即用一个short来表示一个采样点，
+     * frame_size 为编码器指定frame_size的大小，一般指定1024作为一帧的大小
+     */
+    
+
     avCodecContext->codec_id = codec->id;
     
     
@@ -121,7 +133,7 @@ int AudioEncoder::alloc_audio_stream(const char *codec_name){
         }
     }
     
-    
+    //为该编码器上下文打开这个编码器，
     if (avcodec_open2(avCodecContext, codec, nullptr) < 0) {
         LOGI("Couldn't open codec");
         return -2;
@@ -135,11 +147,14 @@ int AudioEncoder::alloc_audio_stream(const char *codec_name){
 }
 
 
+//初始化inputFrame
 int AudioEncoder::alloc_avframe(){
     int ret = 0;
     AVSampleFormat preferedSampleFMT = AV_SAMPLE_FMT_S16;
     int preferedChannels = audioChannels;
     int preferedSampleRate = audioSampleRate;
+    
+    /**input_frame 作为客户端代码输入的PCM数据存放的地方，需要注意的是必须知道inputFrame分配的buffer的大小，*/
     input_frame = av_frame_alloc();
     if (!input_frame) {
         LOGI("Could not allocate audio frame\n");
@@ -154,7 +169,9 @@ int AudioEncoder::alloc_avframe(){
                                              av_get_channel_layout_nb_channels(input_frame->channel_layout),
                                              input_frame->nb_samples,
                                              preferedSampleFMT,
-                                             0);
+                                             0); //计算buffer_Size = frame_size * sizeof(SInt16) * channels 其中frame_size 就是AVCodecContext中的frame_size
+    
+    //重采样
     samples = (uint8_t *)av_malloc(buffer_size);
     samplesCursor = 0;
     if (!samples) {
@@ -196,7 +213,7 @@ int AudioEncoder::alloc_avframe(){
         
         LOGI("After av_malloc swrBuffer");
         
-        swrFrame = av_frame_alloc();
+        swrFrame = av_frame_alloc(); //用于重采样，作为最终得到结果的AVFrame
         if (!swrFrame) {
             LOGI("Could not allocate swrFrame frame\n");
             return -1;
