@@ -264,8 +264,11 @@ static OSStatus renderInput(void *inRefCon,
 - (void)onNotificationAudioInterrupted:(NSNotification *)sender{
     AVAudioSessionInterruptionType interruption = [[[sender userInfo] objectForKey:AVAudioSessionInterruptionTypeKey] unsignedIntValue];
     switch (interruption) {
-        case AVAudioSessionInterruptionTypeBegan:
-            [self stop];
+        case AVAudioSessionInterruptionTypeBegan:{
+            if (self.isPlaying) {
+                [self stop];
+            }
+        }
             break;
         case AVAudioSessionInterruptionTypeEnded:
             [self start];
@@ -288,11 +291,11 @@ static OSStatus renderInput(void *inRefCon,
     if (self) {
         memset(&mSoundBuffer, 0, sizeof(mSoundBuffer));
         
-        sourceURL[0] = CFURLCreateWithFileSystemPath(kCFAllocatorNull,
+        sourceURL[0] = CFURLCreateWithFileSystemPath(kCFAllocatorDefault,
                                                      (CFStringRef)path1,
                                                      kCFURLPOSIXPathStyle,
                                                      false);
-        sourceURL[1] = CFURLCreateWithFileSystemPath(kCFAllocatorNull,
+        sourceURL[1] = CFURLCreateWithFileSystemPath(kCFAllocatorDefault,
                                                      (CFStringRef)path2,
                                                      kCFURLPOSIXPathStyle,
                                                      false);
@@ -362,7 +365,25 @@ static OSStatus renderInput(void *inRefCon,
     }
 }
 
+
+- (void)destoryAudioUnitGraph{
+    AUGraphStop(_auGraph);
+    AUGraphUninitialize(_auGraph);
+    AUGraphRemoveNode(_auGraph, _mixerNode);
+    AUGraphRemoveNode(_auGraph, _outputNode);
+    
+    DisposeAUGraph(_auGraph);
+    
+    _mMixer = NULL;
+    _outputUnit = NULL;
+    _mixerNode = 0;
+    _outputNode = 0;
+    _auGraph = NULL;
+}
+
+
 - (void)dealloc{
+    [self destoryAudioUnitGraph];
     free(mSoundBuffer[0].data);
     free(mSoundBuffer[1].data);
     
