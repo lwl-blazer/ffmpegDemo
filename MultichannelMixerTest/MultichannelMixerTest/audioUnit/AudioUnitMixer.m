@@ -78,6 +78,7 @@ static OSStatus renderInput(void *inRefCon,
     Float32 *outA = (Float32 *)ioData->mBuffers[0].mData;
     Float32 *outB = (Float32 *)ioData->mBuffers[1].mData;
     
+    
     for (UInt32 i = 0; i < inNumberFrames; ++i) {
         if (inBusNumber == 1) {
             outA[i] = 0;
@@ -87,11 +88,12 @@ static OSStatus renderInput(void *inRefCon,
             outB[i] = 0;
         }
         if (sample > bufSamples) {
-            printf("looping data for bus %d after %ld source frames rendered\n", (unsigned int)inBusNumber, (long)sample-1);
-            sample = 0;
+            NSLog(@"looping data for bus %d after %ld source frames rendered", (unsigned int)inBusNumber, (long)sample-1);
+            sample = 0; //置于0 就是要进行重新播放
         }
     }
     
+    //记录下一次开始的位置
     sndbuf[inBusNumber].sampleNum = sample;
     return noErr;
 }
