@@ -38,12 +38,61 @@ static void CheckStatus(OSStatus status, NSString *message, BOOL fatal) {
     }
 }
 
+/**
+ * AURenderCallback
+ * 当Audio Unit需要input samples的时候由系统调用，可能发生在渲染操作之前或者之后
+ * 参数:
+ * inRefCon
+ *     在向Audio Unit 注册回调时提供的自定义数据
+ *
+ * ioActionFlags
+ *    Audio Unit渲染的标志
+ *
+ * inTimeStamp
+ *   Audio Unit渲染调用相关的时间戳
+ *
+ * inBusNumber
+ *   bus
+ *
+ * inNumberFrames
+ *   ioData需要多少样本帧数
+ *
+ * ioData
+ *   提供的数据
+ */
+
 static OSStatus renderInput(void *inRefCon,
                             AudioUnitRenderActionFlags *ioActionFlags,
                             const AudioTimeStamp *inTimeStamp,
                             UInt32 inBusNumber,
                             UInt32 inNumberFrames,
                             AudioBufferList *ioData){
+    
+    SoundBufferPtr sndbuf = (SoundBufferPtr)inRefCon;
+    
+    UInt32 sample = sndbuf[inBusNumber].sampleNum;
+    UInt32 bufSamples = sndbuf[inBusNumber].numFrames;
+    
+    //引用
+    Float32 *in = sndbuf[inBusNumber].data;
+    Float32 *outA = (Float32 *)ioData->mBuffers[0].mData;
+    Float32 *outB = (Float32 *)ioData->mBuffers[1].mData;
+    
+    for (UInt32 i = 0; i < inNumberFrames; ++i) {
+        if (inBusNumber == 1) {
+            outA[i] = 0;
+            outB[i] = in[sample++];
+        } else {
+            outA[i] = in[sample++];
+            outB[i] = 0;
+        }
+        if (sample > bufSamples) {
+            printf("looping data for bus %d after %ld source frames rendered\n", (unsigned int)inBusNumber, (long)sample-1);
+            sample = 0;
+        }
+    }
+    
+    sndbuf[inBusNumber].sampleNum = sample;
     return noErr;
 }
 
@@ -73,7 +122,8 @@ static OSStatus renderInput(void *inRefCon,
                                                          sampleRate:self.sampleRate
                                                            channels:2
                                                         interleaved:NO];
-     [self performSelectorInBackground:@selector(loadFiles) withObject:nil];
+    /**performSelectorInBackground 在后台创建一个新线程，把调用方法放进去 */
+    [self performSelectorInBackground:@selector(loadFiles) withObject:nil];
     
     OSStatus result = NewAUGraph(&_auGraph);
     CheckStatus(result, @"create a new AUGraph faile", YES);
@@ -144,6 +194,7 @@ static OSStatus renderInput(void *inRefCon,
         AURenderCallbackStruct rcbs;
         rcbs.inputProc = &renderInput;
         rcbs.inputProcRefCon = mSoundBuffer;
+        /** AUGraphSetNodeInputCallback 是set input **/
         result = AUGraphSetNodeInputCallback(_auGraph,
                                              _mixerNode,
                                              i,
@@ -168,7 +219,7 @@ static OSStatus renderInput(void *inRefCon,
                                   sizeof(AudioStreamBasicDescription));
     CheckStatus(result, @"AudioUnitSetProperty_bus0_kAudioUnitProperty_StreamFormat", YES);
     
-    result = AudioUnitSetProperty(_mMixer,
+    result = AudioUnitSetProperty(_outputUnit,
                                   kAudioUnitProperty_StreamFormat,
                                   kAudioUnitScope_Output,
                                   1,
@@ -179,6 +230,14 @@ static OSStatus renderInput(void *inRefCon,
 
 - (void)makeNodeConnections{
     OSStatus result = noErr;
+    
+    /** AUGraphConnectNodeInput
+     * 注意点:
+     * 从字面看是看_mixerNoder的输出作为_outputNode的输入，但是在bus的参数设置上，为什么Remote I/O Unit的bus不是(inputBush)1呢
+     * 原因:
+     *   因为Remote I/O Unit有输入域有两个Bus,inputBus对应的是麦克风的输入，outputBus对应的是app发送给Remote I/O Unit的数据
+     *   这里Mixer Unit是把数据混合后，输出给Remote I/O Unit 相当于App发送数据给Remote I/O Unit 所以这里应该填outputBus
+     */
     result = AUGraphConnectNodeInput(_auGraph,
                                      _mixerNode,
                                      0,
@@ -305,9 +364,10 @@ static OSStatus renderInput(void *inRefCon,
         _sampleRate = 44100.0;
         [[ELAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback];
         [[ELAudioSession sharedInstance] setPreferredLatency:0.0005];
-        [[ELAudioSession sharedInstance] setPreferredSampleRate:_sampleRate];
-        [[ELAudioSession sharedInstance] setActive:YES];
+        [[ELAudioSession sharedInstance] setPreferredSampleRate:self.sampleRate];
         [[ELAudioSession sharedInstance] addRouteChangeListener];
+        [[ELAudioSession sharedInstance] setActive:YES];
+        
         [self addAudioSessionInterruptedObserver];
         [self createAudioUnitGraph];
     }

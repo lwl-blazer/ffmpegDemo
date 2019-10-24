@@ -20,9 +20,12 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    /*[CommonUtil documentsPath:@"GuitarMonoSTP.aif"]*/
+    /*[CommonUtil documentsPath:@"DrumsMonoSTP.aif"]*/
     self.view.backgroundColor = [UIColor whiteColor];
-    self.mixer = [[AudioUnitMixer alloc] initWithPath1:[CommonUtil documentsPath:@"GuitarMonoSTP.aif"]
-                                                 path2:[CommonUtil documentsPath:@"DrumsMonoSTP.aif"]];
+    self.mixer = [[AudioUnitMixer alloc] initWithPath1:[[NSBundle mainBundle] pathForResource:@"GuitarMonoSTP" ofType:@"aif"]
+                                                 path2:[[NSBundle mainBundle] pathForResource:@"DrumsMonoSTP" ofType:@"aif"]
+                  ];
 }
 
 - (IBAction)playAction:(UIButton *)sender {
