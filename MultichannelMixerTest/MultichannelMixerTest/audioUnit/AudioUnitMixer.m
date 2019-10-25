@@ -196,7 +196,22 @@ static OSStatus renderInput(void *inRefCon,
         AURenderCallbackStruct rcbs;
         rcbs.inputProc = &renderInput;
         rcbs.inputProcRefCon = mSoundBuffer;
-        /** AUGraphSetNodeInputCallback 是set input **/
+        /** AUGraphSetNodeInputCallback 是set input
+         *
+         * 可能出现的问题:
+         *   AUGraphSetNodeInputCallback 给Remote I/O Unit设置回调失效问题
+         *   给Remote I/O 设置回调可以用AudioUnitSetProperty方法修改 kAudioOutputUnitProperty_SetInputCallback设置回调，但尝试用AuGraphSetNodeInputCallback对Remote I/O Unit节点添加回调的时候，发现没有办法正常调用回调函数
+         *   AUGraphSetNodeInputCallback(auGraph, outputNode, 1, &rcbs)
+         *  原因:
+         *     AUGraphSetNodeInputCallback 默认是inputScope,如果在input bus的inputScope修改属性会造成异常现象
+         *
+         *
+         * kAudioOutputUnitProperty_SetInputCallback和kAudioUnitProperty_SetRenderCallback混淆:
+         *   kAudioOutputUnitProperty_SetInputCallback 是Audio Unit需要数据，向host请求数据
+         *   kAudioUnitProperty_SetRenderCallback 是Audio Unit通知Host数据已经就绪，可以通过Audio Unit Render拉取数据
+         *
+         *
+         **/
         result = AUGraphSetNodeInputCallback(_auGraph,
                                              _mixerNode,
                                              i,

@@ -31,6 +31,8 @@
 		25674D09235D556B00EF9311 /* libswresample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 25674D02235D556B00EF9311 /* libswresample.a */; };
 		25674D0C235D560700EF9311 /* Audio_encoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25674D0A235D560700EF9311 /* Audio_encoder.cpp */; };
 		25674D0F235DAED600EF9311 /* CommonUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 25674D0D235DAED500EF9311 /* CommonUtil.m */; };
+		25E81EF32362A43900DAC946 /* AudioToolboxEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 25E81EF22362A43900DAC946 /* AudioToolboxEncoder.m */; };
+		25E81EF62362D0A900DAC946 /* HardWareController.m in Sources */ = {isa = PBXBuildFile; fileRef = 25E81EF52362D0A900DAC946 /* HardWareController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -85,6 +87,10 @@
 		25674D0B235D560700EF9311 /* Audio_encoder.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Audio_encoder.hpp; sourceTree = "<group>"; };
 		25674D0D235DAED500EF9311 /* CommonUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CommonUtil.m; path = ../../AUPlayer/AUPlayer/CommonUtil.m; sourceTree = "<group>"; };
 		25674D0E235DAED500EF9311 /* CommonUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CommonUtil.h; path = ../../AUPlayer/AUPlayer/CommonUtil.h; sourceTree = "<group>"; };
+		25E81EF12362A43900DAC946 /* AudioToolboxEncoder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AudioToolboxEncoder.h; sourceTree = "<group>"; };
+		25E81EF22362A43900DAC946 /* AudioToolboxEncoder.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioToolboxEncoder.m; sourceTree = "<group>"; };
+		25E81EF42362D0A900DAC946 /* HardWareController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HardWareController.h; sourceTree = "<group>"; };
+		25E81EF52362D0A900DAC946 /* HardWareController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HardWareController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -156,6 +162,10 @@
 				25674CBB235D52AD00EF9311 /* AppDelegate.m */,
 				25674CC0235D52AD00EF9311 /* ViewController.h */,
 				25674CC1235D52AD00EF9311 /* ViewController.mm */,
+				25E81EF42362D0A900DAC946 /* HardWareController.h */,
+				25E81EF52362D0A900DAC946 /* HardWareController.m */,
+				25E81EF12362A43900DAC946 /* AudioToolboxEncoder.h */,
+				25E81EF22362A43900DAC946 /* AudioToolboxEncoder.m */,
 				25674D0A235D560700EF9311 /* Audio_encoder.cpp */,
 				25674D0B235D560700EF9311 /* Audio_encoder.hpp */,
 				25674CC3235D52AD00EF9311 /* Main.storyboard */,
@@ -338,7 +348,9 @@
 			files = (
 				25674D0F235DAED600EF9311 /* CommonUtil.m in Sources */,
 				25674CC2235D52AD00EF9311 /* ViewController.mm in Sources */,
+				25E81EF62362D0A900DAC946 /* HardWareController.m in Sources */,
 				25674CBC235D52AD00EF9311 /* AppDelegate.m in Sources */,
+				25E81EF32362A43900DAC946 /* AudioToolboxEncoder.m in Sources */,
 				25674CCD235D52B000EF9311 /* main.m in Sources */,
 				25674D0C235D560700EF9311 /* Audio_encoder.cpp in Sources */,
 			);

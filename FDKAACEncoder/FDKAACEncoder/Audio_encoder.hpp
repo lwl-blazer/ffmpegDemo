@@ -5,6 +5,7 @@
 //  Created by luowailin on 2019/10/21.
 //  Copyright © 2019 luowailin. All rights reserved.
 //
+//  使用FFmpeg 进行软编码
 
 #ifndef Audio_encoder_hpp
 #define Audio_encoder_hpp

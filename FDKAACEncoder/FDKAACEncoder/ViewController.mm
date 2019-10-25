@@ -19,13 +19,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    if (@available(iOS 13.0, *)) {
-        self.view.backgroundColor = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
-            return [UIColor redColor];
-        }];
-    } else {
-        self.view.backgroundColor = [UIColor redColor];
-    }
+    self.title = @"编码";
 }
 
 - (IBAction)encodeAction:(UIButton *)sender {
@@ -69,5 +63,10 @@
     delete encoder;
 }
 
+- (IBAction)hardwareAction:(id)sender {
+    
+    
+    
+}
 
 @end

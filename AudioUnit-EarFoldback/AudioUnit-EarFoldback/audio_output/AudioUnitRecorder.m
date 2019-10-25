@@ -324,7 +324,7 @@ static OSStatus renderCallback(void *inRefCon,
     OSStatus status = noErr;
     status = AUGraphConnectNodeInput(_auGraph,
                                      _ioNode,
-                                     1,
+                                     1,   // ioNode 的inputElement 就是麦克风的采集
                                      _convertNode,
                                      0); //注意这里不是连接到_convertNode的 InputElement 而且 OutputElement
     CheckStatus(status, @"Could not connect I/O node input to convert node input", YES);
