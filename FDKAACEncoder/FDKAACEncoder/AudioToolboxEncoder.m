@@ -67,18 +67,48 @@
 - (void)setupEncoderWithSampleRate:(NSInteger)inputSampleRate
                           channels:(int)channels
                            bitRate:(UInt32)bitRate{
+    /**
+     * AudioStreamBasicDescription (简称 ASBD) 音频流格式启用数据流
+     * 音频值在您的应用程序以及您的应用程序和音频硬件之间移动的流是AudioStreamBasicDescription结构
+     *
+     * struct AudioStreamBasicDescription{
+         Float64 mSampleRate;    //帧率
+         UInt32 mFormatID;       //音频单元
+         UInt32 mFormatFlags;   //音频单元标志集
+         UInt32 mBytesPerPacket;
+         UInt32 mFramePerPacket;
+         UInt32 mBytesPerFrame;     //每帧的位数
+         UInt32 mChannelsPerFrame;
+         UInt32 mBitsPerChannel;    //音频样本的位数
+         UInt32 mReserved;
+       }
+     *
+     * AudioUnitSampleType 被定义为8.24定点整数
+     *
+     *  音频单元标志集: 对于大多数音频单元，mFormatFlags字段都指定kAudioFormatFlagsAudioUnitCanonical元标志
+     *   kAudioFormatFlagsAudioUnitCanonical该标志的定义是:kAudioFormatFlagIsFloat | kAudioFormatFlagsNativeEndian | kAudioFormatFlagIsPacked | kAudioFormatFlagIsNonInterleaved   该元标记负责为类型为AudioUnitSampleType的线性PCM样本值中的bits指定所有布局细节
+     *
+     * 某些音频单元采用非典型音频数据格式，要求样本采用不同的数据类型，而mFormatFlags字段采用不同的标志集。exsample:3D混音器单元需要针对其音频采样值使用UInt16数据类型，并要求将ASBD的mFormatFlags字段设置为kAudioFormatFlagsCanonical.使用特定的音频设备时，请小心使用正确的数据格式和正确的格式标志 参阅：https://developer.apple.com/documentation/coreaudiotypes/1572096-audio_data_format_identifiers?language=objc
+     *
+     */
     
-    AudioStreamBasicDescription inAudioStreamBasicDescription = {0};
+    //step 1: 确定数据类型以表示一个音频采样值  AudioUnitSampleType 是大多数音频单元的推荐数据类型
     UInt32 bytesPerSample = sizeof(SInt16);
+    
+    //step 2: 初始化
+    AudioStreamBasicDescription inAudioStreamBasicDescription = {0};   //不要跳过这个步骤，不然有可能会造成不知道的问题
+    
+    //step 3: 音频单元   kAudioFormatLinearPCM 音频单元使用未压缩的音频数据，所以无论何时使用音频单元，这都是正确的格式标识符
     inAudioStreamBasicDescription.mFormatID = kAudioFormatLinearPCM;
     inAudioStreamBasicDescription.mFormatFlags = kAudioFormatFlagIsSignedInteger | kAudioFormatFlagIsPacked;
+    
     inAudioStreamBasicDescription.mBytesPerPacket = bytesPerSample *channels;
     inAudioStreamBasicDescription.mBytesPerFrame = bytesPerSample * channels;
     inAudioStreamBasicDescription.mChannelsPerFrame = channels;
     inAudioStreamBasicDescription.mFramesPerPacket = 1;
     inAudioStreamBasicDescription.mBitsPerChannel = 8 * channels;
     inAudioStreamBasicDescription.mSampleRate = inputSampleRate;
-    inAudioStreamBasicDescription.mReserved = 0;
+    inAudioStreamBasicDescription.mReserved = 0;      //必须设置为0  填充结构以强制进行均匀的8字节对齐
     
     AudioStreamBasicDescription outAudioStreamBasicDescription = {0};
     outAudioStreamBasicDescription.mSampleRate = inAudioStreamBasicDescription.mSampleRate;
