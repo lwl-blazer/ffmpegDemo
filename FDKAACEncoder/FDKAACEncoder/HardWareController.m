@@ -37,9 +37,12 @@
                                                    ofType:@"pcm"];*/
     self.pcmFileHandle = [NSFileHandle fileHandleForReadingAtPath:self.pcmFilePath];
     
-    self.aacFilePath = [CommonUtil documentsPath:@"hardwareEncoder.aac"]; /*[[NSBundle mainBundle] pathForResource:@"hardwareEncoder"
+    self.aacFilePath = [CommonUtil documentsPath:@"encoder.aac"]; /*[[NSBundle mainBundle] pathForResource:@"hardwareEncoder"
                                                        ofType:@"aac"];*/
     NSLog(@"%@", self.aacFilePath);
+    [[NSFileManager defaultManager] removeItemAtPath:self.aacFilePath
+                                               error:nil];
+    [[NSFileManager defaultManager] createFileAtPath:self.aacFilePath contents:nil attributes:nil];
     self.aacFileHandle = [NSFileHandle fileHandleForWritingAtPath:self.aacFilePath];
     
     NSInteger sampleRate = 44100;
