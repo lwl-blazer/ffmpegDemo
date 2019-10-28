@@ -148,17 +148,19 @@
     memset(_aacBuffer, 0, _aacBufferSize);
 }
 
+//设置编码器
 - (AudioClassDescription *)getAudioClassDescriptionWithType:(UInt32)type
                                            fromManufacturer:(UInt32)manufacturer{
+    //编解码器类型
     static AudioClassDescription desc;
     
-    UInt32 encoderSpecifier = type;
-    OSStatus st;
-    
+    UInt32 encoderSpecifier = type; //type是kAudioFormatMPEG4AAC   ‘aac’
+    OSStatus st = noErr;
     UInt32 size;
-    st = AudioFormatGetPropertyInfo(kAudioFormatProperty_Encoders,
+    //
+    st = AudioFormatGetPropertyInfo(kAudioFormatProperty_Encoders,   //kAudioFormatProperty_Encoders 获取所有已经安装的编码器
                                     sizeof(encoderSpecifier),
-                                    &encoderSpecifier,
+                                    &encoderSpecifier,   //inSpecifier 所需要的格式
                                     &size);
     if (st) {
         NSLog(@"error getting audio format property info:%d", (int)(st));
