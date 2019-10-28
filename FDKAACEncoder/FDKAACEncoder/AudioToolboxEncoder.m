@@ -248,9 +248,13 @@
                                                               &ioOutputDataPacketSize,  //在输入时代表另一个参数outOutputData的大小(以音频包表示)，在输出时会写入已经转换了的数据包数。如果调用完毕ioOutputDataPacketSize == 0 说明EOF (end of file)
                                                               &outAudioBufferList, //转换后的数据输出
                                                               outPacketDescription); //outPacketDescription 在输入时，必须指向能够保存ioOutputDataPacketSize * sizeof(AudioStreamPacketDescription)内存块。在输出时如果为空，并且AudioConverter的AudioStreamPacketDescription数组
-            if (status == 0) {
+            
+            
+            if (status == 0) { //先执行inInputDataProc回调，然后再到这里
+                //step 7: 编码完成，获取缓冲区的数据，添加ADTS头信息
                 NSData *rawAAC = [NSData dataWithBytes:outAudioBufferList.mBuffers[0].mData
                                                 length:outAudioBufferList.mBuffers[0].mDataByteSize];
+                
                 if (_withADTSHeader) {
                     NSData *adtsHeader = [self adtsDataForPacketLength:rawAAC.length];
                     NSMutableData *fullData = [NSMutableData dataWithData:adtsHeader];
@@ -265,6 +269,7 @@
                                         userInfo:nil];
             }
             
+            //step 8: 将数据写入文件
             if (self.fillAudioDataDelegate && [self.fillAudioDataDelegate respondsToSelector:@selector(outputAACPacket:presentationTimeMills:error:)]) {
                 [self.fillAudioDataDelegate outputAACPacket:outputData
                                   presentationTimeMills:_presentationTimeMills
@@ -286,8 +291,8 @@ OSStatus inInputDataProc(AudioConverterRef inAudioCOnverter,
                          AudioBufferList *ioData,  //ioData在输出时，将此结构体的字段指向要提供的要转换的音频数据
                          AudioStreamPacketDescription **outDataPacketDescription,   //在输入时，如果不为NULL，则需要在输出时提供一组AudioStreamPacketDescription结构，用于给ioData参数中提供AudioStreamPacketDescription描述信息
                          void *inUserData){
-    
     AudioToolboxEncoder *encoder = (__bridge AudioToolboxEncoder *)(inUserData);
+    //step 6:将数据填充到缓冲区
     return [encoder fillAudioRawData:ioData
                  ioNumberDataPackets:ioNumberDataPackets];
 }
@@ -302,12 +307,13 @@ OSStatus inInputDataProc(AudioConverterRef inAudioCOnverter,
     if (NULL == _pcmBuffer) {
         _pcmBuffer = malloc(bufferLength);
     }
-    
+    //从源文件读取数据
     if (self.fillAudioDataDelegate && [self.fillAudioDataDelegate respondsToSelector:@selector(fillAudioData:bufferSize:)]) {
             bufferRead = [self.fillAudioDataDelegate fillAudioData:_pcmBuffer
                                                         bufferSize:bufferLength];
     }
     
+    //如果读取完成后，把isCompletion 设为YES
     if(bufferRead <= 0) {
         *ioNumberDataPackets = 0;
         _isCompletion = YES;
