@@ -110,7 +110,19 @@
     inAudioStreamBasicDescription.mBitsPerChannel = 8 * channels;
     inAudioStreamBasicDescription.mSampleRate = inputSampleRate;
     inAudioStreamBasicDescription.mReserved = 0;      //必须设置为0  填充结构以强制进行均匀的8字节对齐
+    /**
+     * 上面配置的inAudioStreamBasicDescription的mFormatID是PCM格式的，表示格式是整数并且是交错存储的，这一点十分关键，因为需要按照设置的格式填充PCM数据，或者反过来说，客户端代码填充的PCM数据的格式是什么样的，这里配置给input描述的mFormatFlags就应该是什么样的，因为我们提供的数据就是交错存放，所以填充后续几个关键值都得乘以channels
+     *
+     * 在iOS的音频流描述的配置中，最重要的就是存储格式和表示格式的配置，表示格式是指用整数或者浮点数表示一个sample;存储格式是指交错存储或非交错存储，输出或输入数据都存储于AudioBufferList中的属性ioData中。假设声道是双声道的，对于非交错存储(isPacked)来讲，对应的数据格式如下：
+     *    ioData->mBuffers[0]; LRLRLR.....
+     * 而对于非交错的存储(NonInterleaved)来讲，对应的数据格式如下:
+     *    ioData->mBuffers[0]：LLLLLL...
+     *    ioData->mBuffers[1]: RRRRR....
+     *
+     *  这要求客户端代码需要按照配置的格式描述来填充或者获取数据，否则就会出现不可预知的问题
+     */
     
+    /**mFormatID需要配置成AAC的编码格式，profile(mFormatFLags)需要配置为低运算复杂度的规格(LC),最后需要注意一点是，配置一帧数据时，其大小为1024，这是AAC编码格式要求的帧大小*/
     AudioStreamBasicDescription outAudioStreamBasicDescription = {0};
     outAudioStreamBasicDescription.mSampleRate = inAudioStreamBasicDescription.mSampleRate;
     outAudioStreamBasicDescription.mFormatID = kAudioFormatMPEG4AAC;
@@ -146,7 +158,7 @@
     UInt32 size = sizeof(_aacBufferSize);
     //从转换器获取参数
     AudioConverterGetProperty(_audioConverter,
-                              kAudioConverterPropertyMaximumOutputPacketSize,  //最大的packetSize
+                              kAudioConverterPropertyMaximumOutputPacketSize,  //编码之后输出的AAC其Packet size最大值是多少。因为需要按照该值来分配编码后数据的存储空间
                               &size,
                               &_aacBufferSize);
     NSLog(@"Expected BitRate is %@, Output PacketSize is %d", @(bitRate), _aacBufferSize);
@@ -156,7 +168,12 @@
     memset(_aacBuffer, 0, _aacBufferSize);
 }
 
-//获取编码器
+/**
+ * 构造一个编码器类的描述--用于提供编码器的类型以及编码器的实现方式
+ * 因为是编码AAC,所以其所使用编码器类型是kAudioFormatMPEG4AAC,编码的实现方式是使用兼容性更好的软件编码方式(虽然是软件编码方式，但是也是有硬件加速的)：kAppleSoftwareAudioCodecManufacturer。
+ *
+ * 通过这两个输入可构造出一个编码器类的描述，它将告诉iOS系统开发者想要使用的到底是哪一个编码器
+ */
 - (AudioClassDescription *)getAudioClassDescriptionWithType:(UInt32)type
                                            fromManufacturer:(UInt32)manufacturer{
     //编解码器类型
@@ -207,7 +224,7 @@
         NSData *outputData = nil;
         if (_audioConverter) {
             NSError *error = nil;
-            //step 4:设置缓冲列表AudioBufferList
+            //step 4:设置缓冲列表AudioBufferList   作为编码器输出AAC数据的存储容器
             AudioBufferList outAudioBufferList = {0};
             outAudioBufferList.mNumberBuffers = 1;
             outAudioBufferList.mBuffers[0].mNumberChannels = _channels;
@@ -301,6 +318,7 @@ OSStatus inInputDataProc(AudioConverterRef inAudioCOnverter,
          ioNumberDataPackets:(UInt32 *)ioNumberDataPackets{
     
     UInt32 requestedPackets = *ioNumberDataPackets;
+    //根据需要填充的帧的数目、当前声道数以及表示格式计算出需要填充的uint8_t类型的buffer的大小
     uint32_t bufferLength = requestedPackets * _channels * 2;
     uint32_t bufferRead = 0;
     
