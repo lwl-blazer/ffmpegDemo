@@ -101,10 +101,11 @@
     //step 3: 音频单元   kAudioFormatLinearPCM 音频单元使用未压缩的音频数据，所以无论何时使用音频单元，这都是正确的格式标识符
     inAudioStreamBasicDescription.mFormatID = kAudioFormatLinearPCM;
     inAudioStreamBasicDescription.mFormatFlags = kAudioFormatFlagIsSignedInteger | kAudioFormatFlagIsPacked;
-    
+    //每个Packet的bytes
     inAudioStreamBasicDescription.mBytesPerPacket = bytesPerSample *channels;
     inAudioStreamBasicDescription.mBytesPerFrame = bytesPerSample * channels;
     inAudioStreamBasicDescription.mChannelsPerFrame = channels;
+
     inAudioStreamBasicDescription.mFramesPerPacket = 1;
     inAudioStreamBasicDescription.mBitsPerChannel = 8 * channels;
     inAudioStreamBasicDescription.mSampleRate = inputSampleRate;
@@ -115,40 +116,47 @@
     outAudioStreamBasicDescription.mFormatID = kAudioFormatMPEG4AAC;
     outAudioStreamBasicDescription.mFormatFlags = kMPEG4Object_AAC_LC;
     outAudioStreamBasicDescription.mBytesPerPacket = 0;
+    //每个Packet的帧数量 设置一个较大的固定值
     outAudioStreamBasicDescription.mFramesPerPacket = 1024;
     outAudioStreamBasicDescription.mBytesPerFrame = 0;
     outAudioStreamBasicDescription.mChannelsPerFrame = inAudioStreamBasicDescription.mChannelsPerFrame;
     outAudioStreamBasicDescription.mBitsPerChannel = 0;
     outAudioStreamBasicDescription.mReserved = 0;
     
+    //step 4:找到对应的编码器
     AudioClassDescription *description = [self getAudioClassDescriptionWithType:kAudioFormatMPEG4AAC
                                                                fromManufacturer:kAppleSoftwareAudioCodecManufacturer];
     
-    OSStatus status = AudioConverterNewSpecific(&inAudioStreamBasicDescription,
-                                                &outAudioStreamBasicDescription,
-                                                1,
-                                                description,
+    //创建编码转换器
+    OSStatus status = AudioConverterNewSpecific(&inAudioStreamBasicDescription,   //源音频格式
+                                                &outAudioStreamBasicDescription,  //目标音频格式
+                                                1,  //音频编码器个数
+                                                description,    //音频编码器的描述
                                                 &_audioConverter);
     if (status != 0) {
         NSLog(@"setup converter:%d", (int)status);
     }
+    
+    //给转换器设置bitrate参数
     UInt32 ulSize = sizeof(bitRate);
     status = AudioConverterSetProperty(_audioConverter,
                                        kAudioConverterEncodeBitRate,
                                        ulSize,
                                        &bitRate);
     UInt32 size = sizeof(_aacBufferSize);
+    //从转换器获取参数
     AudioConverterGetProperty(_audioConverter,
-                              kAudioConverterPropertyMaximumOutputPacketSize,
+                              kAudioConverterPropertyMaximumOutputPacketSize,  //最大的packetSize
                               &size,
                               &_aacBufferSize);
     NSLog(@"Expected BitRate is %@, Output PacketSize is %d", @(bitRate), _aacBufferSize);
     
+    //初始化初始空间
     _aacBuffer = malloc(_aacBufferSize * sizeof(uint8_t));
     memset(_aacBuffer, 0, _aacBufferSize);
 }
 
-//设置编码器
+//获取编码器
 - (AudioClassDescription *)getAudioClassDescriptionWithType:(UInt32)type
                                            fromManufacturer:(UInt32)manufacturer{
     //编解码器类型
@@ -157,8 +165,8 @@
     UInt32 encoderSpecifier = type; //type是kAudioFormatMPEG4AAC   ‘aac’
     OSStatus st = noErr;
     UInt32 size;
-    //
-    st = AudioFormatGetPropertyInfo(kAudioFormatProperty_Encoders,   //kAudioFormatProperty_Encoders 获取所有已经安装的编码器
+    //获取Audio Format Property的information
+    st = AudioFormatGetPropertyInfo(kAudioFormatProperty_Encoders,   //kAudioFormatProperty_Encoders 编码ID， 编码说明大小，属性当前值的大小
                                     sizeof(encoderSpecifier),
                                     &encoderSpecifier,   //inSpecifier 所需要的格式
                                     &size);
@@ -167,8 +175,10 @@
         return nil;
     }
     
+    //计算编码器的个数
     unsigned int count = size / sizeof(AudioClassDescription);
     AudioClassDescription descriptions[count];
+    //获取Audio Format Property的value
     st = AudioFormatGetProperty(kAudioFormatProperty_Encoders,
                                 sizeof(encoderSpecifier),
                                 &encoderSpecifier,
@@ -179,6 +189,7 @@
         return nil;
     }
     
+    //筛选出
     for (unsigned int i = 0; i < count; i ++) {
         if ((type == descriptions[i].mSubType) && (manufacturer == descriptions[i].mManufacturer)) {
             memcpy(&desc,
@@ -196,21 +207,47 @@
         NSData *outputData = nil;
         if (_audioConverter) {
             NSError *error = nil;
+            //step 4:设置缓冲列表AudioBufferList
             AudioBufferList outAudioBufferList = {0};
             outAudioBufferList.mNumberBuffers = 1;
             outAudioBufferList.mBuffers[0].mNumberChannels = _channels;
             outAudioBufferList.mBuffers[0].mDataByteSize = (int)_aacBufferSize;
             outAudioBufferList.mBuffers[0].mData = _aacBuffer;
             
+            //step 5:开始编码，在编码回调函数中处理
             AudioStreamPacketDescription *outPacketDescription = NULL;
-            UInt32 ioOutputDataPacketSize = 1;
             
+            /** AudioConverter 提供了三个函数用于编解码
+             * 1.
+             *   OSStatus AudioConverterConvertBuffer(AudioConverterRef inAudioConverter,
+             *                                                    UInt32 inInputDataSize,
+             *                                                  const void * inInputData,
+             *                                                  UInt32 *ioOutputDataSize,
+             *                                                        void *outOutputData);
+             *
+             * 2.
+             *  OSStatus AudioConverterConvertComplexBuffer(AudioConverterRef inAudioConverter,
+             *                                                        UInt32 inNumberPCMFrames,
+             *                                               const AudioBufferList *inInputData,
+             *                                               AudioBufferList *outOutputData);
+             *
+             *  这两个函数功能类似，都只支持PCM之间的转换，并且两种PCM的采样率必须一致。无法从PCM转换成其他压缩格式或者从压缩格式转换成PCM
+             *
+             * 3.
+             *  OSStatus AudioConverterFillComplexBuffer(AudioConverterRef inAudioConverter
+             *                                           AudioConverterComplexInputDataProc inInputDataProc,
+             *                                           void * inInputDataProcUserData,
+             *                                           UInt32 * ioOutputDataPacketSize,
+             *                                           AudioBufferList *outOutputData,
+             *                                           AudioStreamPacketDescription * outPacketDescription);
+             */
+            UInt32 ioOutputDataPacketSize = 1;
             OSStatus status = AudioConverterFillComplexBuffer(_audioConverter,
-                                                              inInputDataProc,
+                                                              inInputDataProc,    //提供音频数据进行转换的回调函数  当AudioConverter准备好新的输入数据时，这个回调被重复使用
                                                               (__bridge void *)(self),
-                                                              &ioOutputDataPacketSize,
-                                                              &outAudioBufferList,
-                                                              outPacketDescription);
+                                                              &ioOutputDataPacketSize,  //在输入时代表另一个参数outOutputData的大小(以音频包表示)，在输出时会写入已经转换了的数据包数。如果调用完毕ioOutputDataPacketSize == 0 说明EOF (end of file)
+                                                              &outAudioBufferList, //转换后的数据输出
+                                                              outPacketDescription); //outPacketDescription 在输入时，必须指向能够保存ioOutputDataPacketSize * sizeof(AudioStreamPacketDescription)内存块。在输出时如果为空，并且AudioConverter的AudioStreamPacketDescription数组
             if (status == 0) {
                 NSData *rawAAC = [NSData dataWithBytes:outAudioBufferList.mBuffers[0].mData
                                                 length:outAudioBufferList.mBuffers[0].mDataByteSize];
@@ -245,9 +282,9 @@
 }
 
 OSStatus inInputDataProc(AudioConverterRef inAudioCOnverter,
-                         UInt32 *ioNumberDataPackets,
-                         AudioBufferList *ioData,
-                         AudioStreamPacketDescription **outDataPacketDescription,
+                         UInt32 *ioNumberDataPackets, //ioNumberDataPackets在输入时，代表AudioConverter可以完成本次转换所需要的最小数据包数，在输出时，代表实际转换的音频数据包数
+                         AudioBufferList *ioData,  //ioData在输出时，将此结构体的字段指向要提供的要转换的音频数据
+                         AudioStreamPacketDescription **outDataPacketDescription,   //在输入时，如果不为NULL，则需要在输出时提供一组AudioStreamPacketDescription结构，用于给ioData参数中提供AudioStreamPacketDescription描述信息
                          void *inUserData){
     
     AudioToolboxEncoder *encoder = (__bridge AudioToolboxEncoder *)(inUserData);
