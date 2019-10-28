@@ -347,22 +347,30 @@ OSStatus inInputDataProc(AudioConverterRef inAudioCOnverter,
     return noErr;
 }
 
+/**
+ * ADTS Audio Data Transport Stream   是AAC音频的传输流的格式，
+ * 通常我们将得到的AAC原始帧加上ADTS头进行封装后写入文件，该文件使用常用的播放器即可播放，这是个验证AAC数据是否正确的方法
+ */
 - (NSData *)adtsDataForPacketLength:(NSUInteger)packetLength{
     int adtsLength = 7;
-    char *packet = malloc(sizeof(char) * adtsLength);
+    char *packet = malloc(sizeof(char) * adtsLength);  //长度为7个字节
     
-    int profile = 2;
-    int freqIdx = 4;
+    int profile = 2;  //AAC LC
+    int freqIdx = 4;  //44.1kHz
     int chanCfg = _channels;
     
     NSUInteger fullLength = adtsLength + packetLength;
     
+    //前两个字节是ADTS的同步字:
     packet[0] = (char)0xFF;
     packet[1] = (char)0xF9;
+    
+    //编码的Profile、采样率下标(注意是下标，而不是采样率)、声道配置(注意是声道配置，而不是声道数)、数据长度的组合(注意packetLen是原始数据长度加上ADTS头的长度) 参考:https://wiki.multimedia.cx/index.php?title=MPEG-4_Audio#Channel_Configurations
     packet[2] = (char)(((profile - 1) << 6) + (freqIdx << 2) + (chanCfg >> 2));
     packet[3] = (char)(((chanCfg&3) << 6) + (fullLength>>11));
     packet[4] = (char)((fullLength & 0x7FF) >> 3);
     packet[5] = (char)(((fullLength & 7) << 5) + 0x1F);
+    //固定的
     packet[6] = (char)0xFC;
     
     NSData *data = [NSData dataWithBytesNoCopy:packet
