@@ -22,6 +22,8 @@
 		253E62E02366E28F00817BA0 /* BLImageProgram.m in Sources */ = {isa = PBXBuildFile; fileRef = 253E62DF2366E28F00817BA0 /* BLImageProgram.m */; };
 		253E62E32366E2A600817BA0 /* BLImageTextureFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = 253E62E22366E2A600817BA0 /* BLImageTextureFrame.m */; };
 		253E62E62366E31600817BA0 /* BLImageDirectPassRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 253E62E52366E31600817BA0 /* BLImageDirectPassRenderer.m */; };
+		253E62E923681F6C00817BA0 /* BLImageVideoCamera.m in Sources */ = {isa = PBXBuildFile; fileRef = 253E62E823681F6C00817BA0 /* BLImageVideoCamera.m */; };
+		253E62EC2368204300817BA0 /* BLImageCameraRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 253E62EB2368204300817BA0 /* BLImageCameraRenderer.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,6 +75,10 @@
 		253E62E22366E2A600817BA0 /* BLImageTextureFrame.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BLImageTextureFrame.m; sourceTree = "<group>"; };
 		253E62E42366E31600817BA0 /* BLImageDirectPassRenderer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BLImageDirectPassRenderer.h; sourceTree = "<group>"; };
 		253E62E52366E31600817BA0 /* BLImageDirectPassRenderer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BLImageDirectPassRenderer.m; sourceTree = "<group>"; };
+		253E62E723681F6C00817BA0 /* BLImageVideoCamera.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BLImageVideoCamera.h; sourceTree = "<group>"; };
+		253E62E823681F6C00817BA0 /* BLImageVideoCamera.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BLImageVideoCamera.m; sourceTree = "<group>"; };
+		253E62EA2368204300817BA0 /* BLImageCameraRenderer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BLImageCameraRenderer.h; sourceTree = "<group>"; };
+		253E62EB2368204300817BA0 /* BLImageCameraRenderer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BLImageCameraRenderer.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -198,6 +204,10 @@
 		253E62D32366E1D500817BA0 /* imageInput */ = {
 			isa = PBXGroup;
 			children = (
+				253E62E723681F6C00817BA0 /* BLImageVideoCamera.h */,
+				253E62E823681F6C00817BA0 /* BLImageVideoCamera.m */,
+				253E62EA2368204300817BA0 /* BLImageCameraRenderer.h */,
+				253E62EB2368204300817BA0 /* BLImageCameraRenderer.m */,
 			);
 			path = imageInput;
 			sourceTree = "<group>";
@@ -346,6 +356,8 @@
 				253E62E62366E31600817BA0 /* BLImageDirectPassRenderer.m in Sources */,
 				253E62DA2366E25400817BA0 /* BLImageOutput.m in Sources */,
 				253E62A92366DDF200817BA0 /* main.m in Sources */,
+				253E62EC2368204300817BA0 /* BLImageCameraRenderer.m in Sources */,
+				253E62E923681F6C00817BA0 /* BLImageVideoCamera.m in Sources */,
 				253E62CE2366E0FC00817BA0 /* ELPushStreamViewController.m in Sources */,
 				253E62E32366E2A600817BA0 /* BLImageTextureFrame.m in Sources */,
 				253E62E02366E28F00817BA0 /* BLImageProgram.m in Sources */,
