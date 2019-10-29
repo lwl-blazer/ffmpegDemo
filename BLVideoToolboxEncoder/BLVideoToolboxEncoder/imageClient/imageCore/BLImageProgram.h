@@ -7,10 +7,28 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <OpenGLES/ES2/gl.h>
+#import <OpenGLES/ES2/glext.h>
+
+#define STRINGIZE(x) #x
+#define STRINGIZE2(x) STRINGIZE(x)
+#define SHADER_STRING(text) @ STRINGIZE2(text)
+
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface BLImageProgram : NSObject
+
+- (void)use;
+
+- (BOOL)link;
+
+- (GLuint)uniformIndex:(NSString *)uniformName;
+
+- (void)addAttribute:(NSString *)attributeName;
+
+- (instancetype)initWithVertexShaderString:(NSString *)vShaderString
+                      fragmentShaderString:(NSString *)fShaderString;
 
 @end
 

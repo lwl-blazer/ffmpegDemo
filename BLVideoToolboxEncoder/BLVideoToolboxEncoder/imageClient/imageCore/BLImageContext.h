@@ -16,7 +16,34 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+#define TEXTURE_FRAME_ASPECT_RATIO  16.0/9.0f
+typedef enum {
+    kBLImageNoRotation,
+    kBLImageFlipHorizontal
+} BLImageRotationMode;
+
+
 @interface BLImageContext : NSObject
+
+@property(readonly, nonatomic) dispatch_queue_t contextQueue;
+@property(readonly, strong, nonatomic) EAGLContext *context;
+@property(readonly, nonatomic) CVOpenGLESTextureCacheRef coreVideoTextureCache;
+
++ (void *)contextKey;
+
++ (BLImageContext *)shareImageProcessingContext;
+
++ (BOOL)supportFastTextureUpload;
+
++ (dispatch_queue_t)shareContextQueue;
+
++ (void)useImageProcessingContext;
+
+- (CVOpenGLESTextureCacheRef)coreVideoTextureCache;
+
+- (void)useSharegroup:(EAGLSharegroup *)sharegroup;
+
+- (void)useAsCurrentContext;
 
 @end
 
