@@ -25,6 +25,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (GLuint)uniformIndex:(NSString *)uniformName;
 
+- (GLuint)attributeIndex:(NSString *)attributeName;
+
 - (void)addAttribute:(NSString *)attributeName;
 
 - (instancetype)initWithVertexShaderString:(NSString *)vShaderString

@@ -12,6 +12,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface BLImageDirectPassRenderer : NSObject
 
+- (BOOL)prepareRender;
+
+- (void)renderWithTextureId:(int)inputTex
+                      width:(int)width
+                     height:(int)height
+                aspectRatio:(float)aspectRatio;
+
 @end
 
 NS_ASSUME_NONNULL_END
