@@ -7,10 +7,25 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "BLImageContext.h"
+#import "BLImageEncoderRender.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface BLImageVideoEncoder : NSObject
+@interface BLImageVideoEncoder : NSObject<BLImageInput>
+
+- (instancetype)initWithFPS:(float)fps
+                 maxBitRate:(int)maxBitRate
+                 avgBitRate:(int)avgBitRate
+               encoderWidth:(int)encoderWidth
+              encoderHeight:(int)encoderHeight
+      encoderStatusDelegate:(id<BLVideoEncoderStatusDelegate>)encoderStatusDelegate;
+
+- (void)settingMaxBitRate:(int)maxBitRate
+               avgBitRate:(int)avgBitRate
+                      fps:(int)fps;
+
+- (void)stopEncode;
 
 @end
 
