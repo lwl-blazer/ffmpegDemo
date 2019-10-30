@@ -24,6 +24,11 @@
 		253E62E62366E31600817BA0 /* BLImageDirectPassRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 253E62E52366E31600817BA0 /* BLImageDirectPassRenderer.m */; };
 		253E62E923681F6C00817BA0 /* BLImageVideoCamera.m in Sources */ = {isa = PBXBuildFile; fileRef = 253E62E823681F6C00817BA0 /* BLImageVideoCamera.m */; };
 		253E62EC2368204300817BA0 /* BLImageCameraRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 253E62EB2368204300817BA0 /* BLImageCameraRenderer.m */; };
+		255D00F723692F4C00519735 /* BLImageEncoderRender.mm in Sources */ = {isa = PBXBuildFile; fileRef = 255D00F623692F4C00519735 /* BLImageEncoderRender.mm */; };
+		255D00FA23692F6300519735 /* BLImageVideoEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 255D00F923692F6300519735 /* BLImageVideoEncoder.m */; };
+		255D00FD23692F6E00519735 /* BLImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 255D00FC23692F6E00519735 /* BLImageView.m */; };
+		255D010023692FBA00519735 /* H264HwEncoderImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 255D00FF23692FBA00519735 /* H264HwEncoderImpl.m */; };
+		255D010323692FD800519735 /* H264HwEncoderHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = 255D010223692FD800519735 /* H264HwEncoderHandler.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,6 +84,16 @@
 		253E62E823681F6C00817BA0 /* BLImageVideoCamera.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BLImageVideoCamera.m; sourceTree = "<group>"; };
 		253E62EA2368204300817BA0 /* BLImageCameraRenderer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BLImageCameraRenderer.h; sourceTree = "<group>"; };
 		253E62EB2368204300817BA0 /* BLImageCameraRenderer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BLImageCameraRenderer.m; sourceTree = "<group>"; };
+		255D00F523692F4C00519735 /* BLImageEncoderRender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BLImageEncoderRender.h; sourceTree = "<group>"; };
+		255D00F623692F4C00519735 /* BLImageEncoderRender.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = BLImageEncoderRender.mm; sourceTree = "<group>"; };
+		255D00F823692F6300519735 /* BLImageVideoEncoder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BLImageVideoEncoder.h; sourceTree = "<group>"; };
+		255D00F923692F6300519735 /* BLImageVideoEncoder.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BLImageVideoEncoder.m; sourceTree = "<group>"; };
+		255D00FB23692F6E00519735 /* BLImageView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BLImageView.h; sourceTree = "<group>"; };
+		255D00FC23692F6E00519735 /* BLImageView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BLImageView.m; sourceTree = "<group>"; };
+		255D00FE23692FBA00519735 /* H264HwEncoderImpl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = H264HwEncoderImpl.h; sourceTree = "<group>"; };
+		255D00FF23692FBA00519735 /* H264HwEncoderImpl.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = H264HwEncoderImpl.m; sourceTree = "<group>"; };
+		255D010123692FD800519735 /* H264HwEncoderHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = H264HwEncoderHandler.h; sourceTree = "<group>"; };
+		255D010223692FD800519735 /* H264HwEncoderHandler.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = H264HwEncoderHandler.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -180,6 +195,10 @@
 		253E62D02366E1B600817BA0 /* encoder */ = {
 			isa = PBXGroup;
 			children = (
+				255D00FE23692FBA00519735 /* H264HwEncoderImpl.h */,
+				255D00FF23692FBA00519735 /* H264HwEncoderImpl.m */,
+				255D010123692FD800519735 /* H264HwEncoderHandler.h */,
+				255D010223692FD800519735 /* H264HwEncoderHandler.mm */,
 			);
 			path = encoder;
 			sourceTree = "<group>";
@@ -215,6 +234,12 @@
 		253E62D42366E1DF00817BA0 /* imageOutput */ = {
 			isa = PBXGroup;
 			children = (
+				255D00F523692F4C00519735 /* BLImageEncoderRender.h */,
+				255D00F623692F4C00519735 /* BLImageEncoderRender.mm */,
+				255D00F823692F6300519735 /* BLImageVideoEncoder.h */,
+				255D00F923692F6300519735 /* BLImageVideoEncoder.m */,
+				255D00FB23692F6E00519735 /* BLImageView.h */,
+				255D00FC23692F6E00519735 /* BLImageView.m */,
 			);
 			path = imageOutput;
 			sourceTree = "<group>";
@@ -349,11 +374,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				255D010323692FD800519735 /* H264HwEncoderHandler.mm in Sources */,
 				253E62DD2366E26B00817BA0 /* BLImageContext.m in Sources */,
 				253E629E2366DDF100817BA0 /* ViewController.m in Sources */,
 				253E62982366DDF100817BA0 /* AppDelegate.m in Sources */,
+				255D010023692FBA00519735 /* H264HwEncoderImpl.m in Sources */,
 				253E62D72366E21300817BA0 /* BLImageVideoScheduler.m in Sources */,
+				255D00FD23692F6E00519735 /* BLImageView.m in Sources */,
+				255D00F723692F4C00519735 /* BLImageEncoderRender.mm in Sources */,
 				253E62E62366E31600817BA0 /* BLImageDirectPassRenderer.m in Sources */,
+				255D00FA23692F6300519735 /* BLImageVideoEncoder.m in Sources */,
 				253E62DA2366E25400817BA0 /* BLImageOutput.m in Sources */,
 				253E62A92366DDF200817BA0 /* main.m in Sources */,
 				253E62EC2368204300817BA0 /* BLImageCameraRenderer.m in Sources */,
