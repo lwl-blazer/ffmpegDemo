@@ -128,7 +128,55 @@ GLfloat *colorConversion709 = colorConversion709Default;
 
 //切换摄像头
 - (int)switchFrontBackCamera{
-    
+    NSUInteger cameraCount = [[AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo] count];
+    int result = -1;
+    if (cameraCount > 1) {
+        NSError *error;
+        AVCaptureDeviceInput *videoInput;
+        AVCaptureDevicePosition position = [[self.captureInput device] position];
+        if (position == AVCaptureDevicePositionBack) {
+            videoInput = [[AVCaptureDeviceInput alloc] initWithDevice:[self frontCamera]
+                                                                error:&error];
+            result = 0;
+        } else if (position == AVCaptureDevicePositionBack) {
+            videoInput = [[AVCaptureDeviceInput alloc] initWithDevice:[self backCamera]
+                                                                error:&error];
+            result = 0;
+        } else {
+            return -1;
+        }
+        
+        if (videoInput) {
+            [self.captureSession beginConfiguration];
+            [self.captureSession removeInput:self.captureInput];
+            if ([self.captureSession canAddInput:videoInput]) {
+                [self.captureSession addInput:videoInput];
+                [self setCaptureInput:videoInput];
+            } else {
+                [self.captureSession addInput:self.captureInput];
+            }
+            
+            self.connection = [self.captureOutput connectionWithMediaType:AVMediaTypeVideo];
+            
+            AVCaptureVideoStabilizationMode stabilizationMode = AVCaptureVideoStabilizationModeStandard;
+            BOOL supportStabilization = [self.captureInput.device.activeFormat isVideoStabilizationModeSupported:stabilizationMode];
+            NSLog(@"device active format: %@, 是否支持防抖: %@", self.captureInput.device.activeFormat,
+            supportStabilization ? @"support" : @"not support");
+            if ([self.captureInput.device.activeFormat isVideoStabilizationModeSupported:stabilizationMode]) {
+                [self.connection setPreferredVideoStabilizationMode:stabilizationMode];
+                NSLog(@"===============mode %@", @(self.connection.activeVideoStabilizationMode));
+            }
+            
+            [self setRelativeVideoOrientation];
+            [self setFrameRate];
+            
+            [self.captureSession commitConfiguration];
+        } else if (error != nil) {
+            result = -1;
+        }
+        [self updateOrientationSendToTargets];
+    }
+    return result;
 }
 
 #pragma mark -- private method
@@ -226,13 +274,19 @@ GLfloat *colorConversion709 = colorConversion709Default;
 
 
 - (void)updateOrientationSendToTargets{
-    
+    runSyncOnVideoProcessingQueue(^{
+        if ([self cameraPosition] == AVCaptureDevicePositionBack) {
+            self->_inputTexRotation = kBLImageNoRotation;
+        } else
+        {
+            self->_inputTexRotation = kBLImageFlipHorizontal;
+        }
+    });
 }
 
-
-
-
-
+- (AVCaptureDevicePosition)cameraPosition{
+    return [[_captureInput device] position];
+}
 
 
 - (dispatch_queue_t)sampleBufferCallbackQueue{
@@ -240,6 +294,181 @@ GLfloat *colorConversion709 = colorConversion709Default;
         _sampleBufferCallbackQueue = dispatch_queue_create("com.changba.sampleBufferCallQueue", DISPATCH_QUEUE_SERIAL);
     }
     return _sampleBufferCallbackQueue;
+}
+
+- (void)setFrameRate:(int)frameRate{
+    _frameRate = frameRate;
+    [self setFrameRate];
+}
+
+- (void)setFrameRate{
+    if (_frameRate > 0) {
+        if ([[self captureInput].device respondsToSelector:@selector(setActiveVideoMinFrameDuration:)] &&
+            [[self captureInput].device respondsToSelector:@selector(setActiveVideoMaxFrameDuration:)]) {
+            NSError *error;
+            [[self captureInput].device lockForConfiguration:&error];
+            if (error == nil) {
+#if defined(__IPHONE_7_0)
+                [[self captureInput].device setActiveVideoMinFrameDuration:CMTimeMake(1, _frameRate)];
+                [[self captureInput].device setActiveVideoMaxFrameDuration:CMTimeMake(1, _frameRate)];
+                
+                //对焦模式
+                if ([[self captureInput].device isFocusModeSupported:AVCaptureFocusModeContinuousAutoFocus]) {
+                    [[self captureInput].device setFocusMode:AVCaptureFocusModeContinuousAutoFocus];
+                } else if ([[self captureInput].device isFocusModeSupported:AVCaptureFocusModeAutoFocus]) {
+                    [[self captureInput].device setFocusMode:AVCaptureFocusModeAutoFocus];
+                }
+#endif
+            }
+            [[self captureInput].device unlockForConfiguration];
+        } else {
+            for (AVCaptureConnection *connection in [self captureOutput].connections) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+                if ([connection respondsToSelector:@selector(setVideoMinFrameDuration:)]) {
+                    connection.videoMinFrameDuration = CMTimeMake(1, _frameRate);
+                }
+                if ([connection respondsToSelector:@selector(setVideoMaxFrameDuration:)]) {
+                    connection.videoMaxFrameDuration = CMTimeMake(1, _frameRate);
+                }
+#pragma clang diagnostic pop
+            }
+        }
+    } else {
+        if ([[self captureInput].device respondsToSelector:@selector(setActiveVideoMinFrameDuration:)] &&
+            [[self captureInput].device respondsToSelector:@selector(setActiveVideoMaxFrameDuration:)]) {
+            NSError *error;
+            [[self captureInput].device lockForConfiguration:&error];
+            if (error == nil) {
+#if defined(__IPHONE_7_0)
+                [[self captureInput].device setActiveVideoMinFrameDuration:kCMTimeInvalid];
+                [[self captureInput].device setActiveVideoMaxFrameDuration:kCMTimeInvalid];
+                
+                //对焦模式
+                if ([[self captureInput].device isFocusModeSupported:AVCaptureFocusModeContinuousAutoFocus]) {
+                    [[self captureInput].device setFocusMode:AVCaptureFocusModeContinuousAutoFocus];
+                } else if ([[self captureInput].device isFocusModeSupported:AVCaptureFocusModeAutoFocus]) {
+                    [[self captureInput].device setFocusMode:AVCaptureFocusModeAutoFocus];
+                }
+#endif
+            }
+            [[self captureInput].device unlockForConfiguration];
+        } else {
+            for (AVCaptureConnection *connection  in [self captureOutput].connections) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+                if ([connection respondsToSelector:@selector(setVideoMinFrameDuration:)]) {
+                    connection.videoMinFrameDuration = kCMTimeInvalid;
+                }
+                if ([connection respondsToSelector:@selector(setVideoMaxFrameDuration:)]) {
+                    connection.videoMaxFrameDuration = kCMTimeInvalid;
+                }
+#pragma clang diagnostic pop
+            }
+        }
+    }
+}
+
+- (int32_t)frameRate{
+    return _frameRate;
+}
+
+#pragma mark - AVCaptureVideoDataOuputSampleBufferDelegate
+- (void)captureOutput:(AVCaptureOutput *)output didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection{
+    if (self.shouldEnableOpenGL) {
+        if (dispatch_semaphore_wait(_frameRenderingSemaphore, DISPATCH_TIME_NOW) != 0) {
+            return;
+        }
+        
+        CFRetain(sampleBuffer);
+        runAsyncOnVideoProcessingQueue(^{
+            [self processVideoSampleBuffer:sampleBuffer];
+            CFRelease(sampleBuffer);
+            dispatch_semaphore_signal(self->_frameRenderingSemaphore);
+        });
+    }
+}
+
+- (void)processVideoSampleBuffer:(CMSampleBufferRef)sampleBuffer{
+    CVImageBufferRef cameraFrame = CMSampleBufferGetImageBuffer(sampleBuffer);
+    CFTypeRef colorAttachments = CVBufferGetAttachment(cameraFrame,
+                                                       kCVImageBufferYCbCrMatrixKey,
+                                                       NULL);
+    if (colorAttachments != NULL) {
+        if (CFStringCompare(colorAttachments,
+                            kCVImageBufferYCbCrMatrix_ITU_R_601_4, 0) == kCFCompareEqualTo) {
+            if (isFullYUVRange) {
+                _preferredConversion = colorConversion601FullRange;
+            } else {
+                _preferredConversion = colorConversion601;
+            }
+        } else {
+            _preferredConversion = colorConversion709;
+        }
+    } else {
+        if (isFullYUVRange) {
+            _preferredConversion = colorConversion601FullRange;
+        } else {
+            _preferredConversion = colorConversion601;
+        }
+    }
+    
+    [BLImageContext useImageProcessingContext];
+    [[self cameraFrameTextureWithSampleBuffer:sampleBuffer
+                                 aspectRation:TEXTURE_FRAME_ASPECT_RATIO] activateFramebuffer];
+    [_cameraLoadTexRenderer renderWithSampleBuffer:sampleBuffer
+                                       aspectRatio:TEXTURE_FRAME_ASPECT_RATIO
+                               preferredConversion:_preferredConversion
+                                     imageRotation:_inputTexRotation];
+    
+    CMTime currentTime = CMSampleBufferGetPresentationTimeStamp(sampleBuffer);
+    CMSampleTimingInfo timimgInfo = kCMTimingInfoInvalid;
+    CMSampleBufferGetSampleTimingInfo(sampleBuffer,
+                                      0,
+                                      &timimgInfo);
+    
+    for (id<BLImageInput> currentTarget in targets) {
+        [currentTarget setInputTexture:outputTexture];
+        [currentTarget newFrameReadyAtTime:currentTime
+                                timingInfo:timimgInfo];
+    }
+}
+
+- (BLImageTextureFrame *)cameraFrameTextureWithSampleBuffer:(CMSampleBufferRef)sampleBuffer
+                                               aspectRation:(float)aspectRation {
+    if (!outputTexture) {
+        CVImageBufferRef cameraFrame = CMSampleBufferGetImageBuffer(sampleBuffer);
+        int bufferHeight = (int)CVPixelBufferGetHeight(cameraFrame);
+        int targetWidth = bufferHeight / aspectRation;
+        int targetHeight = bufferHeight;
+        outputTexture = [[BLImageTextureFrame alloc] initWithSize:CGSizeMake(targetWidth, targetHeight)];
+    }
+    return outputTexture;
+}
+
+- (void)dealloc{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
+    if ([_captureSession isRunning]) {
+        [_captureSession stopRunning];
+    }
+    [_captureOutput setSampleBufferDelegate:nil
+                                      queue:dispatch_get_main_queue()];
+    [self removeInputsAndOutputs];
+}
+
+
+- (void)removeInputsAndOutputs{
+    [_captureSession beginConfiguration];
+    if (_captureInput) {
+        [_captureSession removeInput:_captureInput];
+        [_captureSession removeOutput:_captureOutput];
+        
+        _captureOutput = nil;
+        _captureInput = nil;
+    }
+    
+    [_captureSession commitConfiguration];
 }
 
 @end
