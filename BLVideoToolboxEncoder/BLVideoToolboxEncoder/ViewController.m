@@ -19,9 +19,5 @@
     self.title = @"Video Toolbox Encoder";
 }
 
-- (IBAction)previewAction:(id)sender {
-    
-    
-}
 
 @end

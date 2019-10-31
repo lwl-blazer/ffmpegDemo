@@ -7,8 +7,13 @@
 //
 
 #import "ELPushStreamViewController.h"
+#import "BLImageVideoScheduler.h"
+#import "ELPushStreamConfigeration.h"
 
 @interface ELPushStreamViewController ()
+{
+    BLImageVideoScheduler *_videoScheduler;
+}
 
 @end
 
@@ -16,7 +21,13 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
+    
+    CGRect bounds = self.view.bounds;
+    _videoScheduler = [[BLImageVideoScheduler alloc] initWithFrame:bounds
+                                                    videoFrameRate:kFrameRate
+                                               disableAutoContrast:NO];
+    
+    [self.view insertSubview:[_videoScheduler previewView] atIndex:0];
 }
 
 

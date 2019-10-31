@@ -88,7 +88,7 @@ GLfloat *colorConversion709 = colorConversion709Default;
         
         [self initialSession];
         [self updateOrientationSendToTargets];
-        
+        _frameRenderingSemaphore = dispatch_semaphore_create(1);
         runSyncOnVideoProcessingQueue(^{
             [BLImageContext useImageProcessingContext];
             self->_cameraLoadTexRenderer = [[BLImageCameraRenderer alloc] init];
