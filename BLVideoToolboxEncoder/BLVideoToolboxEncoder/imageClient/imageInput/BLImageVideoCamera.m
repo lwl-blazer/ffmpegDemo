@@ -21,8 +21,8 @@ GLfloat colorConversion601Default[] = {
 //BT.601 full range
 GLfloat colorConversion601FullRangeDefault[] = {
     1.0,   1.0,    1.0,
-    0.0,   -0.392, 2.017,
-    1.596, -0.813, 0.0,
+    0.0,   -0.343, 1.765,
+    1.4, -0.711, 0.0,
 };
 
 //BT.709 which is the standard for HDTV

@@ -145,6 +145,7 @@ NSString *const YUVVideoRangeConversionForLAFragmentShaderString = SHADER_STRING
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     
+    //UV-plane
     glActiveTexture(GL_TEXTURE5);
     err = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
                                                        [[BLImageContext shareImageProcessingContext] coreVideoTextureCache],
@@ -167,7 +168,7 @@ NSString *const YUVVideoRangeConversionForLAFragmentShaderString = SHADER_STRING
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     
-    [self convertYUVToRGBOutputWIthWidth:bufferWidth
+    [self convertYUVToRGBOutputWithWidth:bufferWidth
                                   height:bufferHeight
                              aspectRatio:aspectRatio
                      preferredConversion:preferredConversion
@@ -178,7 +179,8 @@ NSString *const YUVVideoRangeConversionForLAFragmentShaderString = SHADER_STRING
     CFRelease(chrominanceTextureRef);
 }
 
-- (void)convertYUVToRGBOutputWIthWidth:(int)bufferWidth
+
+- (void)convertYUVToRGBOutputWithWidth:(int)bufferWidth
                                 height:(int)bufferHeight
                            aspectRatio:(float)aspectRatio
                    preferredConversion:(const GLfloat *)preferredConversion
@@ -199,10 +201,10 @@ NSString *const YUVVideoRangeConversionForLAFragmentShaderString = SHADER_STRING
          1.0f,  1.0f,
     };
     GLfloat rotate180TextureCoordinates[] = {
-      fromX, 1.0f,
-        toX, 1.0f,
-      fromX, 0.0f,
-        toX, 0.0f,
+        fromX, 1.0f,
+        toX,   1.0f,
+        fromX, 0.0f,
+        toX,   0.0f,
     };
     
     if (inputTexRotation == kBLImageFlipHorizontal) {
@@ -217,7 +219,7 @@ NSString *const YUVVideoRangeConversionForLAFragmentShaderString = SHADER_STRING
     glUniform1i(luminanceTextureUniform, 4);
     
     glActiveTexture(GL_TEXTURE5);
-    glBindTexture(GL_TEXTURE_2D, chrominanceTextureUniform);
+    glBindTexture(GL_TEXTURE_2D, chrominanceTexture);
     glUniform1i(chrominanceTextureUniform, 5);
     
     glUniformMatrix3fv(matrixUniform, 1, GL_FALSE, preferredConversion);
@@ -239,6 +241,5 @@ NSString *const YUVVideoRangeConversionForLAFragmentShaderString = SHADER_STRING
     
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
-
 
 @end
