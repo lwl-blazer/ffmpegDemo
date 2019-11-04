@@ -192,7 +192,7 @@ GLfloat *colorConversion709 = colorConversion709Default;
 - (void)initialSession{
     //初始化 session 和设备
     self.captureSession = [[AVCaptureSession alloc] init];
-    self.captureInput = [[AVCaptureDeviceInput alloc] initWithDevice:[self frontCamera]
+    self.captureInput = [[AVCaptureDeviceInput alloc] initWithDevice:[self backCamera]
                                                                error:nil];
     self.captureOutput = [[AVCaptureVideoDataOutput alloc] init];
     self.captureOutput.alwaysDiscardsLateVideoFrames = YES;
@@ -255,6 +255,9 @@ GLfloat *colorConversion709 = colorConversion709Default;
 }
 
 - (AVCaptureDevice *)cameraWithPosition:(AVCaptureDevicePosition)position{
+    
+    AVCaptureDeviceDiscoverySession
+    
     NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
     for (AVCaptureDevice *device in devices) {
         if ([device position] == position) {
