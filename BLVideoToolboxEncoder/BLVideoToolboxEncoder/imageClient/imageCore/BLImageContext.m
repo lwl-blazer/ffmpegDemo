@@ -90,7 +90,7 @@ static void *openGLESContextQueueKey;
  *  1.在可能使用对象的每个上下文上调用glFlush;
  *  2.在要修改对象的上下文中，调用一个或多个OpenGL ES函数来更改对象
  *  3.在接收到状态修改命令的上下文中调用glFlush
- *  4.
+ *  4.在其他上下文中，重新绑定对象标识符。
  */
 - (void)useSharegroup:(EAGLSharegroup *)sharegroup{
     _sharegroup = sharegroup;

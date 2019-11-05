@@ -88,6 +88,8 @@ GLfloat *colorConversion709 = colorConversion709Default;
         
         [self initialSession];
         [self updateOrientationSendToTargets];
+        
+        //创建信号量
         _frameRenderingSemaphore = dispatch_semaphore_create(1);
         runSyncOnVideoProcessingQueue(^{
             [BLImageContext useImageProcessingContext];
@@ -195,7 +197,7 @@ GLfloat *colorConversion709 = colorConversion709Default;
     self.captureInput = [[AVCaptureDeviceInput alloc] initWithDevice:[self backCamera]
                                                                error:nil];
     self.captureOutput = [[AVCaptureVideoDataOutput alloc] init];
-    self.captureOutput.alwaysDiscardsLateVideoFrames = YES;
+    self.captureOutput.alwaysDiscardsLateVideoFrames = YES;  //是否丢掉迟到的帧 默认为YES
     
     //输出配置
     BOOL supportFullYUVRange = NO;
@@ -205,7 +207,16 @@ GLfloat *colorConversion709 = colorConversion709Default;
             supportFullYUVRange = YES;
         }
     }
-    
+    /**
+     * 看懂kCVPixelFormatTypes
+     *
+     * kCVPixelFormatType_{长度|序列}{颜色空间}{Planar|8BiPlanar}{FullRange|VideoRange}
+     *
+     * Planar--平面   BiPlanar--双平面  平面/双平面主要应用于YUV上。UV分开存储的为Planar.反之是BiPlanar 所以
+         kCVPixelFormatType_420YpCbCr8PlanarFullRange是420p
+         kCVPixelFormatType_420YpCbCr8BiPlanarFullRange是nv12
+     * VideoRange和FullRange的区别在于数值的范围   FullRange比VideoRange大一些，颜色也更丰富一些
+     */
     if (supportFullYUVRange) {
         [_captureOutput setVideoSettings:@{(id)kCVPixelBufferPixelFormatTypeKey:@(kCVPixelFormatType_420YpCbCr8BiPlanarFullRange)}];
         isFullYUVRange = YES;
@@ -215,7 +226,6 @@ GLfloat *colorConversion709 = colorConversion709Default;
     }
     [_captureOutput setSampleBufferDelegate:self
                                       queue:[self sampleBufferCallbackQueue]];
-    
     
     //添加设备
     if ([self.captureSession canAddInput:self.captureInput]) {
@@ -227,7 +237,7 @@ GLfloat *colorConversion709 = colorConversion709Default;
     
     
     [self.captureSession beginConfiguration];
-    
+    //设置预设图像的分辨率
     if ([self.captureSession canSetSessionPreset:[NSString stringWithString:kHighCaptureSessionPreset]]) {
         [self.captureSession setSessionPreset:[NSString stringWithString:kHighCaptureSessionPreset]];
     } else {
@@ -255,10 +265,12 @@ GLfloat *colorConversion709 = colorConversion709Default;
 }
 
 - (AVCaptureDevice *)cameraWithPosition:(AVCaptureDevicePosition)position{
+
     
-    AVCaptureDeviceDiscoverySession
-    
-    NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
+   AVCaptureDeviceDiscoverySession *deviceSession = [AVCaptureDeviceDiscoverySession discoverySessionWithDeviceTypes:@[AVCaptureDeviceTypeBuiltInWideAngleCamera]
+                                                           mediaType:AVMediaTypeVideo position:position];
+    //NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
+    NSArray *devices = deviceSession.devices;
     for (AVCaptureDevice *device in devices) {
         if ([device position] == position) {
             NSError *error = nil;
@@ -304,6 +316,18 @@ GLfloat *colorConversion709 = colorConversion709Default;
     [self setFrameRate];
 }
 
+/**
+ * Focus Modes 聚焦模式
+ *
+ * AVCaptureFocusModeLocked  焦点的位置是固定的
+      当你想让用户组成一个场景，然后锁定焦点
+ *
+ * AVCaptureFocusModeAutoFocus  照相机做一次扫描聚焦，然后将焦点锁定
+      这适合于，你想要选择一个特定的项目，即使它不是现场的中心，但可以专注于该项目的焦点
+ *
+ * AVCaptureFocusModelContinuousAutoFocus 相机需要不断的自动对焦
+     
+ */
 - (void)setFrameRate{
     if (_frameRate > 0) {
         if ([[self captureInput].device respondsToSelector:@selector(setActiveVideoMinFrameDuration:)] &&
@@ -312,6 +336,7 @@ GLfloat *colorConversion709 = colorConversion709Default;
             [[self captureInput].device lockForConfiguration:&error];
             if (error == nil) {
 #if defined(__IPHONE_7_0)
+                //设置帧率
                 [[self captureInput].device setActiveVideoMinFrameDuration:CMTimeMake(1, _frameRate)];
                 [[self captureInput].device setActiveVideoMaxFrameDuration:CMTimeMake(1, _frameRate)];
                 
@@ -324,19 +349,20 @@ GLfloat *colorConversion709 = colorConversion709Default;
 #endif
             }
             [[self captureInput].device unlockForConfiguration];
-        } else {
+        }
+        /*else {
             for (AVCaptureConnection *connection in [self captureOutput].connections) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
                 if ([connection respondsToSelector:@selector(setVideoMinFrameDuration:)]) {
-                    connection.videoMinFrameDuration = CMTimeMake(1, _frameRate);
+                    connection.videoMinFrameDuration = CMTimeMake(1, _frameRate);  //从i
                 }
                 if ([connection respondsToSelector:@selector(setVideoMaxFrameDuration:)]) {
                     connection.videoMaxFrameDuration = CMTimeMake(1, _frameRate);
                 }
 #pragma clang diagnostic pop
             }
-        }
+        }*/
     } else {
         if ([[self captureInput].device respondsToSelector:@selector(setActiveVideoMinFrameDuration:)] &&
             [[self captureInput].device respondsToSelector:@selector(setActiveVideoMaxFrameDuration:)]) {
@@ -344,6 +370,7 @@ GLfloat *colorConversion709 = colorConversion709Default;
             [[self captureInput].device lockForConfiguration:&error];
             if (error == nil) {
 #if defined(__IPHONE_7_0)
+                //设置帧率
                 [[self captureInput].device setActiveVideoMinFrameDuration:kCMTimeInvalid];
                 [[self captureInput].device setActiveVideoMaxFrameDuration:kCMTimeInvalid];
                 
@@ -356,7 +383,8 @@ GLfloat *colorConversion709 = colorConversion709Default;
 #endif
             }
             [[self captureInput].device unlockForConfiguration];
-        } else {
+        }
+        /*else {
             for (AVCaptureConnection *connection  in [self captureOutput].connections) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -368,7 +396,7 @@ GLfloat *colorConversion709 = colorConversion709Default;
                 }
 #pragma clang diagnostic pop
             }
-        }
+        }*/
     }
 }
 
@@ -378,20 +406,22 @@ GLfloat *colorConversion709 = colorConversion709Default;
 
 #pragma mark - AVCaptureVideoDataOuputSampleBufferDelegate
 - (void)captureOutput:(AVCaptureOutput *)output didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection{
-    if (self.shouldEnableOpenGL) {
+    if (self.shouldEnableOpenGL) { //是否进行OpenGL ES绘制
         if (dispatch_semaphore_wait(_frameRenderingSemaphore, DISPATCH_TIME_NOW) != 0) {
             return;
         }
         
+        //手动把引用计数加1
         CFRetain(sampleBuffer);
         runAsyncOnVideoProcessingQueue(^{
             [self processVideoSampleBuffer:sampleBuffer];
-            CFRelease(sampleBuffer);
+            CFRelease(sampleBuffer); //手动把引用计数减1
             dispatch_semaphore_signal(self->_frameRenderingSemaphore);
         });
     }
 }
 
+//处理摄像头采集的图像数据
 - (void)processVideoSampleBuffer:(CMSampleBufferRef)sampleBuffer{
     CVImageBufferRef cameraFrame = CMSampleBufferGetImageBuffer(sampleBuffer);
     CFTypeRef colorAttachments = CVBufferGetAttachment(cameraFrame,
@@ -399,7 +429,7 @@ GLfloat *colorConversion709 = colorConversion709Default;
                                                        NULL);
     if (colorAttachments != NULL) {
         if (CFStringCompare(colorAttachments,
-                            kCVImageBufferYCbCrMatrix_ITU_R_601_4, 0) == kCFCompareEqualTo) {
+                            kCVImageBufferYCbCrMatrix_ITU_R_601_4, 0) == kCFCompareEqualTo) { //String 是否相等
             if (isFullYUVRange) {
                 _preferredConversion = colorConversion601FullRange;
             } else {
@@ -418,7 +448,8 @@ GLfloat *colorConversion709 = colorConversion709Default;
     
     [BLImageContext useImageProcessingContext];
     [[self cameraFrameTextureWithSampleBuffer:sampleBuffer
-                                 aspectRation:TEXTURE_FRAME_ASPECT_RATIO] activateFramebuffer];
+                                 aspectRation:TEXTURE_FRAME_ASPECT_RATIO] activateFramebuffer]; //得到frameBuffer
+    
     [_cameraLoadTexRenderer renderWithSampleBuffer:sampleBuffer
                                        aspectRatio:TEXTURE_FRAME_ASPECT_RATIO
                                preferredConversion:_preferredConversion

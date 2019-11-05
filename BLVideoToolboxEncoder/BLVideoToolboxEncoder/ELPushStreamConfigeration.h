@@ -18,3 +18,10 @@
 #define kFrameRate   24.0f
 #define kMaxVideoBitRate 650 * 1024
 #define kAVGVideoBitRate 600 * 1024
+
+
+
+/** AVCaptureSessionPreset
+ * AVCaptureSessionPreset1280x720   可以达到.h264的帧率  和40mbits/s 的AAC Audio的帧率
+ * AVCaptureSessionPresetiFrame960x540 可以达到.h264的帧率  和30mbits/s 的AAC Audio的帧率
+ */
