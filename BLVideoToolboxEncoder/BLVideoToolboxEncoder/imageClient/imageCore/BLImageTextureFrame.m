@@ -109,9 +109,9 @@
     
     if ([BLImageContext supportFastTextureUpload]) {
         CVOpenGLESTextureCacheRef coreVideoTextureCache = [[BLImageContext shareImageProcessingContext] coreVideoTextureCache];
+        
         CFDictionaryRef empty;
         CFMutableDictionaryRef attrs;
-        
         empty = CFDictionaryCreate(kCFAllocatorDefault,
                                    NULL,
                                    NULL,
@@ -124,6 +124,7 @@
                                           &kCFTypeDictionaryValueCallBacks);
         CFDictionarySetValue(attrs, kCVPixelBufferIOSurfacePropertiesKey, empty);
         
+        //如果要创建空的image buffer(CVPixelBuffer)并和texture绑定用来render，那么创建时需要为dictionary指定一个特殊的key:kCVPixelBufferIOSurfacePropertiesKey
         CVReturn err = CVPixelBufferCreate(kCFAllocatorDefault,
                                            (int)_size.width,
                                            (int)_size.height,
@@ -135,6 +136,18 @@
             NSAssert(NO, @"Error at CVPixelBufferCreate %d", err);
         }
         
+        /**
+         * Core Video允许OpenGL ES的texture 和一个image buffer绑定，从而省略创建texture的步骤，也方便对image buffer操作，例如以多种格式读取其中的数据而不用glReadPixels 这样比较费时的方法。Core Video中的OpenGL ES texture类型为CVOpenGLESTextureRef。
+         *
+         * CVOpenGLESTextureRef 一种基于纹理的图像缓冲区，为OpenGL ES提供源图像数据
+         * typedef CVImageBufferRef CVOpenGLESTextureRef
+         *
+         * image buffer类型为CVImageBufferRef 其实两个类型是一回事
+         *
+         * 这些texture是由CVOpenGLESTextureCache缓存、管理的。可以用CVOpenGLESTextureCacheTextureFromImage来从image buffer 得到 texture 并将两者绑定，该texture可能是新建的或缓存的但未使用。用CVOpenGLESTextureCacheFlush来清理未使用的缓存
+         *
+         * CVOpenGLESTextureCacheCreateTextureFromImage-从已经存在的CVImageBufferRef创建一个CVOpenGLESTextureRef
+         */
         err = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
                                                            coreVideoTextureCache,
                                                            renderTarget,
@@ -162,11 +175,19 @@
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, _textureOptions.wrapS);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, _textureOptions.wrapT);
         
+        //附加到帧缓冲上
         glFramebufferTexture2D(GL_FRAMEBUFFER,
                                GL_COLOR_ATTACHMENT0,
                                GL_TEXTURE_2D,
                                CVOpenGLESTextureGetName(renderTexture),
                                0);
+        /** glFramebufferTexture2D参数
+         * target: 帧缓冲的目标(绘制、读取或者两者皆有)
+         * attachment: 我们想要的附加的附件类型   当前我们正在附加一个颜色附件。注意最后的0意味着我们可以附加多个颜色附件，
+         * textarget: 你希望附加的纹理类型
+         * texture: 要附加的纹理本身
+         * Level: 多级渐远纹理的级别     我们将它保留为0
+         */
     } else {
         [self generateTexture];
         glBindTexture(GL_TEXTURE_2D,

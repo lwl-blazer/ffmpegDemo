@@ -423,10 +423,19 @@ GLfloat *colorConversion709 = colorConversion709Default;
 
 //处理摄像头采集的图像数据
 - (void)processVideoSampleBuffer:(CMSampleBufferRef)sampleBuffer{
+    /**CVImageBufferRef
+     * 对Core Video中图像缓冲区的引用
+     * 根据网上一些资料，CVImageBufferRef 就是 CVPixelBufferRef的别名，从现在文档的定义来看是 "typedef CVBufferRef CVImageBufferRef"
+     *
+     * 图像缓冲区是一种抽象的类型，表示容纳图像的Core Video的缓冲区。在Core Video中，像素缓冲区(pixel buffers)、OpenGL缓冲区(OpenGL buffers)和OpenGL纹理(OpenGL textures)都是从图像缓冲区类型派生的。
+     *
+     */
     CVImageBufferRef cameraFrame = CMSampleBufferGetImageBuffer(sampleBuffer);
+    //从CVPixelBuffer/CVImageBufferRef中获取颜色转换矩阵
     CFTypeRef colorAttachments = CVBufferGetAttachment(cameraFrame,
-                                                       kCVImageBufferYCbCrMatrixKey,
+                                                       kCVImageBufferYCbCrMatrixKey, //此key最关键 kCVImageBufferYCbCrMatrixKey 颜色转换矩阵
                                                        NULL);
+    //得到合适的颜色转换矩阵，为了提升性能，一般在Framgment Shader中进行YUV至RGB的转换， 在此根据不同的YUV格式进行相应的处理，比如Full Range或Video Range
     if (colorAttachments != NULL) {
         if (CFStringCompare(colorAttachments,
                             kCVImageBufferYCbCrMatrix_ITU_R_601_4, 0) == kCFCompareEqualTo) { //String 是否相等
@@ -447,9 +456,10 @@ GLfloat *colorConversion709 = colorConversion709Default;
     }
     
     [BLImageContext useImageProcessingContext];
+    //帧缓冲
     [[self cameraFrameTextureWithSampleBuffer:sampleBuffer
-                                 aspectRation:TEXTURE_FRAME_ASPECT_RATIO] activateFramebuffer]; //得到frameBuffer
-    
+                                 aspectRation:TEXTURE_FRAME_ASPECT_RATIO] activateFramebuffer]; //激活frameBuffer
+    //绘制
     [_cameraLoadTexRenderer renderWithSampleBuffer:sampleBuffer
                                        aspectRatio:TEXTURE_FRAME_ASPECT_RATIO
                                preferredConversion:_preferredConversion
@@ -462,12 +472,13 @@ GLfloat *colorConversion709 = colorConversion709Default;
                                       &timimgInfo);
     
     for (id<BLImageInput> currentTarget in targets) {
-        [currentTarget setInputTexture:outputTexture];
+        [currentTarget setInputTexture:outputTexture];   //把outputTexture 传给target  而BLImageView就是target
         [currentTarget newFrameReadyAtTime:currentTime
                                 timingInfo:timimgInfo];
     }
 }
 
+//创建帧缓冲，纹理，并把纹理附加到帧缓冲中
 - (BLImageTextureFrame *)cameraFrameTextureWithSampleBuffer:(CMSampleBufferRef)sampleBuffer
                                                aspectRation:(float)aspectRation {
     if (!outputTexture) {
