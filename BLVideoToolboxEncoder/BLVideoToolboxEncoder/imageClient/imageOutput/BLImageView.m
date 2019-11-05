@@ -100,7 +100,7 @@
 }
 
 
-#pragma mark --
+#pragma mark -- BLImageInput
 - (void)newFrameReadyAtTime:(CMTime)frameTime timingInfo:(CMSampleTimingInfo)timingInfo{
     glBindFramebuffer(GL_FRAMEBUFFER, _displayFramebuffer);
     [_directPassRenderer renderWithTextureId:[_inputFrameTexture texture]

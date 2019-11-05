@@ -6,6 +6,7 @@
 //  Copyright © 2019 luowailin. All rights reserved.
 //
 
+
 #import <Foundation/Foundation.h>
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
@@ -16,7 +17,11 @@
 
 
 NS_ASSUME_NONNULL_BEGIN
-
+/**
+* BLImageProgram  用于把OpenGL的Program的构建、查找属性、使用等这些操作
+*
+* 每个节点都会有一个该类的引用实例
+*/
 @interface BLImageProgram : NSObject
 
 - (void)use;
