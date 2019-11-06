@@ -28,6 +28,7 @@ NSString *const videoEncodeVertexShaderString = SHADER_STRING
 }
  );
 
+
 NSString *const videoEncodeFragmentShaderString = SHADER_STRING
 (
  varying highp vec2 textureCoordinate;
@@ -177,8 +178,6 @@ NSString *const videoEncodeColorSwizzlingFragmentShaderString = SHADER_STRING
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         glFinish();
         
-        
-        
         //取出对应的这一帧图像，然后进行组成CMSampleBufferRef 最后进行编码
         CVPixelBufferRef pixel_buffer = NULL;
         if ([BLImageContext supportFastTextureUpload]) {
@@ -210,7 +209,20 @@ NSString *const videoEncodeColorSwizzlingFragmentShaderString = SHADER_STRING
                 glReadPixels(0, 0, self->_width, self->_height, GL_RGBA, GL_UNSIGNED_BYTE, pixelBufferData);
             }
         }
-        
+       /**
+        * CVPixelBuffer apple的解释是其是主内存中存储所有像素点数据的一个对象，那么什么是主内存呢:
+        *   此处的主内存并不是我们平时所操作的主内存，但是两都的概念是可以关联起来的，此处的主内存可理解为这块存储区域存在于缓存之中，所以我们在访问这块区域之前必须先锁定这块区域:
+        *   锁定
+        *   CVPixelBufferLockBaseAddress()
+        *
+        *   访问这块内存区域
+        *   void *data = CVPixelBufferGetBaseAddress()
+        *   操作data变量可以向该内存区域填充内容或者从中读取内容，
+        *
+        *   解锁该区域
+        *   CVPixelBufferRelease()
+        *
+        */
         CMSampleBufferRef encodeSampleBuffer = NULL;
         CMVideoFormatDescriptionRef videoInfo = NULL;
         CMVideoFormatDescriptionCreateForImageBuffer(NULL,
@@ -225,7 +237,7 @@ NSString *const videoEncodeColorSwizzlingFragmentShaderString = SHADER_STRING
                                            videoInfo,
                                            &timingInfo,
                                            &encodeSampleBuffer);
-        
+        //进行硬编码 VideoToolbox只支持CVPixelBuffer的数据结构
         [[weakSelf h264Encoder] encode:encodeSampleBuffer];
         
         CVPixelBufferUnlockBaseAddress(pixel_buffer, 0);

@@ -30,7 +30,7 @@
         NSFileManager *fileManager = [NSFileManager defaultManager];
         [fileManager removeItemAtPath:mp4File
                                 error:nil];
-        if ([fileManager createFileAtPath:mp4File
+        if (![fileManager createFileAtPath:mp4File
                                  contents:nil
                                attributes:nil]) {
             NSLog(@"创建文件失败");

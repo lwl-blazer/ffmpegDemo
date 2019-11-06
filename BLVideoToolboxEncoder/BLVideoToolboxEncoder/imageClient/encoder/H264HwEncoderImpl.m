@@ -13,7 +13,7 @@
 
 @interface H264HwEncoderImpl ()
 {
-    VTCompressionSessionRef EncodingSession;
+    VTCompressionSessionRef EncodingSession; //VTCompressionSession 硬件编码器  VTDecompressionRef 硬件解码器
     dispatch_queue_t aQueue;
     CMFormatDescriptionRef format;
     CMSampleTimingInfo *timingInfo;
@@ -52,16 +52,17 @@ static bool encodingSessionValid = false;
         maxBitRate:(int)maxBitRate
         avgBitRate:(int)avgBitRate{
     dispatch_sync(aQueue, ^{
-    OSStatus status = VTCompressionSessionCreate(NULL,
-                                                 width,
-                                                 height,
-                                                 kCMVideoCodecType_H264,
-                                                 NULL,
-                                                 NULL,
-                                                 NULL,
-                                                 didCompressH264,
-                                                 (__bridge void *)(self),
-                                                 &EncodingSession);
+        //创建编码器会话(编码的视频宽、高、编码器类型、回调函数、回调函数上下文)
+        OSStatus status = VTCompressionSessionCreate(NULL,
+                                                     width,
+                                                     height,
+                                                     kCMVideoCodecType_H264,
+                                                     NULL,
+                                                     NULL,
+                                                     NULL,
+                                                     didCompressH264,
+                                                     (__bridge void *)(self),
+                                                     &EncodingSession);
         if (status != 0) {
             NSLog(@"H264:Unable to create a H264 session status is %d", (int)status);
             [_encoderStatusDelegate onEncoderInitialFailed];
@@ -72,20 +73,22 @@ static bool encodingSessionValid = false;
         
         //set the properties
         VTSessionSetProperty(EncodingSession,
-                             kVTCompressionPropertyKey_RealTime,
+                             kVTCompressionPropertyKey_RealTime, //是否需要实时编码
                              kCFBooleanTrue);
         VTSessionSetProperty(EncodingSession,
-                             kVTCompressionPropertyKey_ProfileLevel,
+                             kVTCompressionPropertyKey_ProfileLevel, //使用H264的profile是High的AutoLevel规格
                              kVTProfileLevel_H264_High_AutoLevel);
         VTSessionSetProperty(EncodingSession,
-                             kVTCompressionPropertyKey_AllowFrameReordering,
+                             kVTCompressionPropertyKey_AllowFrameReordering,   //是否产生B帧
                              kCFBooleanFalse);
         [self settingMaxBitRate:maxBitRate
                      avgBitRate:avgBitRate
                             fps:fps];
         
+        //告诉编码器开始编码
         VTCompressionSessionPrepareToEncodeFrames(EncodingSession);
         
+        //重新拿到是否产生B帧的属性设置
         status = VTSessionCopyProperty(EncodingSession,
                                        kVTCompressionPropertyKey_AllowFrameReordering,
                                        kCFAllocatorDefault,
@@ -100,13 +103,14 @@ static bool encodingSessionValid = false;
     NSLog(@"设置avgBitRate %dKb", avgBitRate / 1024);
     m_fps = fps;
     VTSessionSetProperty(EncodingSession,
-                         kVTCompressionPropertyKey_MaxKeyFrameInterval,
+                         kVTCompressionPropertyKey_MaxKeyFrameInterval,  //设置关键帧的间隔，通常是指gop size
                          (__bridge CFTypeRef)(@(fps)));
     
     VTSessionSetProperty(EncodingSession,
-                         kVTCompressionPropertyKey_ExpectedFrameRate,
+                         kVTCompressionPropertyKey_ExpectedFrameRate,   //设置帧率
                          (__bridge CFTypeRef)(@(fps)));
     
+    //kVTCompressionPropertyKey_DataRateLimits  kVTCompressionPropertyKey_AverageBitRate  共同用于控制编码器输出的码率
     if (![self isInSettingDataRateLimitsBlackList]) {
         VTSessionSetProperty(EncodingSession,
                              kVTCompressionPropertyKey_DataRateLimits,

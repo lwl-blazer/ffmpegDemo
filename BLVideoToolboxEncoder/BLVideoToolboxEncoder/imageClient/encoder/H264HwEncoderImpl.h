@@ -53,6 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
                avgBitRate:(int)avgBitRate
                       fps:(int)fps;
 
+//必须将原始图像数据封装成CVPixelBuffer的数据结构，
 - (void)encode:(CMSampleBufferRef)sampleBuffer;
 
 - (void)endCompresseion;
