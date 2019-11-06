@@ -152,19 +152,21 @@ static bool encodingSessionValid = false;
         if (!self.initialized) {
             return;
         }
-        
+        //说明编码器具体是如何使用的
+        //输入CVPixelBuffer  构造当前编码视频帧的时间戳以及时长，最后调用编码会话对这个三个参数进行编码
         int64_t currentTimeMills = CFAbsoluteTimeGetCurrent() * 1000;
-        if (-1 == self->encodingTimeMills) {
+        if (-1 == self->encodingTimeMills) { //第一帧的时间
             self->encodingTimeMills = currentTimeMills;
         }
         
         int64_t encodingDuration = currentTimeMills - self->encodingTimeMills;
         CVImageBufferRef imageBuffer = (CVImageBufferRef)CMSampleBufferGetImageBuffer(sampleBuffer);
-        
-        CMTime pts = CMTimeMake(encodingDuration, 1000);
-        CMTime dur = CMTimeMake(1, m_fps);
+        //pts,显示时间戳  dur时长  dts编码时间戳
+        CMTime pts = CMTimeMake(encodingDuration, 1000); //timestamp is in ms
+        CMTime dur = CMTimeMake(1, m_fps);  //此帧的时长
         
         VTEncodeInfoFlags flags;
+        //待编码器编码成功之后，就会回调最开始初始化编码器会话时传入的回调函数，
         OSStatus statusCode = VTCompressionSessionEncodeFrame(EncodingSession,
                                                               imageBuffer,
                                                               pts,
@@ -185,7 +187,7 @@ void didCompressH264(void *outputCallbackRefCon,
                      OSStatus status,
                      VTEncodeInfoFlags infoFlags,
                      CMSampleBufferRef sampleBuffer){
-    if (status != noErr) {
+    if (status != noErr) { //首先判断status 如果为0 表示成功，如果不成功不处理
         continuousEncodeFailureTimes++;
         return;
     }
@@ -201,8 +203,14 @@ void didCompressH264(void *outputCallbackRefCon,
     
     H264HwEncoderImpl *encoder = (__bridge H264HwEncoderImpl *)outputCallbackRefCon;
     
+    //判断是否为关键帧
     bool keyframe = !CFDictionaryContainsKey((CFDictionaryRef)(CFArrayGetValueAtIndex(CMSampleBufferGetSampleAttachmentsArray(sampleBuffer, true), 0)),
                                              (const void *)kCMSampleAttachmentKey_NotSync);
+    
+    /**
+     * 为什么要判断关键帧，因为VideoToolbox编码器在每一个关键帧前面都会输出SPS和PPS信息,如果是关键帧，则取出对应的SPS和PPS信息。
+     * CMSampleBuffer中有一个CMVideoFormatDesc 而SPS和PPS信息就存在于这个对于视频格式的描述里面
+     */
     if (keyframe) {
         if (encoder) {
             CMFormatDescriptionRef format = CMSampleBufferGetFormatDescription(sampleBuffer);
@@ -210,7 +218,7 @@ void didCompressH264(void *outputCallbackRefCon,
             size_t sparameterSetSize, sparameterSetCount;
             const uint8_t *sparameterSet;
             OSStatus statusCode = CMVideoFormatDescriptionGetH264ParameterSetAtIndex(format,
-                                                                                     0,
+                                                                                     0, //代表sps
                                                                                      &sparameterSet,
                                                                                      &sparameterSetSize,
                                                                                      &sparameterSetCount,
@@ -219,7 +227,7 @@ void didCompressH264(void *outputCallbackRefCon,
                 size_t pparameterSetSize, pparameterSetCount;
                 const uint8_t *pparameterSet;
                 OSStatus statusCode = CMVideoFormatDescriptionGetH264ParameterSetAtIndex(format,
-                                                                                         1,
+                                                                                         1,  //代表pps
                                                                                          &pparameterSet,
                                                                                          &pparameterSetSize,
                                                                                          &pparameterSetCount,
@@ -229,6 +237,7 @@ void didCompressH264(void *outputCallbackRefCon,
                     encoder->pps = [NSData dataWithBytes:pparameterSet length:pparameterSetSize];
                     
                     if (encoder->_delegate) {
+                        //取出此帧的时间戳 CMSampleBufferGetPresentationTimeStamp()  取出PTS
                         double timeMills = CMTimeGetSeconds(CMSampleBufferGetPresentationTimeStamp(sampleBuffer)) * 1000;
                         [encoder->_delegate gotSpsPps:encoder->sps
                                                   pps:encoder->pps
@@ -240,15 +249,17 @@ void didCompressH264(void *outputCallbackRefCon,
         }
     }
     
+    //提出此帧的压缩内容 CMBlockBufferRef
     CMBlockBufferRef dataBuffer = CMSampleBufferGetDataBuffer(sampleBuffer);
     size_t length,totalLength;
     char *dataPointer;
+    //访问CMBlockBufferRef的这块内，
     OSStatus statusCodeRet = CMBlockBufferGetDataPointer(dataBuffer,
                                                          0,
                                                          &length,
                                                          &totalLength,
                                                          &dataPointer);
-    
+    //取出具体的数据，就可以做后续操作了
     if (statusCodeRet == noErr) {
         size_t bufferOffset = 0;
         static const int AVCCHeaderLength = 4;
