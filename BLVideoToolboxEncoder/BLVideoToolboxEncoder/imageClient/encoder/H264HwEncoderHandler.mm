@@ -23,15 +23,18 @@
 - (instancetype)init{
     self = [super init];
     if (self) {
-        NSString *mp4File = [[NSBundle mainBundle] pathForResource:@"preview"
-                                                            ofType:@"h264"];
-        
+        NSString *mp4File = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"preview.h264"];
+        //[[NSBundle mainBundle] pathForResource:@"preview"
+                                                            //ofType:@"h264"];
+        NSLog(@"%@", mp4File);
         NSFileManager *fileManager = [NSFileManager defaultManager];
         [fileManager removeItemAtPath:mp4File
                                 error:nil];
-        [fileManager createFileAtPath:mp4File
-                             contents:nil
-                           attributes:nil];
+        if ([fileManager createFileAtPath:mp4File
+                                 contents:nil
+                               attributes:nil]) {
+            NSLog(@"创建文件失败");
+        }
         
         fileHandle = [NSFileHandle fileHandleForWritingAtPath:mp4File];
     }

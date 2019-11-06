@@ -265,7 +265,7 @@ NSString *const videoEncodeColorSwizzlingFragmentShaderString = SHADER_STRING
 }
 
 - (H264HwEncoderHandler *)H264HwEncoderHandler{
-    if (_h264HwEncoderHandler) {
+    if (!_h264HwEncoderHandler) {
         _h264HwEncoderHandler = [[H264HwEncoderHandler alloc] init];
     }
     return _h264HwEncoderHandler;

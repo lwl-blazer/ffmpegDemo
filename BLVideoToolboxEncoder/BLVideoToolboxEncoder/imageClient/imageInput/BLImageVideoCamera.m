@@ -130,7 +130,10 @@ GLfloat *colorConversion709 = colorConversion709Default;
 
 //切换摄像头
 - (int)switchFrontBackCamera{
-    NSUInteger cameraCount = [[AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo] count];
+    AVCaptureDeviceDiscoverySession *discoverySession = [AVCaptureDeviceDiscoverySession discoverySessionWithDeviceTypes:@[AVCaptureDeviceTypeBuiltInWideAngleCamera]
+                                                                                                               mediaType:AVMediaTypeVideo position:[self cameraPosition]];
+    NSUInteger cameraCount = discoverySession.devices.count;
+    //NSUInteger cameraCount = [[AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo] count];
     int result = -1;
     if (cameraCount > 1) {
         NSError *error;
@@ -266,7 +269,6 @@ GLfloat *colorConversion709 = colorConversion709Default;
 
 - (AVCaptureDevice *)cameraWithPosition:(AVCaptureDevicePosition)position{
 
-    
    AVCaptureDeviceDiscoverySession *deviceSession = [AVCaptureDeviceDiscoverySession discoverySessionWithDeviceTypes:@[AVCaptureDeviceTypeBuiltInWideAngleCamera]
                                                            mediaType:AVMediaTypeVideo position:position];
     //NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];

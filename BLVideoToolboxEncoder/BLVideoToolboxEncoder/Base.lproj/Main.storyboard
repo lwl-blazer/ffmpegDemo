@@ -59,14 +59,35 @@
                     <view key="view" contentMode="scaleToFill" id="X3J-fw-Rax">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="W28-DY-2FW">
+                                <rect key="frame" x="177" y="802" width="60" height="60"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="60" id="nrW-ji-xA1"/>
+                                    <constraint firstAttribute="width" constant="60" id="z6W-ZP-fom"/>
+                                </constraints>
+                                <state key="normal" title="Start"/>
+                                <state key="selected" title="Stop"/>
+                                <connections>
+                                    <action selector="buttonAction:" destination="hA0-md-u7W" eventType="touchUpInside" id="1CF-40-maJ"/>
+                                </connections>
+                            </button>
+                        </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="W28-DY-2FW" firstAttribute="bottom" secondItem="CAv-18-gjq" secondAttribute="bottom" id="Gci-PG-S4X"/>
+                            <constraint firstItem="W28-DY-2FW" firstAttribute="centerX" secondItem="X3J-fw-Rax" secondAttribute="centerX" id="rJr-Dy-dPm"/>
+                        </constraints>
                         <viewLayoutGuide key="safeArea" id="CAv-18-gjq"/>
                     </view>
                     <navigationItem key="navigationItem" id="dQ9-Fp-Zny"/>
+                    <connections>
+                        <outlet property="startButton" destination="W28-DY-2FW" id="hPx-Hr-muz"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="XSn-Jg-aLq" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2061" y="133"/>
+            <point key="canvasLocation" x="2060.8695652173915" y="132.58928571428572"/>
         </scene>
     </scenes>
 </document>

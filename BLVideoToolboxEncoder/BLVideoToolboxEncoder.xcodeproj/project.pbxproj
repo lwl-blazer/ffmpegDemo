@@ -29,6 +29,7 @@
 		255D00FD23692F6E00519735 /* BLImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 255D00FC23692F6E00519735 /* BLImageView.m */; };
 		255D010023692FBA00519735 /* H264HwEncoderImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 255D00FF23692FBA00519735 /* H264HwEncoderImpl.m */; };
 		255D010323692FD800519735 /* H264HwEncoderHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = 255D010223692FD800519735 /* H264HwEncoderHandler.mm */; };
+		25B5111323716DE500BF68D1 /* BLVideoToolbox架构图.png in Resources */ = {isa = PBXBuildFile; fileRef = 25B5111223716DE400BF68D1 /* BLVideoToolbox架构图.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -94,6 +95,7 @@
 		255D00FF23692FBA00519735 /* H264HwEncoderImpl.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = H264HwEncoderImpl.m; sourceTree = "<group>"; };
 		255D010123692FD800519735 /* H264HwEncoderHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = H264HwEncoderHandler.h; sourceTree = "<group>"; };
 		255D010223692FD800519735 /* H264HwEncoderHandler.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = H264HwEncoderHandler.mm; sourceTree = "<group>"; };
+		25B5111223716DE400BF68D1 /* BLVideoToolbox架构图.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "BLVideoToolbox架构图.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -157,6 +159,7 @@
 				253E62A42366DDF200817BA0 /* LaunchScreen.storyboard */,
 				253E62A72366DDF200817BA0 /* Info.plist */,
 				253E62A82366DDF200817BA0 /* main.m */,
+				25B5111223716DE400BF68D1 /* BLVideoToolbox架构图.png */,
 			);
 			path = BLVideoToolboxEncoder;
 			sourceTree = "<group>";
@@ -347,6 +350,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				25B5111323716DE500BF68D1 /* BLVideoToolbox架构图.png in Resources */,
 				253E62A62366DDF200817BA0 /* LaunchScreen.storyboard in Resources */,
 				253E62A32366DDF200817BA0 /* Assets.xcassets in Resources */,
 				253E62A12366DDF100817BA0 /* Main.storyboard in Resources */,
