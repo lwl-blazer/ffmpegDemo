@@ -30,6 +30,21 @@
 		255D010023692FBA00519735 /* H264HwEncoderImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 255D00FF23692FBA00519735 /* H264HwEncoderImpl.m */; };
 		255D010323692FD800519735 /* H264HwEncoderHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = 255D010223692FD800519735 /* H264HwEncoderHandler.mm */; };
 		25B5111323716DE500BF68D1 /* BLVideoToolbox架构图.png in Resources */ = {isa = PBXBuildFile; fileRef = 25B5111223716DE400BF68D1 /* BLVideoToolbox架构图.png */; };
+		25B511702374029800BF68D1 /* VideoEncoderAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 25B5116F2374029800BF68D1 /* VideoEncoderAdapter.m */; };
+		25B5118923751C5100BF68D1 /* SoftEncoderAdapter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25B5118723751C5100BF68D1 /* SoftEncoderAdapter.cpp */; };
+		25B5118C23751D9D00BF68D1 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25B5118B23751D9D00BF68D1 /* CoreVideo.framework */; };
+		25B5118E23751DA600BF68D1 /* VideoToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25B5118D23751DA600BF68D1 /* VideoToolbox.framework */; };
+		25B5119023751DAC00BF68D1 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25B5118F23751DAC00BF68D1 /* AudioToolbox.framework */; };
+		25B5119223751DB400BF68D1 /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 25B5119123751DB400BF68D1 /* libiconv.tbd */; };
+		25B5119423751DBB00BF68D1 /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 25B5119323751DBB00BF68D1 /* libbz2.tbd */; };
+		25B5119623751DC000BF68D1 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 25B5119523751DC000BF68D1 /* libz.tbd */; };
+		25B5119E23751DD000BF68D1 /* libswscale.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 25B5119723751DD000BF68D1 /* libswscale.a */; };
+		25B5119F23751DD000BF68D1 /* libavfilter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 25B5119823751DD000BF68D1 /* libavfilter.a */; };
+		25B511A023751DD000BF68D1 /* libavutil.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 25B5119923751DD000BF68D1 /* libavutil.a */; };
+		25B511A123751DD000BF68D1 /* libavcodec.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 25B5119A23751DD000BF68D1 /* libavcodec.a */; };
+		25B511A223751DD000BF68D1 /* libavdevice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 25B5119B23751DD000BF68D1 /* libavdevice.a */; };
+		25B511A323751DD000BF68D1 /* libavformat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 25B5119C23751DD000BF68D1 /* libavformat.a */; };
+		25B511A423751DD000BF68D1 /* libswresample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 25B5119D23751DD000BF68D1 /* libswresample.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -96,6 +111,23 @@
 		255D010123692FD800519735 /* H264HwEncoderHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = H264HwEncoderHandler.h; sourceTree = "<group>"; };
 		255D010223692FD800519735 /* H264HwEncoderHandler.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = H264HwEncoderHandler.mm; sourceTree = "<group>"; };
 		25B5111223716DE400BF68D1 /* BLVideoToolbox架构图.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "BLVideoToolbox架构图.png"; sourceTree = "<group>"; };
+		25B5116E2374029800BF68D1 /* VideoEncoderAdapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VideoEncoderAdapter.h; sourceTree = "<group>"; };
+		25B5116F2374029800BF68D1 /* VideoEncoderAdapter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VideoEncoderAdapter.m; sourceTree = "<group>"; };
+		25B5118723751C5100BF68D1 /* SoftEncoderAdapter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SoftEncoderAdapter.cpp; sourceTree = "<group>"; };
+		25B5118823751C5100BF68D1 /* SoftEncoderAdapter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = SoftEncoderAdapter.hpp; sourceTree = "<group>"; };
+		25B5118B23751D9D00BF68D1 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
+		25B5118D23751DA600BF68D1 /* VideoToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VideoToolbox.framework; path = System/Library/Frameworks/VideoToolbox.framework; sourceTree = SDKROOT; };
+		25B5118F23751DAC00BF68D1 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		25B5119123751DB400BF68D1 /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
+		25B5119323751DBB00BF68D1 /* libbz2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbz2.tbd; path = usr/lib/libbz2.tbd; sourceTree = SDKROOT; };
+		25B5119523751DC000BF68D1 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		25B5119723751DD000BF68D1 /* libswscale.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libswscale.a; path = "../../FFmpeg-iOS/lib/libswscale.a"; sourceTree = "<group>"; };
+		25B5119823751DD000BF68D1 /* libavfilter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavfilter.a; path = "../../FFmpeg-iOS/lib/libavfilter.a"; sourceTree = "<group>"; };
+		25B5119923751DD000BF68D1 /* libavutil.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavutil.a; path = "../../FFmpeg-iOS/lib/libavutil.a"; sourceTree = "<group>"; };
+		25B5119A23751DD000BF68D1 /* libavcodec.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavcodec.a; path = "../../FFmpeg-iOS/lib/libavcodec.a"; sourceTree = "<group>"; };
+		25B5119B23751DD000BF68D1 /* libavdevice.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavdevice.a; path = "../../FFmpeg-iOS/lib/libavdevice.a"; sourceTree = "<group>"; };
+		25B5119C23751DD000BF68D1 /* libavformat.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavformat.a; path = "../../FFmpeg-iOS/lib/libavformat.a"; sourceTree = "<group>"; };
+		25B5119D23751DD000BF68D1 /* libswresample.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libswresample.a; path = "../../FFmpeg-iOS/lib/libswresample.a"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,6 +135,19 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				25B5119E23751DD000BF68D1 /* libswscale.a in Frameworks */,
+				25B5119F23751DD000BF68D1 /* libavfilter.a in Frameworks */,
+				25B511A023751DD000BF68D1 /* libavutil.a in Frameworks */,
+				25B511A123751DD000BF68D1 /* libavcodec.a in Frameworks */,
+				25B511A223751DD000BF68D1 /* libavdevice.a in Frameworks */,
+				25B511A323751DD000BF68D1 /* libavformat.a in Frameworks */,
+				25B511A423751DD000BF68D1 /* libswresample.a in Frameworks */,
+				25B5119623751DC000BF68D1 /* libz.tbd in Frameworks */,
+				25B5119423751DBB00BF68D1 /* libbz2.tbd in Frameworks */,
+				25B5119223751DB400BF68D1 /* libiconv.tbd in Frameworks */,
+				25B5119023751DAC00BF68D1 /* AudioToolbox.framework in Frameworks */,
+				25B5118E23751DA600BF68D1 /* VideoToolbox.framework in Frameworks */,
+				25B5118C23751D9D00BF68D1 /* CoreVideo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -130,6 +175,7 @@
 				253E62B12366DDF300817BA0 /* BLVideoToolboxEncoderTests */,
 				253E62BC2366DDF300817BA0 /* BLVideoToolboxEncoderUITests */,
 				253E62942366DDF100817BA0 /* Products */,
+				25B5118A23751D9C00BF68D1 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -202,6 +248,10 @@
 				255D00FF23692FBA00519735 /* H264HwEncoderImpl.m */,
 				255D010123692FD800519735 /* H264HwEncoderHandler.h */,
 				255D010223692FD800519735 /* H264HwEncoderHandler.mm */,
+				25B5116E2374029800BF68D1 /* VideoEncoderAdapter.h */,
+				25B5116F2374029800BF68D1 /* VideoEncoderAdapter.m */,
+				25B5118723751C5100BF68D1 /* SoftEncoderAdapter.cpp */,
+				25B5118823751C5100BF68D1 /* SoftEncoderAdapter.hpp */,
 			);
 			path = encoder;
 			sourceTree = "<group>";
@@ -245,6 +295,26 @@
 				255D00FC23692F6E00519735 /* BLImageView.m */,
 			);
 			path = imageOutput;
+			sourceTree = "<group>";
+		};
+		25B5118A23751D9C00BF68D1 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				25B5119A23751DD000BF68D1 /* libavcodec.a */,
+				25B5119B23751DD000BF68D1 /* libavdevice.a */,
+				25B5119823751DD000BF68D1 /* libavfilter.a */,
+				25B5119C23751DD000BF68D1 /* libavformat.a */,
+				25B5119923751DD000BF68D1 /* libavutil.a */,
+				25B5119D23751DD000BF68D1 /* libswresample.a */,
+				25B5119723751DD000BF68D1 /* libswscale.a */,
+				25B5119523751DC000BF68D1 /* libz.tbd */,
+				25B5119323751DBB00BF68D1 /* libbz2.tbd */,
+				25B5119123751DB400BF68D1 /* libiconv.tbd */,
+				25B5118F23751DAC00BF68D1 /* AudioToolbox.framework */,
+				25B5118D23751DA600BF68D1 /* VideoToolbox.framework */,
+				25B5118B23751D9D00BF68D1 /* CoreVideo.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -390,11 +460,13 @@
 				255D00FA23692F6300519735 /* BLImageVideoEncoder.m in Sources */,
 				253E62DA2366E25400817BA0 /* BLImageOutput.m in Sources */,
 				253E62A92366DDF200817BA0 /* main.m in Sources */,
+				25B511702374029800BF68D1 /* VideoEncoderAdapter.m in Sources */,
 				253E62EC2368204300817BA0 /* BLImageCameraRenderer.m in Sources */,
 				253E62E923681F6C00817BA0 /* BLImageVideoCamera.m in Sources */,
 				253E62CE2366E0FC00817BA0 /* ELPushStreamViewController.m in Sources */,
 				253E62E32366E2A600817BA0 /* BLImageTextureFrame.m in Sources */,
 				253E62E02366E28F00817BA0 /* BLImageProgram.m in Sources */,
+				25B5118923751C5100BF68D1 /* SoftEncoderAdapter.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -565,12 +637,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = ME92NL5RP7;
+				HEADER_SEARCH_PATHS = "/Users/luowailin/Documents/Code/ffmpegDemo/FFmpeg-iOS/include";
 				INFOPLIST_FILE = BLVideoToolboxEncoder/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = "/Users/luowailin/Documents/Code/ffmpegDemo/FFmpeg-iOS/lib";
 				PRODUCT_BUNDLE_IDENTIFIER = bee2c.com.BLVideoToolboxEncoder;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -583,12 +657,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = ME92NL5RP7;
+				HEADER_SEARCH_PATHS = "/Users/luowailin/Documents/Code/ffmpegDemo/FFmpeg-iOS/include";
 				INFOPLIST_FILE = BLVideoToolboxEncoder/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = "/Users/luowailin/Documents/Code/ffmpegDemo/FFmpeg-iOS/lib";
 				PRODUCT_BUNDLE_IDENTIFIER = bee2c.com.BLVideoToolboxEncoder;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
