@@ -56,7 +56,7 @@ public:
     //入队列
     int put(AudioPacket *audioPacket);
     //出队列
-    int get(AudioPacket **audioPacket);
+    int get(AudioPacket **audioPacket, bool block);
     //销毁队列
     void flush();
     

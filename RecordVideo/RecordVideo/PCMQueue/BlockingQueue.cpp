@@ -39,12 +39,14 @@ int BlockingQueue::put(AudioPacket *audioPacket){
         mLast->next = pkt1;
     }
     mLast = pkt1;
+    mNbPackets ++;
+    
     pthread_cond_signal(&mCondition);
     pthread_mutex_unlock(&mLock);
     return 0;
 }
 
-int BlockingQueue::get(AudioPacket **audioPacket){
+int BlockingQueue::get(AudioPacket **audioPacket, bool block){
     AudioPacketList *pkt1;
     int ret = 0;
     pthread_mutex_lock(&mLock);
@@ -67,7 +69,10 @@ int BlockingQueue::get(AudioPacket **audioPacket){
             pkt1 = nullptr;
             ret = 1;
             break;
-        }else {
+        } else if (!block) {
+            ret = 0;
+            break;
+        } else {
             pthread_cond_wait(&mCondition, &mLock);
         }
     }

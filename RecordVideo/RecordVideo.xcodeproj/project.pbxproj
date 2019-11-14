@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		251ECD65237D023E0053272E /* AVAudioSession+RouteUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 251ECD64237D023E0053272E /* AVAudioSession+RouteUtils.m */; };
+		251ECD68237D24470053272E /* BLAudioSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 251ECD67237D24470053272E /* BLAudioSession.m */; };
+		251ECD6D237D29450053272E /* AudioUnitInput.m in Sources */ = {isa = PBXBuildFile; fileRef = 251ECD6C237D29450053272E /* AudioUnitInput.m */; };
+		251ECD70237D4D1C0053272E /* CommonUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 251ECD6E237D4D1C0053272E /* CommonUtil.m */; };
 		25ACB872237BA824008A5918 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 25ACB871237BA824008A5918 /* AppDelegate.m */; };
 		25ACB878237BA824008A5918 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 25ACB877237BA824008A5918 /* ViewController.m */; };
 		25ACB87B237BA824008A5918 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 25ACB879237BA824008A5918 /* Main.storyboard */; };
@@ -36,6 +40,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		251ECD63237D023E0053272E /* AVAudioSession+RouteUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AVAudioSession+RouteUtils.h"; sourceTree = "<group>"; };
+		251ECD64237D023E0053272E /* AVAudioSession+RouteUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "AVAudioSession+RouteUtils.m"; sourceTree = "<group>"; };
+		251ECD66237D24470053272E /* BLAudioSession.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BLAudioSession.h; sourceTree = "<group>"; };
+		251ECD67237D24470053272E /* BLAudioSession.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BLAudioSession.m; sourceTree = "<group>"; };
+		251ECD6B237D29450053272E /* AudioUnitInput.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AudioUnitInput.h; sourceTree = "<group>"; };
+		251ECD6C237D29450053272E /* AudioUnitInput.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioUnitInput.m; sourceTree = "<group>"; };
+		251ECD6E237D4D1C0053272E /* CommonUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CommonUtil.m; path = "../../AudioUnit-EarFoldback/AudioUnit-EarFoldback/audio_output/CommonUtil.m"; sourceTree = "<group>"; };
+		251ECD6F237D4D1C0053272E /* CommonUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CommonUtil.h; path = "../../AudioUnit-EarFoldback/AudioUnit-EarFoldback/audio_output/CommonUtil.h"; sourceTree = "<group>"; };
 		25ACB86D237BA824008A5918 /* RecordVideo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RecordVideo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		25ACB870237BA824008A5918 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		25ACB871237BA824008A5918 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -81,6 +93,33 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		251ECD5D237CFE790053272E /* Consumer */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Consumer;
+			sourceTree = "<group>";
+		};
+		251ECD69237D290D0053272E /* Audio */ = {
+			isa = PBXGroup;
+			children = (
+				251ECD63237D023E0053272E /* AVAudioSession+RouteUtils.h */,
+				251ECD64237D023E0053272E /* AVAudioSession+RouteUtils.m */,
+				251ECD66237D24470053272E /* BLAudioSession.h */,
+				251ECD67237D24470053272E /* BLAudioSession.m */,
+				251ECD6B237D29450053272E /* AudioUnitInput.h */,
+				251ECD6C237D29450053272E /* AudioUnitInput.m */,
+			);
+			path = Audio;
+			sourceTree = "<group>";
+		};
+		251ECD6A237D29130053272E /* Video */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Video;
+			sourceTree = "<group>";
+		};
 		25ACB864237BA823008A5918 = {
 			isa = PBXGroup;
 			children = (
@@ -104,13 +143,16 @@
 		25ACB86F237BA824008A5918 /* RecordVideo */ = {
 			isa = PBXGroup;
 			children = (
-				25ACB8AA237C0019008A5918 /* Output */,
-				25ACB8A9237C0011008A5918 /* Input */,
+				251ECD6A237D29130053272E /* Video */,
+				251ECD69237D290D0053272E /* Audio */,
 				25ACB8A5237BABD8008A5918 /* PCMQueue */,
+				251ECD5D237CFE790053272E /* Consumer */,
 				25ACB870237BA824008A5918 /* AppDelegate.h */,
 				25ACB871237BA824008A5918 /* AppDelegate.m */,
 				25ACB876237BA824008A5918 /* ViewController.h */,
 				25ACB877237BA824008A5918 /* ViewController.m */,
+				251ECD6F237D4D1C0053272E /* CommonUtil.h */,
+				251ECD6E237D4D1C0053272E /* CommonUtil.m */,
 				25ACB879237BA824008A5918 /* Main.storyboard */,
 				25ACB87C237BA826008A5918 /* Assets.xcassets */,
 				25ACB87E237BA826008A5918 /* LaunchScreen.storyboard */,
@@ -145,20 +187,6 @@
 				25ACB8A7237BAC0A008A5918 /* BlockingQueue.hpp */,
 			);
 			path = PCMQueue;
-			sourceTree = "<group>";
-		};
-		25ACB8A9237C0011008A5918 /* Input */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Input;
-			sourceTree = "<group>";
-		};
-		25ACB8AA237C0019008A5918 /* Output */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Output;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -293,7 +321,11 @@
 			files = (
 				25ACB8A8237BAC0A008A5918 /* BlockingQueue.cpp in Sources */,
 				25ACB878237BA824008A5918 /* ViewController.m in Sources */,
+				251ECD65237D023E0053272E /* AVAudioSession+RouteUtils.m in Sources */,
+				251ECD68237D24470053272E /* BLAudioSession.m in Sources */,
 				25ACB872237BA824008A5918 /* AppDelegate.m in Sources */,
+				251ECD6D237D29450053272E /* AudioUnitInput.m in Sources */,
+				251ECD70237D4D1C0053272E /* CommonUtil.m in Sources */,
 				25ACB883237BA826008A5918 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
