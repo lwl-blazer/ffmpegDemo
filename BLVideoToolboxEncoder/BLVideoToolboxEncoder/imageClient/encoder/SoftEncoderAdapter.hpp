@@ -32,7 +32,7 @@ private:
     int videoBitRate;
     float frameRate;
     
-    
+
 public:
     //构造编码器实例
     void init(const char *h264Path, int width, int height, int videoBitRate, float frameRate);
