@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface AudioUnitInput : NSObject
 
-- (instancetype)initWithAccompanyPath:(NSString *)path;
+- (instancetype)initWithpath:(NSString *)path accompanyPath:(NSString *)accompanyPath;
 - (void)start;
 - (void)stop;
 

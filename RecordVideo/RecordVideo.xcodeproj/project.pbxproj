@@ -20,6 +20,7 @@
 		25ACB88D237BA826008A5918 /* RecordVideoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 25ACB88C237BA826008A5918 /* RecordVideoTests.m */; };
 		25ACB898237BA826008A5918 /* RecordVideoUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 25ACB897237BA826008A5918 /* RecordVideoUITests.m */; };
 		25ACB8A8237BAC0A008A5918 /* BlockingQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25ACB8A6237BAC0A008A5918 /* BlockingQueue.cpp */; };
+		25ED2BBF237E7281003A005B /* background.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 25ED2BBE237E7280003A005B /* background.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,6 +67,7 @@
 		25ACB899237BA826008A5918 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		25ACB8A6237BAC0A008A5918 /* BlockingQueue.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BlockingQueue.cpp; sourceTree = "<group>"; };
 		25ACB8A7237BAC0A008A5918 /* BlockingQueue.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = BlockingQueue.hpp; sourceTree = "<group>"; };
+		25ED2BBE237E7280003A005B /* background.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = background.mp3; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -158,6 +160,7 @@
 				25ACB87E237BA826008A5918 /* LaunchScreen.storyboard */,
 				25ACB881237BA826008A5918 /* Info.plist */,
 				25ACB882237BA826008A5918 /* main.m */,
+				25ED2BBE237E7280003A005B /* background.mp3 */,
 			);
 			path = RecordVideo;
 			sourceTree = "<group>";
@@ -292,6 +295,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				25ED2BBF237E7281003A005B /* background.mp3 in Resources */,
 				25ACB880237BA826008A5918 /* LaunchScreen.storyboard in Resources */,
 				25ACB87D237BA826008A5918 /* Assets.xcassets in Resources */,
 				25ACB87B237BA824008A5918 /* Main.storyboard in Resources */,

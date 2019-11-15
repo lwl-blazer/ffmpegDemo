@@ -21,14 +21,16 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.recoder = [[AudioUnitInput alloc] initWithAccompanyPath:[CommonUtil documentsPath:@"recorder.pcm"]];
+    self.recoder = [[AudioUnitInput alloc] initWithpath:[CommonUtil documentsPath:@"recorder.pcm"]
+                                          accompanyPath:[CommonUtil bundlePath:@"background" type:@"mp3"]];
 }
 
 - (IBAction)action:(UIButton *)sender {
-    
     sender.selected = !sender.selected;
     if (sender.selected) {
-        
+        [self.recoder start];
+    } else {
+        [self.recoder stop];
     }
 }
 
