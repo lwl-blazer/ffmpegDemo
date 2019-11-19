@@ -10,6 +10,7 @@
 #import "BLAudioSession.h"
 #import <AudioToolbox/AudioToolbox.h>
 #import <AVFoundation/AVFoundation.h>
+#include "BlockingQueue.hpp"
 
 static void CheckStatus(OSStatus status, NSString *message, BOOL fatal) {
     if (status != noErr) {
@@ -46,6 +47,11 @@ static const AudioUnitElement inputElement = 1;
 @property(nonatomic, assign) AUNode convertNode;
 @property(nonatomic, assign) AudioUnit convertUnit;
 
+@property(nonatomic, assign) AUNode c32fTo16iNode;
+@property(nonatomic, assign) AudioUnit c32fTo16iUnit;
+@property(nonatomic, assign) AUNode c16iTo32fNode;
+@property(nonatomic, assign) AudioUnit c16iTo32fUnit;
+
 @property(nonatomic, assign) Float64 sampleRate;
 
 @end
@@ -55,6 +61,7 @@ static const AudioUnitElement inputElement = 1;
 {
     NSString *_destinationFilePath;
     ExtAudioFileRef finalAudioFile;
+    BlockingQueue *packetPool;
 }
 
 - (instancetype)initWithpath:(NSString *)path accompanyPath:(NSString *)accompanyPath{
@@ -68,6 +75,8 @@ static const AudioUnitElement inputElement = 1;
         [[BLAudioSession sharedInstance] setPerferredSampleRate:_sampleRate];
         [[BLAudioSession sharedInstance] setActive:YES];
         [[BLAudioSession sharedInstance] addRouteChangeListener];
+        
+        packetPool = new BlockingQueue();
         
         [self addAudioSessionInterruptedObserver];
         [self createAudioUnitGraph];
@@ -134,6 +143,28 @@ static const AudioUnitElement inputElement = 1;
                    &playerDescription,
                    &_mPlayerNode);
     CheckStatus(status, @"Create file Player node faile", YES);
+    
+    AudioComponentDescription convert2Description;
+    bzero(&convertDescription, sizeof(convert2Description));
+    convert2Description.componentManufacturer = kAudioUnitManufacturer_Apple;
+    convert2Description.componentType = kAudioUnitType_FormatConverter;
+    convert2Description.componentSubType = kAudioUnitSubType_AUConverter;
+    status = AUGraphAddNode(_auGraph,
+                   &convert2Description,
+                   &_c32fTo16iNode);
+    CheckStatus(status, @"create c32to16 convert node faile", YES);
+    
+    
+    AudioComponentDescription convert3Description;
+    bzero(&convert3Description, sizeof(convert3Description));
+    convert3Description.componentManufacturer = kAudioUnitManufacturer_Apple;
+    convert3Description.componentType = kAudioUnitType_FormatConverter;
+    convert3Description.componentSubType = kAudioUnitSubType_AUConverter;
+    status = AUGraphAddNode(_auGraph,
+                            &convert3Description,
+                            &_c16iTo32fNode);
+    CheckStatus(status, @"create c16To32 convert node faile", YES);
+    
 }
 
 - (void)getUnitsFromNodes{
@@ -161,6 +192,20 @@ static const AudioUnitElement inputElement = 1;
                              NULL,
                              &_mPlayerUnit);
     CheckStatus(status, @"Could not retrieve node info file player node", YES);
+    
+    
+    status = AUGraphNodeInfo(_auGraph,
+                             _c32fTo16iNode,
+                             NULL,
+                             &_c32fTo16iUnit);
+    CheckStatus(status, @"Could not retrieve node info c32to16 convert node", YES);
+    
+    
+    status = AUGraphNodeInfo(_auGraph,
+                             _c16iTo32fNode,
+                             NULL,
+                             &_c16iTo32fUnit);
+    CheckStatus(status, @"Could not retrieve node info c16to32 convert node ", YES);
 }
 
 - (void)setAudioUnitProperties{
@@ -215,16 +260,66 @@ static const AudioUnitElement inputElement = 1;
                           kMultiChannelMixerParam_Volume,
                           kAudioUnitScope_Input,
                           0,
-                          1.0,
+                          0.5,
                           0);
     AudioUnitSetParameter(_mixerUnit,
                           kMultiChannelMixerParam_Volume,
                           kAudioUnitScope_Input,
                           1,
-                          0.5,
+                          1.0,
                           0);
+
+    //设置Float32转SInt16
+    UInt32 bytesPerSample1 = sizeof(Float32);
+    AudioStreamBasicDescription c16iFmt;
+    bzero(&c16iFmt, sizeof(c16iFmt));
+    
+    c16iFmt.mSampleRate = _sampleRate;
+    c16iFmt.mFormatID = kAudioFormatLinearPCM;
+    c16iFmt.mFormatFlags = kAudioFormatFlagIsSignedInteger | kAudioFormatFlagsNativeEndian | kAudioFormatFlagIsPacked | kAudioFormatFlagIsNonInterleaved;
+    c16iFmt.mBitsPerChannel = 8 * bytesPerSample1;
+    c16iFmt.mBytesPerFrame = bytesPerSample1;
+    c16iFmt.mBytesPerPacket = bytesPerSample1;
+    c16iFmt.mFramesPerPacket = 1;
+    c16iFmt.mChannelsPerFrame = 2;
+    AudioUnitSetProperty(_c32fTo16iUnit,
+                         kAudioUnitProperty_StreamFormat,
+                         kAudioUnitScope_Output,
+                         0,
+                         &c16iFmt,
+                         sizeof(c16iFmt));
+    AudioUnitSetProperty(_c16iTo32fUnit,
+                         kAudioUnitProperty_StreamFormat,
+                         kAudioUnitScope_Input,
+                         0,
+                         &c16iFmt,
+                         sizeof(c16iFmt));
     
     
+    UInt32 bytesPerSample2 = sizeof(SInt16);
+    AudioStreamBasicDescription c32fFmt;
+    c32fFmt.mSampleRate = _sampleRate;
+    c32fFmt.mFormatID = kAudioFormatLinearPCM;
+    
+    c32fFmt.mFormatFlags = kAudioFormatFlagIsSignedInteger | kAudioFormatFlagsNativeEndian | kAudioFormatFlagIsPacked | kAudioFormatFlagIsNonInterleaved;
+    c32fFmt.mBitsPerChannel = 8 * bytesPerSample2;
+    c32fFmt.mBytesPerFrame = bytesPerSample2;
+    c32fFmt.mBytesPerPacket = bytesPerSample2;
+    c32fFmt.mFramesPerPacket = 1;
+    c32fFmt.mChannelsPerFrame = 2;
+    AudioUnitSetProperty(_c32fTo16iUnit,
+                         kAudioUnitProperty_StreamFormat,
+                         kAudioUnitScope_Input,
+                         0,
+                         &c32fFmt,
+                         sizeof(c32fFmt));
+    
+    AudioUnitSetProperty(_c16iTo32fUnit,
+                         kAudioUnitProperty_StreamFormat,
+                         kAudioUnitScope_Output,
+                         0,
+                         &c32fFmt,
+                         sizeof(c32fFmt));
     
     //ASBD
     UInt32 bytesPerSample = sizeof(SInt32);
@@ -290,12 +385,40 @@ static OSStatus renderCallback(void *inRefCon,
                     inNumberFrames,
                     ioData);
     
+
+    //写文件操作
     result = ExtAudioFileWriteAsync(recorder->finalAudioFile,
                                     inNumberFrames,
                                     ioData);
     
     return result;
 }
+
+//在这个里面拿到数据就是SInt16格式 把数据封装成AudioPacket并放入到音频队列中
+static OSStatus mixerRenderNotify(void *inRefCon,
+                                  AudioUnitRenderActionFlags *ioActionFlags,
+                                  const AudioTimeStamp *inTimeStamp,
+                                  UInt32 inBusNumber,
+                                  UInt32 inNumberFrames,
+                                  AudioBufferList * __nullable ioData){
+    
+    AudioUnitInput *input = (__bridge AudioUnitInput *)inRefCon;
+    
+    OSStatus status = noErr;
+    
+    AudioBuffer buffer = ioData->mBuffers[0];
+    int sampleCount = buffer.mDataByteSize/2;
+    short *packetBuffer = new short[sampleCount];
+    memcpy(packetBuffer, buffer.mData, buffer.mDataByteSize);
+    
+    AudioPacket *audioPacket = new AudioPacket();
+    audioPacket->buffer = packetBuffer;
+    audioPacket->size = buffer.mDataByteSize / 2;
+    input->packetPool->put(audioPacket);
+    return status;
+} 
+
+
 
 - (AudioStreamBasicDescription )noninterleavedPCMFormatWithChannels:(UInt32)channels{
     UInt32 bytesPerSample = sizeof(SInt32);
@@ -348,8 +471,30 @@ static OSStatus renderCallback(void *inRefCon,
                                          0,
                                          &finalRenderCallback);
     CheckStatus(status, @"Could not set InputCallback For IONode", YES);
+    
+    /**
+     * RenderNotify 和 InputCallback 是不一样的
+     * InputCallback是当下一级节点需要数据的时候将会调用的方法，让配置的这个方法来填充数据
+     *
+     * RenderNotify是不同的调用机制，RenderNotify是在这个节点从它的上一级节点获取到数据之后才会调用该函数，可以让开发者做一些额外的操作(比如音频处理或者编码文件等)
+     */
+    AudioUnitAddRenderNotify(_c32fTo16iUnit,
+                             &mixerRenderNotify,
+                             (__bridge void *)self);
+    
+    AUGraphConnectNodeInput(_auGraph,
+                            _c32fTo16iNode,
+                            0,
+                            _c16iTo32fNode,
+                            0);
+    AUGraphConnectNodeInput(_auGraph,
+                            _c16iTo32fNode,
+                            0,
+                            _ioNode,
+                            0);
 }
 
+//下面的代码一定是要在AUGraphInitialize之后设置，否则不生效
 - (void)prepareWriteAccompanyFile:(NSString *)path{
     OSStatus status = noErr;
     //1.打开文件 并生成一个文件句柄AudioFileID
@@ -390,6 +535,7 @@ static OSStatus renderCallback(void *inRefCon,
                          sizeof(musicFile));
     CheckStatus(status, @"set up scheduled file ids", YES);
     
+    //Scheduled Audio File Region 是对于AudioFile进行访问计划的区域，其实该结构就是用来控制AudioFilePlayer的
     //5.指定从音频中读取数据的方式   （这里是指定要播放的范围比如是播放整个文件还是播放部分文件） 播放方式等
     ScheduledAudioFileRegion rgn;
     memset(&rgn.mTimeStamp, 0, sizeof(rgn.mTimeStamp));
@@ -400,7 +546,7 @@ static OSStatus renderCallback(void *inRefCon,
     rgn.mAudioFile = musicFile;  //要读取的文件句柄
     rgn.mLoopCount = -1 ; //是否循环播放  0不循环 -1 一直循环   其它值循环的次数
     rgn.mStartFrame = 0; //读取f的起始的frame索引
-    
+    //mStartTime  用来设置开始播放的时间，拖动(Seek)操作就是通过这个参数来设置的
     rgn.mFramesToPlay = (UInt32)nPackets * fileASBD.mFramesPerPacket; //从读取的起始frame 索引开始，总共要读取的frames数目
     
     //必须要调用完AUGraphInitialize 否则报错-10867
@@ -436,6 +582,8 @@ static OSStatus renderCallback(void *inRefCon,
                                   &startTime,
                                   sizeof(startTime));
     CheckStatus(status, @"kAudioUnitProperty_ScheduleStartTimeStamp ", YES);
+    
+    //在播放的过程中，可以通过获取kAudioUnitProperty_CurrentPlayTime来得到相对于所设置的开始时间的播放时长，从而计算出当前播放到的位置
 }
 
 - (void)prepareFinalWriteFile{
@@ -530,7 +678,7 @@ static OSStatus renderCallback(void *inRefCon,
 }
 
 - (void)onNotificationAudioInterrupted:(NSNotification *)sender{
-    AVAudioSessionInterruptionType interruption = [[[sender userInfo] objectForKey:AVAudioSessionInterruptionTypeKey] unsignedIntValue];
+    /*AVAudioSessionInterruptionType interruption = [[[sender userInfo] objectForKey:AVAudioSessionInterruptionTypeKey] unsignedIntValue];
     switch (interruption) {
         case AVAudioSessionInterruptionTypeBegan:
             [self stop];
@@ -540,7 +688,7 @@ static OSStatus renderCallback(void *inRefCon,
             break;
         default:
             break;
-    }
+    }*/
 }
 
 

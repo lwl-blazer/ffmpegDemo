@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		251ECD65237D023E0053272E /* AVAudioSession+RouteUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 251ECD64237D023E0053272E /* AVAudioSession+RouteUtils.m */; };
 		251ECD68237D24470053272E /* BLAudioSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 251ECD67237D24470053272E /* BLAudioSession.m */; };
-		251ECD6D237D29450053272E /* AudioUnitInput.m in Sources */ = {isa = PBXBuildFile; fileRef = 251ECD6C237D29450053272E /* AudioUnitInput.m */; };
+		251ECD6D237D29450053272E /* AudioUnitInput.mm in Sources */ = {isa = PBXBuildFile; fileRef = 251ECD6C237D29450053272E /* AudioUnitInput.mm */; };
 		251ECD70237D4D1C0053272E /* CommonUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 251ECD6E237D4D1C0053272E /* CommonUtil.m */; };
 		25ACB872237BA824008A5918 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 25ACB871237BA824008A5918 /* AppDelegate.m */; };
 		25ACB878237BA824008A5918 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 25ACB877237BA824008A5918 /* ViewController.m */; };
@@ -46,7 +46,7 @@
 		251ECD66237D24470053272E /* BLAudioSession.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BLAudioSession.h; sourceTree = "<group>"; };
 		251ECD67237D24470053272E /* BLAudioSession.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BLAudioSession.m; sourceTree = "<group>"; };
 		251ECD6B237D29450053272E /* AudioUnitInput.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AudioUnitInput.h; sourceTree = "<group>"; };
-		251ECD6C237D29450053272E /* AudioUnitInput.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioUnitInput.m; sourceTree = "<group>"; };
+		251ECD6C237D29450053272E /* AudioUnitInput.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AudioUnitInput.mm; sourceTree = "<group>"; };
 		251ECD6E237D4D1C0053272E /* CommonUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CommonUtil.m; path = "../../AudioUnit-EarFoldback/AudioUnit-EarFoldback/audio_output/CommonUtil.m"; sourceTree = "<group>"; };
 		251ECD6F237D4D1C0053272E /* CommonUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CommonUtil.h; path = "../../AudioUnit-EarFoldback/AudioUnit-EarFoldback/audio_output/CommonUtil.h"; sourceTree = "<group>"; };
 		25ACB86D237BA824008A5918 /* RecordVideo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RecordVideo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -110,7 +110,7 @@
 				251ECD66237D24470053272E /* BLAudioSession.h */,
 				251ECD67237D24470053272E /* BLAudioSession.m */,
 				251ECD6B237D29450053272E /* AudioUnitInput.h */,
-				251ECD6C237D29450053272E /* AudioUnitInput.m */,
+				251ECD6C237D29450053272E /* AudioUnitInput.mm */,
 			);
 			path = Audio;
 			sourceTree = "<group>";
@@ -328,7 +328,7 @@
 				251ECD65237D023E0053272E /* AVAudioSession+RouteUtils.m in Sources */,
 				251ECD68237D24470053272E /* BLAudioSession.m in Sources */,
 				25ACB872237BA824008A5918 /* AppDelegate.m in Sources */,
-				251ECD6D237D29450053272E /* AudioUnitInput.m in Sources */,
+				251ECD6D237D29450053272E /* AudioUnitInput.mm in Sources */,
 				251ECD70237D4D1C0053272E /* CommonUtil.m in Sources */,
 				25ACB883237BA826008A5918 /* main.m in Sources */,
 			);
