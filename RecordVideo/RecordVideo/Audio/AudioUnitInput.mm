@@ -401,10 +401,19 @@ static OSStatus mixerRenderNotify(void *inRefCon,
                                   UInt32 inBusNumber,
                                   UInt32 inNumberFrames,
                                   AudioBufferList * __nullable ioData){
-    
-    AudioUnitInput *input = (__bridge AudioUnitInput *)inRefCon;
-    
     OSStatus status = noErr;
+    AudioUnitInput *recorder = (__bridge AudioUnitInput *)inRefCon;
+    AudioUnitRender(recorder->_mixerUnit,
+                    ioActionFlags,
+                    inTimeStamp,
+                    0,
+                    inNumberFrames,
+                    ioData);
+    
+    /*
+    
+    
+    
     
     AudioBuffer buffer = ioData->mBuffers[0];
     int sampleCount = buffer.mDataByteSize/2;
@@ -414,11 +423,9 @@ static OSStatus mixerRenderNotify(void *inRefCon,
     AudioPacket *audioPacket = new AudioPacket();
     audioPacket->buffer = packetBuffer;
     audioPacket->size = buffer.mDataByteSize / 2;
-    input->packetPool->put(audioPacket);
+    input->packetPool->put(audioPacket);*/
     return status;
 } 
-
-
 
 - (AudioStreamBasicDescription )noninterleavedPCMFormatWithChannels:(UInt32)channels{
     UInt32 bytesPerSample = sizeof(SInt32);
@@ -461,7 +468,7 @@ static OSStatus mixerRenderNotify(void *inRefCon,
                                      1);
     CheckStatus(status, @"Could not connect file node input to mixer node input", YES);
     
-    
+    /*
     AURenderCallbackStruct finalRenderCallback;
     finalRenderCallback.inputProc = &renderCallback;
     finalRenderCallback.inputProcRefCon = (__bridge void *)self;
@@ -471,6 +478,28 @@ static OSStatus mixerRenderNotify(void *inRefCon,
                                          0,
                                          &finalRenderCallback);
     CheckStatus(status, @"Could not set InputCallback For IONode", YES);
+    */
+    
+//    status = AUGraphConnectNodeInput(_auGraph,
+//                                     _mixerNode,
+//                                     0,
+//                                     _c32fTo16iNode,
+//                                     1);
+//    CheckStatus(status, @"could not set mixernode to c32fto16iNode", YES);
+    
+    status = AUGraphConnectNodeInput(_auGraph,
+                                     _c32fTo16iNode,
+                                     0,
+                                     _c16iTo32fNode,
+                                     0);
+    CheckStatus(status, @"Could not set _c32fto16iNode", YES);
+    
+    status = AUGraphConnectNodeInput(_auGraph,
+                                     _c16iTo32fNode,
+                                     0,
+                                     _ioNode,
+                                     0);
+    CheckStatus(status, @"could not set _c16iTo32fNode", YES);
     
     /**
      * RenderNotify 和 InputCallback 是不一样的
@@ -478,20 +507,10 @@ static OSStatus mixerRenderNotify(void *inRefCon,
      *
      * RenderNotify是不同的调用机制，RenderNotify是在这个节点从它的上一级节点获取到数据之后才会调用该函数，可以让开发者做一些额外的操作(比如音频处理或者编码文件等)
      */
-    AudioUnitAddRenderNotify(_c32fTo16iUnit,
+    status = AudioUnitAddRenderNotify(_c32fTo16iUnit,
                              &mixerRenderNotify,
                              (__bridge void *)self);
-    
-    AUGraphConnectNodeInput(_auGraph,
-                            _c32fTo16iNode,
-                            0,
-                            _c16iTo32fNode,
-                            0);
-    AUGraphConnectNodeInput(_auGraph,
-                            _c16iTo32fNode,
-                            0,
-                            _ioNode,
-                            0);
+    CheckStatus(status, @"Could not set _c32fto16iUnit renderNotify", YES);
 }
 
 //下面的代码一定是要在AUGraphInitialize之后设置，否则不生效
@@ -678,17 +697,18 @@ static OSStatus mixerRenderNotify(void *inRefCon,
 }
 
 - (void)onNotificationAudioInterrupted:(NSNotification *)sender{
-    /*AVAudioSessionInterruptionType interruption = [[[sender userInfo] objectForKey:AVAudioSessionInterruptionTypeKey] unsignedIntValue];
-    switch (interruption) {
-        case AVAudioSessionInterruptionTypeBegan:
-            [self stop];
-            break;
-        case AVAudioSessionInterruptionTypeEnded:
-            [self start];
-            break;
-        default:
-            break;
-    }*/
+   NSString *info = [[sender userInfo] objectForKey:AVAudioSessionInterruptionTypeKey];
+    AVAudioSessionInterruptionType interruption;
+//    switch (interruption) {
+//        case AVAudioSessionInterruptionTypeBegan:
+//            [self stop];
+//            break;
+//        case AVAudioSessionInterruptionTypeEnded:
+//            [self start];
+//            break;
+//        default:
+//            break;
+//    }
 }
 
 
@@ -715,7 +735,7 @@ static OSStatus mixerRenderNotify(void *inRefCon,
 #pragma mark -- public method
 
 - (void)start{
-    [self prepareFinalWriteFile];
+    //[self prepareFinalWriteFile];
     OSStatus status = AUGraphStart(_auGraph);
     CheckStatus(status, @"Could not start AUGraph", YES);
 }
