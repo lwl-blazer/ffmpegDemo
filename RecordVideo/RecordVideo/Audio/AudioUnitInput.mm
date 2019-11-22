@@ -38,20 +38,21 @@ static const AudioUnitElement inputElement = 1;
 @property(nonatomic, assign) AUNode ioNode;
 @property(nonatomic, assign) AudioUnit ioUnit;
 
-@property(nonatomic, assign) AUNode mPlayerNode;
-@property(nonatomic, assign) AudioUnit mPlayerUnit;
-
 @property(nonatomic, assign) AUNode mixerNode;
 @property(nonatomic, assign) AudioUnit mixerUnit;
 
 @property(nonatomic, assign) AUNode convertNode;
 @property(nonatomic, assign) AudioUnit convertUnit;
 
+/*
+@property(nonatomic, assign) AUNode mPlayerNode;
+@property(nonatomic, assign) AudioUnit mPlayerUnit;
+ 
 @property(nonatomic, assign) AUNode c32fTo16iNode;
 @property(nonatomic, assign) AudioUnit c32fTo16iUnit;
 @property(nonatomic, assign) AUNode c16iTo32fNode;
 @property(nonatomic, assign) AudioUnit c16iTo32fUnit;
-
+*/
 @property(nonatomic, assign) Float64 sampleRate;
 
 @end
@@ -80,7 +81,7 @@ static const AudioUnitElement inputElement = 1;
         
         [self addAudioSessionInterruptedObserver];
         [self createAudioUnitGraph];
-        [self prepareWriteAccompanyFile:accompanyPath];
+        //[self prepareWriteAccompanyFile:accompanyPath];
     }
     return self;
 }
@@ -134,6 +135,7 @@ static const AudioUnitElement inputElement = 1;
                             &_mixerNode);
     CheckStatus(status, @"Create mixer node faile", YES);
     
+    /*
     AudioComponentDescription playerDescription;
     bzero(&playerDescription, sizeof(playerDescription));
     playerDescription.componentManufacturer = kAudioUnitManufacturer_Apple;
@@ -164,7 +166,7 @@ static const AudioUnitElement inputElement = 1;
                             &convert3Description,
                             &_c16iTo32fNode);
     CheckStatus(status, @"create c16To32 convert node faile", YES);
-    
+    */
 }
 
 - (void)getUnitsFromNodes{
@@ -187,6 +189,7 @@ static const AudioUnitElement inputElement = 1;
                              &_mixerUnit);
     CheckStatus(status, @"Could not retrieve node info mixer node", YES);
     
+    /*
     status = AUGraphNodeInfo(_auGraph,
                              _mPlayerNode,
                              NULL,
@@ -205,7 +208,7 @@ static const AudioUnitElement inputElement = 1;
                              _c16iTo32fNode,
                              NULL,
                              &_c16iTo32fUnit);
-    CheckStatus(status, @"Could not retrieve node info c16to32 convert node ", YES);
+    CheckStatus(status, @"Could not retrieve node info c16to32 convert node ", YES);*/
 }
 
 - (void)setAudioUnitProperties{
@@ -229,7 +232,7 @@ static const AudioUnitElement inputElement = 1;
                                   sizeof(enableIO));
     CheckStatus( status, @"Could not enable I/O on I/O unit input scope", YES);
     
-    UInt32 mixerElementCount = 2;
+    UInt32 mixerElementCount = 1;
     status = AudioUnitSetProperty(_mixerUnit,
                                   kAudioUnitProperty_ElementCount,
                                   kAudioUnitScope_Input,
@@ -256,7 +259,7 @@ static const AudioUnitElement inputElement = 1;
                          sizeof(maximumFramesPerSlice));
     
     /**设置各路混合后的音量*/
-    AudioUnitSetParameter(_mixerUnit,
+    /*AudioUnitSetParameter(_mixerUnit,
                           kMultiChannelMixerParam_Volume,
                           kAudioUnitScope_Input,
                           0,
@@ -267,8 +270,9 @@ static const AudioUnitElement inputElement = 1;
                           kAudioUnitScope_Input,
                           1,
                           1.0,
-                          0);
+                          0);*/
 
+    /*
     //设置Float32转SInt16
     UInt32 bytesPerSample1 = sizeof(Float32);
     AudioStreamBasicDescription c16iFmt;
@@ -320,6 +324,7 @@ static const AudioUnitElement inputElement = 1;
                          0,
                          &c32fFmt,
                          sizeof(c32fFmt));
+    */
     
     //ASBD
     UInt32 bytesPerSample = sizeof(SInt32);
@@ -360,13 +365,13 @@ static const AudioUnitElement inputElement = 1;
                          0,
                          &_clientFormat32float,
                          sizeof(_clientFormat32float));
-    
+    /*
     AudioUnitSetProperty(_mPlayerUnit,
                          kAudioUnitProperty_StreamFormat,
                          kAudioUnitScope_Output,
                          0,
                          &_clientFormat32float,
-                         sizeof(_clientFormat32float));
+                         sizeof(_clientFormat32float));*/
 }
 
 static OSStatus renderCallback(void *inRefCon,
@@ -460,15 +465,15 @@ static OSStatus mixerRenderNotify(void *inRefCon,
                                      _mixerNode,
                                      0);
     CheckStatus(status, @"Could not connect I/O node input to mixer node input", YES);
-    
+    /*
     status = AUGraphConnectNodeInput(_auGraph,
                                      _mPlayerNode,
                                      0,
                                      _mixerNode,
                                      1);
     CheckStatus(status, @"Could not connect file node input to mixer node input", YES);
+    */
     
-    /*
     AURenderCallbackStruct finalRenderCallback;
     finalRenderCallback.inputProc = &renderCallback;
     finalRenderCallback.inputProcRefCon = (__bridge void *)self;
@@ -478,7 +483,7 @@ static OSStatus mixerRenderNotify(void *inRefCon,
                                          0,
                                          &finalRenderCallback);
     CheckStatus(status, @"Could not set InputCallback For IONode", YES);
-    */
+    
     
 //    status = AUGraphConnectNodeInput(_auGraph,
 //                                     _mixerNode,
@@ -486,7 +491,7 @@ static OSStatus mixerRenderNotify(void *inRefCon,
 //                                     _c32fTo16iNode,
 //                                     1);
 //    CheckStatus(status, @"could not set mixernode to c32fto16iNode", YES);
-    
+    /*
     status = AUGraphConnectNodeInput(_auGraph,
                                      _c32fTo16iNode,
                                      0,
@@ -500,21 +505,23 @@ static OSStatus mixerRenderNotify(void *inRefCon,
                                      _ioNode,
                                      0);
     CheckStatus(status, @"could not set _c16iTo32fNode", YES);
-    
+    */
     /**
      * RenderNotify 和 InputCallback 是不一样的
      * InputCallback是当下一级节点需要数据的时候将会调用的方法，让配置的这个方法来填充数据
      *
      * RenderNotify是不同的调用机制，RenderNotify是在这个节点从它的上一级节点获取到数据之后才会调用该函数，可以让开发者做一些额外的操作(比如音频处理或者编码文件等)
      */
+    /*
     status = AudioUnitAddRenderNotify(_c32fTo16iUnit,
                              &mixerRenderNotify,
                              (__bridge void *)self);
-    CheckStatus(status, @"Could not set _c32fto16iUnit renderNotify", YES);
+    CheckStatus(status, @"Could not set _c32fto16iUnit renderNotify", YES);*/
 }
 
 //下面的代码一定是要在AUGraphInitialize之后设置，否则不生效
 - (void)prepareWriteAccompanyFile:(NSString *)path{
+    
     OSStatus status = noErr;
     //1.打开文件 并生成一个文件句柄AudioFileID
     AudioFileID musicFile;
@@ -546,12 +553,12 @@ static OSStatus mixerRenderNotify(void *inRefCon,
     CheckStatus(status, @"get AUFile packet count", YES);
     
     //4.指定要播放的文件句柄 要把该文件加入指定的AudioUnit中
-    status = AudioUnitSetProperty(_mPlayerUnit,
-                         kAudioUnitProperty_ScheduledFileIDs,
-                         kAudioUnitScope_Global,
-                         0,
-                         &musicFile,
-                         sizeof(musicFile));
+//    status = AudioUnitSetProperty(_mPlayerUnit,
+//                         kAudioUnitProperty_ScheduledFileIDs,
+//                         kAudioUnitScope_Global,
+//                         0,
+//                         &musicFile,
+//                         sizeof(musicFile));
     CheckStatus(status, @"set up scheduled file ids", YES);
     
     //Scheduled Audio File Region 是对于AudioFile进行访问计划的区域，其实该结构就是用来控制AudioFilePlayer的
@@ -569,23 +576,23 @@ static OSStatus mixerRenderNotify(void *inRefCon,
     rgn.mFramesToPlay = (UInt32)nPackets * fileASBD.mFramesPerPacket; //从读取的起始frame 索引开始，总共要读取的frames数目
     
     //必须要调用完AUGraphInitialize 否则报错-10867
-    status = AudioUnitSetProperty(_mPlayerUnit,
-                                  kAudioUnitProperty_ScheduledFileRegion,
-                                  kAudioUnitScope_Global,
-                                  0,
-                                  &rgn,
-                                  sizeof(rgn));
+//    status = AudioUnitSetProperty(_mPlayerUnit,
+//                                  kAudioUnitProperty_ScheduledFileRegion,
+//                                  kAudioUnitScope_Global,
+//                                  0,
+//                                  &rgn,
+//                                  sizeof(rgn));
     CheckStatus(status, @"set audio file play fileRegion", YES);
     
     //指定从音频文件中读取音频数据的行为，必须读取指定的frames数(也就是defaultVal设置的值，如果为0表示采用系统默认的值)才返回，否则就等待
     //这一步一定要在上一步之后设定
     UInt32 defaultVal = 0;
-   status = AudioUnitSetProperty(_mPlayerUnit,
-                         kAudioUnitProperty_ScheduledFilePrime,
-                         kAudioUnitScope_Global,
-                         0,
-                         &defaultVal,
-                         sizeof(defaultVal));
+//   status = AudioUnitSetProperty(_mPlayerUnit,
+//                         kAudioUnitProperty_ScheduledFilePrime,
+//                         kAudioUnitScope_Global,
+//                         0,
+//                         &defaultVal,
+//                         sizeof(defaultVal));
     CheckStatus(status, @"kAudioUnitProperty_ScheduledFilePrime faile", YES);
     
     
@@ -594,12 +601,12 @@ static OSStatus mixerRenderNotify(void *inRefCon,
            0, sizeof(startTime));
     startTime.mFlags = kAudioTimeStampSampleTimeValid; //要想mSampleTime有效，要这样设定
     startTime.mSampleTime = -1; //表示means next render cycle 否则按这个指定的数值
-    status = AudioUnitSetProperty(_mPlayerUnit,
-                                  kAudioUnitProperty_ScheduleStartTimeStamp,
-                                  kAudioUnitScope_Global,
-                                  0,
-                                  &startTime,
-                                  sizeof(startTime));
+//    status = AudioUnitSetProperty(_mPlayerUnit,
+//                                  kAudioUnitProperty_ScheduleStartTimeStamp,
+//                                  kAudioUnitScope_Global,
+//                                  0,
+//                                  &startTime,
+//                                  sizeof(startTime));
     CheckStatus(status, @"kAudioUnitProperty_ScheduleStartTimeStamp ", YES);
     
     //在播放的过程中，可以通过获取kAudioUnitProperty_CurrentPlayTime来得到相对于所设置的开始时间的播放时长，从而计算出当前播放到的位置
@@ -698,17 +705,17 @@ static OSStatus mixerRenderNotify(void *inRefCon,
 
 - (void)onNotificationAudioInterrupted:(NSNotification *)sender{
    NSString *info = [[sender userInfo] objectForKey:AVAudioSessionInterruptionTypeKey];
-    AVAudioSessionInterruptionType interruption;
-//    switch (interruption) {
-//        case AVAudioSessionInterruptionTypeBegan:
-//            [self stop];
-//            break;
-//        case AVAudioSessionInterruptionTypeEnded:
-//            [self start];
-//            break;
-//        default:
-//            break;
-//    }
+    AVAudioSessionInterruptionType interruption = (AVAudioSessionInterruptionType)info.integerValue;
+    switch (interruption) {
+        case AVAudioSessionInterruptionTypeBegan:
+            [self stop];
+            break;
+        case AVAudioSessionInterruptionTypeEnded:
+            [self start];
+            break;
+        default:
+            break;
+    }
 }
 
 
@@ -735,7 +742,7 @@ static OSStatus mixerRenderNotify(void *inRefCon,
 #pragma mark -- public method
 
 - (void)start{
-    //[self prepareFinalWriteFile];
+    [self prepareFinalWriteFile];
     OSStatus status = AUGraphStart(_auGraph);
     CheckStatus(status, @"Could not start AUGraph", YES);
 }
