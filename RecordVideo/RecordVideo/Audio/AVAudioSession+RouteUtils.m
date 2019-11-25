@@ -9,7 +9,7 @@
 #import "AVAudioSession+RouteUtils.h"
 
 @implementation AVAudioSession (RouteUtils)
-
+//蓝牙设备
 - (BOOL)usingBlueTooth{
     //输入
     NSArray *inputs = self.currentRoute.inputs;

@@ -28,8 +28,7 @@ const NSTimeInterval AUSAudioSessionLatency_LowLatency = 0.0058;
 {
     self = [super init];
     if (self) {
-        self.perferredSampleRate = 44100;
-        _currentSampleRate = 44100;
+        self.perferredSampleRate = 44100.0;
         self.audioSession = [AVAudioSession sharedInstance];
     }
     return self;
@@ -40,8 +39,10 @@ const NSTimeInterval AUSAudioSessionLatency_LowLatency = 0.0058;
     _category = category;
     NSError *error = nil;
     
-    if (![self.audioSession setCategory:category
-                                  error:&error]) {
+    [self.audioSession setCategory:category
+                             error:&error];
+    
+    if (error) {
         NSLog(@"Could note set category on audio session:%@", error.localizedDescription);
     }
 }
@@ -51,14 +52,16 @@ const NSTimeInterval AUSAudioSessionLatency_LowLatency = 0.0058;
  
     //设置采样频率、让硬件设置按照设置的采样频率来采集或者播放音频
     NSError *error = nil;
-    if (![self.audioSession setPreferredSampleRate:self.perferredSampleRate
-                                             error:&error]) {
+    [self.audioSession setPreferredSampleRate:self.perferredSampleRate
+                                        error:&error];
+    if (error) {
         NSLog(@"Error when setting sample rate on audio session:%@", error.localizedDescription);
     }
     
     //当设置完毕所有的参数之后就可以激活AudioSession
-    if (![self.audioSession setActive:active
-                                error:&error]) {
+    [self.audioSession setActive:active
+                           error:&error];
+    if (error) {
         NSLog(@"Error when setting active state of audio session:%@", error.localizedDescription);
     }
     _currentSampleRate = [self.audioSession sampleRate];
@@ -67,8 +70,9 @@ const NSTimeInterval AUSAudioSessionLatency_LowLatency = 0.0058;
 - (void)setPreferredLatency:(NSTimeInterval)preferredLatency{
     _preferredLatency = preferredLatency;
     NSError *error = nil;
-    if (![self.audioSession setPreferredIOBufferDuration:preferredLatency
-                                                   error:&error]) {
+    [self.audioSession setPreferredIOBufferDuration:preferredLatency
+                                              error:&error];
+    if (error) {
         NSLog(@"Error when setting preferred I/O buffer duration");
     }
 }
@@ -93,10 +97,12 @@ const NSTimeInterval AUSAudioSessionLatency_LowLatency = 0.0058;
 - (void)adjustOnRouteChange{
     AVAudioSessionRouteDescription *currentRoute = [[AVAudioSession sharedInstance] currentRoute];
     if (currentRoute) {
-        if (![[AVAudioSession sharedInstance] usingWiredMicrophone]) {
+        if ([[AVAudioSession sharedInstance] usingWiredMicrophone]) {
             
         } else {
-            if (![[AVAudioSession sharedInstance] usingBlueTooth]) {
+            if ([[AVAudioSession sharedInstance] usingBlueTooth]) {
+                
+            } else {
                 [[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker
                                                                    error:nil];
             }

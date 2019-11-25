@@ -704,8 +704,8 @@ static OSStatus mixerRenderNotify(void *inRefCon,
 }
 
 - (void)onNotificationAudioInterrupted:(NSNotification *)sender{
-   NSString *info = [[sender userInfo] objectForKey:AVAudioSessionInterruptionTypeKey];
-    AVAudioSessionInterruptionType interruption = (AVAudioSessionInterruptionType)info.integerValue;
+    /*NSString *info = [[sender userInfo] objectForKey:AVAudioSessionInterruptionTypeKey] ;
+    AVAudioSessionInterruptionType interruption = [[[sender userInfo] objectForKey:AVAudioSessionInterruptionTypeKey] integerValue];
     switch (interruption) {
         case AVAudioSessionInterruptionTypeBegan:
             [self stop];
@@ -715,7 +715,7 @@ static OSStatus mixerRenderNotify(void *inRefCon,
             break;
         default:
             break;
-    }
+    }*/
 }
 
 
