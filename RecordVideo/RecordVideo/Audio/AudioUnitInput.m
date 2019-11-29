@@ -10,7 +10,7 @@
 #import "BLAudioSession.h"
 #import <AudioToolbox/AudioToolbox.h>
 #import <AVFoundation/AVFoundation.h>
-#include "BlockingQueue.hpp"
+//#include "BlockingQueue.hpp"
 
 static void CheckStatus(OSStatus status, NSString *message, BOOL fatal) {
     if (status != noErr) {
@@ -62,7 +62,7 @@ static const AudioUnitElement inputElement = 1;
 {
     NSString *_destinationFilePath;
     ExtAudioFileRef finalAudioFile;
-    BlockingQueue *packetPool;
+    //BlockingQueue *packetPool;
 }
 
 - (instancetype)initWithpath:(NSString *)path accompanyPath:(NSString *)accompanyPath{
@@ -77,7 +77,7 @@ static const AudioUnitElement inputElement = 1;
         [[BLAudioSession sharedInstance] setActive:YES];
         [[BLAudioSession sharedInstance] addRouteChangeListener];
         
-        packetPool = new BlockingQueue();
+        //packetPool = new BlockingQueue();
         
         [self addAudioSessionInterruptedObserver];
         [self createAudioUnitGraph];
@@ -679,7 +679,6 @@ static OSStatus mixerRenderNotify(void *inRefCon,
 }
 
 - (void)onNotificationAudioInterrupted:(NSNotification *)sender{
-    /*NSString *info = [[sender userInfo] objectForKey:AVAudioSessionInterruptionTypeKey] ;
     AVAudioSessionInterruptionType interruption = [[[sender userInfo] objectForKey:AVAudioSessionInterruptionTypeKey] integerValue];
     switch (interruption) {
         case AVAudioSessionInterruptionTypeBegan:
@@ -690,7 +689,7 @@ static OSStatus mixerRenderNotify(void *inRefCon,
             break;
         default:
             break;
-    }*/
+    }
 }
 
 
