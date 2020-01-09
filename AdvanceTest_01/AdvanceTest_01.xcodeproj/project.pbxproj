@@ -7,8 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		25095D1923AA12D800E772C7 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 25A79ACE22F297BF00D3ED8F /* libz.tbd */; };
 		2533F74822F03165002AA676 /* libmp3lame.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2533F74722F03165002AA676 /* libmp3lame.a */; };
 		2533F74B22F040B1002AA676 /* test.pcm in Resources */ = {isa = PBXBuildFile; fileRef = 2533F74A22F040B1002AA676 /* test.pcm */; };
+		253ADAF923C716D8009D88DB /* I love My Daddy .mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 253ADAF823C716D8009D88DB /* I love My Daddy .mp3 */; };
+		253ADAFB23C717B8009D88DB /* SomeoneLikeYou.wav in Resources */ = {isa = PBXBuildFile; fileRef = 253ADAFA23C717B8009D88DB /* SomeoneLikeYou.wav */; };
 		25A79AC422F2749C00D3ED8F /* accompany_decoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25A79AC222F2749C00D3ED8F /* accompany_decoder.cpp */; };
 		25A79AC722F274CF00D3ED8F /* accompany_decoder_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25A79AC522F274CF00D3ED8F /* accompany_decoder_controller.cpp */; };
 		25A79AC922F2972200D3ED8F /* VideoToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25A79AC822F2972200D3ED8F /* VideoToolbox.framework */; };
@@ -59,6 +62,8 @@
 		2533F74722F03165002AA676 /* libmp3lame.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmp3lame.a; path = "../lib-lame/libmp3lame.a"; sourceTree = "<group>"; };
 		2533F74922F03193002AA676 /* lame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lame.h; path = "../../lib-lame/lame.h"; sourceTree = "<group>"; };
 		2533F74A22F040B1002AA676 /* test.pcm */ = {isa = PBXFileReference; lastKnownFileType = file; name = test.pcm; path = "../../lib-lame/test.pcm"; sourceTree = "<group>"; };
+		253ADAF823C716D8009D88DB /* I love My Daddy .mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "I love My Daddy .mp3"; sourceTree = "<group>"; };
+		253ADAFA23C717B8009D88DB /* SomeoneLikeYou.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = SomeoneLikeYou.wav; sourceTree = "<group>"; };
 		25A79AC222F2749C00D3ED8F /* accompany_decoder.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = accompany_decoder.cpp; sourceTree = "<group>"; };
 		25A79AC322F2749C00D3ED8F /* accompany_decoder.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = accompany_decoder.hpp; sourceTree = "<group>"; };
 		25A79AC522F274CF00D3ED8F /* accompany_decoder_controller.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = accompany_decoder_controller.cpp; sourceTree = "<group>"; };
@@ -109,6 +114,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				25095D1923AA12D800E772C7 /* libz.tbd in Frameworks */,
 				25B583BD233313EF008D3756 /* libiconv.2.4.0.tbd in Frameworks */,
 				25A79AD522F297E000D3ED8F /* CoreMedia.framework in Frameworks */,
 				25A79AD122F297C600D3ED8F /* libbz2.tbd in Frameworks */,
@@ -192,7 +198,9 @@
 			isa = PBXGroup;
 			children = (
 				2533F74A22F040B1002AA676 /* test.pcm */,
+				253ADAFA23C717B8009D88DB /* SomeoneLikeYou.wav */,
 				25A79AD622F2991E00D3ED8F /* 131.aac */,
+				253ADAF823C716D8009D88DB /* I love My Daddy .mp3 */,
 				2533F74922F03193002AA676 /* lame.h */,
 				25BB94B822EEEFE500A63950 /* AppDelegate.h */,
 				25BB94B922EEEFE500A63950 /* AppDelegate.m */,
@@ -339,6 +347,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				25BB94C522EEEFE900A63950 /* LaunchScreen.storyboard in Resources */,
+				253ADAF923C716D8009D88DB /* I love My Daddy .mp3 in Resources */,
+				253ADAFB23C717B8009D88DB /* SomeoneLikeYou.wav in Resources */,
 				25BB94C222EEEFE900A63950 /* Assets.xcassets in Resources */,
 				2533F74B22F040B1002AA676 /* test.pcm in Resources */,
 				25BB94C022EEEFE500A63950 /* Main.storyboard in Resources */,

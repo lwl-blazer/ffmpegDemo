@@ -57,7 +57,7 @@
 
 - (IBAction)aac2pcmAction:(id)sender {
     NSLog(@"decode Test...");
-    const char* mp3FilePath = [[CommonUtil bundlePath:@"131" type:@"aac"] cStringUsingEncoding:NSUTF8StringEncoding];
+    const char* mp3FilePath = [[CommonUtil bundlePath:@"SomeoneLikeYou" type:@"wav"] cStringUsingEncoding:NSUTF8StringEncoding];
     const char *pcmFilePath = [[CommonUtil documentsPath:@"131.pcm"] cStringUsingEncoding:NSUTF8StringEncoding];
     printf("%s\n", pcmFilePath);
     

@@ -210,12 +210,40 @@ int DecoderAction::readFrame(){
                             break;
                         }
                         audioData = swrBuffer;
-                    } else {
-                        if (avCodecContext->sample_fmt == AV_SAMPLE_FMT_S16) {
-                            printf("bucheck, audio format is invalid\n");
-                            ret = -1;
-                            break;
-                        }
+                    } else { //WAV格式的会走在这里
+                        /**
+                         * WAVE(.wav)与PCM
+                         * WAV格式的实质就是在PCM文件的前面加一个文件头。
+                         * WAVE文件是RIFF格式的文件，其基本块名称是"WAVE"，其中包含了两个子块"fmt"和“data”.从编程的角度简单来说就是由WAVE_HEADER,WAVE_FMT,WAVE_DATA，采样数据(PCM数据)共4个部分组成。结构如下:
+                         *
+                         * 在写入WAVE文件头的时候给其中的每个字段赋上合适的值就可以了。但是有一点需要注意:WAVE_HEADER和WAVE_DATA中包含一个文件长度信息的dwSize字段，该字段的值必须在写入完音频采样数据之后才能获得。因此这两个结构体最后才写入WAVE文件中
+                         */
+                        typedef struct WAVE_HEADER{
+                            char fccID[4];
+                            unsigned long dwSize;
+                            char fccType[4];
+                        }WAVE_HEADER;
+                        
+                        typedef struct WAVE_FMT{
+                            char fccID[4];
+                            unsigned long dwSize;
+                            unsigned short wFormatTag;
+                            unsigned short wChannels;
+                            unsigned long dwSamplesPerSec;
+                            unsigned long dwAvgBytesPerSec;
+                            unsigned short wBlockAlign;
+                            unsigned short uiBitsPerSample;
+                        }WAVE_FMT;
+                        
+                        typedef struct WAVE_DATA{
+                            char fccID[4];
+                            unsigned long dwSize;
+                        }WAVE_DATA;
+//                        if (avCodecContext->sample_fmt == AV_SAMPLE_FMT_S16) {
+//                            printf("bucheck, audio format is invalid\n");
+//                            ret = -1;
+//                            break;
+//                        }
                         audioData = pAudioFrame->data[0];
                         numFrames = pAudioFrame->nb_samples;
                     }

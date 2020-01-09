@@ -70,7 +70,7 @@ static const AudioUnitElement inputElement = 1;
     if (self) {
         _sampleRate = 44100.0;
         _destinationFilePath = path;
-        
+    
         NSLog(@"%@", path);
         [[BLAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord];
         [[BLAudioSession sharedInstance] setPerferredSampleRate:_sampleRate];
@@ -105,6 +105,7 @@ static const AudioUnitElement inputElement = 1;
 
 - (void)addAudioUnitNodes{
     OSStatus status = noErr;
+    //Remote IO
     AudioComponentDescription ioDescription;
     bzero(&ioDescription, sizeof(ioDescription));
     ioDescription.componentType = kAudioUnitType_Output;
@@ -115,6 +116,7 @@ static const AudioUnitElement inputElement = 1;
                             &_ioNode);
     CheckStatus(status, @"create io node faile", YES);
     
+    //转换
     AudioComponentDescription convertDescription;
     bzero(&convertDescription, sizeof(convertDescription));
     convertDescription.componentType = kAudioUnitType_FormatConverter;
@@ -125,6 +127,7 @@ static const AudioUnitElement inputElement = 1;
                             &_convertNode);
     CheckStatus(status, @"Create convert node faile", YES);
     
+    //混合
     AudioComponentDescription mixerDescription;
     bzero(&mixerDescription, sizeof(mixerDescription));
     mixerDescription.componentType = kAudioUnitType_Mixer;
@@ -136,6 +139,7 @@ static const AudioUnitElement inputElement = 1;
     CheckStatus(status, @"Create mixer node faile", YES);
     
     
+    //伴奏
     AudioComponentDescription playerDescription;
     bzero(&playerDescription, sizeof(playerDescription));
     playerDescription.componentManufacturer = kAudioUnitManufacturer_Apple;
@@ -146,6 +150,7 @@ static const AudioUnitElement inputElement = 1;
                    &_mPlayerNode);
     CheckStatus(status, @"Create file Player node faile", YES);
     
+    //转换2
     AudioComponentDescription convertDesc2;
     bzero(&convertDesc2, sizeof(convertDesc2));
     convertDesc2.componentManufacturer = kAudioUnitManufacturer_Apple;
@@ -156,6 +161,7 @@ static const AudioUnitElement inputElement = 1;
                    &_c32fTo16iNode);
     CheckStatus(status, @"create c32to16 convert node faile", YES);
     
+    //转换3
     AudioComponentDescription convertDesc3;
     bzero(&convertDesc3, sizeof(convertDesc3));
     convertDesc3.componentManufacturer = kAudioUnitManufacturer_Apple;
@@ -215,12 +221,12 @@ static const AudioUnitElement inputElement = 1;
     status = AudioUnitSetProperty(_ioUnit,
                                   kAudioUnitProperty_StreamFormat,
                                   kAudioUnitScope_Output,
-                                 inputElement,
+                                  inputElement,
                                   &stereoStreamFormat,
                                   sizeof(stereoStreamFormat));
-    
     CheckStatus(status, @"could not set stream format on I/O unit output scope", YES);
     
+    //启用开启录制(采集人声的数据 inputElement)
     UInt32 enableIO = 1;
     status = AudioUnitSetProperty(_ioUnit,
                                   kAudioOutputUnitProperty_EnableIO,
@@ -230,6 +236,7 @@ static const AudioUnitElement inputElement = 1;
                                   sizeof(enableIO));
     CheckStatus( status, @"Could not enable I/O on I/O unit input scope", YES);
     
+    //两路音轨
     UInt32 mixerElementCount = 2;
     status = AudioUnitSetProperty(_mixerUnit,
                                   kAudioUnitProperty_ElementCount,
@@ -270,35 +277,10 @@ static const AudioUnitElement inputElement = 1;
                           0.1,
                           0);
 
-    
-    //设置Float32转SInt16
-    UInt32 bytesPerSample1 = sizeof(SInt16);
-    AudioStreamBasicDescription c16iFmt;
-    bzero(&c16iFmt, sizeof(c16iFmt));
-    c16iFmt.mSampleRate = _sampleRate;
-    c16iFmt.mFormatID = kAudioFormatLinearPCM;
-    c16iFmt.mFormatFlags = kAudioFormatFlagIsSignedInteger | kAudioFormatFlagsNativeEndian | kAudioFormatFlagIsPacked | kAudioFormatFlagIsNonInterleaved;
-    c16iFmt.mBitsPerChannel = 8 * bytesPerSample1;
-    c16iFmt.mBytesPerFrame = bytesPerSample1;
-    c16iFmt.mBytesPerPacket = bytesPerSample1;
-    c16iFmt.mFramesPerPacket = 1;
-    c16iFmt.mChannelsPerFrame = 2;
-    AudioUnitSetProperty(_c32fTo16iUnit,
-                         kAudioUnitProperty_StreamFormat,
-                         kAudioUnitScope_Output,
-                         0,
-                         &c16iFmt,
-                         sizeof(c16iFmt));
-    AudioUnitSetProperty(_c16iTo32fUnit,
-                         kAudioUnitProperty_StreamFormat,
-                         kAudioUnitScope_Input,
-                         0,
-                         &c16iFmt,
-                         sizeof(c16iFmt));
-    
-    //ASBD
+    //设置ASBD
     UInt32 bytesPerSample = sizeof(SInt32);
     AudioStreamBasicDescription _clientFormat32float;
+    bzero(&_clientFormat32float, sizeof(bytesPerSample));
     _clientFormat32float.mFormatID = kAudioFormatLinearPCM;
     _clientFormat32float.mFormatFlags = kAudioFormatFlagsNativeFloatPacked | kAudioFormatFlagIsNonInterleaved;
     _clientFormat32float.mBytesPerPacket = bytesPerSample;
@@ -342,19 +324,63 @@ static const AudioUnitElement inputElement = 1;
                          &_clientFormat32float,
                          sizeof(_clientFormat32float));
     
-    AudioUnitSetProperty(_c32fTo16iUnit,
-                         kAudioUnitProperty_StreamFormat,
-                         kAudioUnitScope_Input,
-                         0,
-                         &_clientFormat32float,
-                         sizeof(_clientFormat32float));
+    //设置SInt16的ASBD
+    UInt32 bytesPerSample1 = sizeof(SInt16);
+    AudioStreamBasicDescription c16iFmt;
+    bzero(&c16iFmt, sizeof(bytesPerSample1));
+    c16iFmt.mSampleRate = _sampleRate;
+    c16iFmt.mFormatID = kAudioFormatLinearPCM;
+    c16iFmt.mFormatFlags = kAudioFormatFlagIsSignedInteger | kAudioFormatFlagsNativeEndian | kAudioFormatFlagIsPacked | kAudioFormatFlagIsNonInterleaved;
+    c16iFmt.mFramesPerPacket = 1;
+    c16iFmt.mBytesPerPacket = bytesPerSample1;
+    c16iFmt.mBytesPerFrame = bytesPerSample1;
+    c16iFmt.mBitsPerChannel = 8 * bytesPerSample1;
+    c16iFmt.mChannelsPerFrame = 2;
+
+    //设置Float32的ASBD
+    UInt32 bytesPerSample2 = sizeof(Float32);
+    AudioStreamBasicDescription c32fFmt;
+    bzero(&c32fFmt, sizeof(bytesPerSample2));
+    c32fFmt.mSampleRate = _sampleRate;
+    c32fFmt.mFormatID = kAudioFormatFlagsNativeFloatPacked | kAudioFormatFlagIsNonInterleaved;
+    c32fFmt.mFramesPerPacket = 1;
+    c32fFmt.mBytesPerPacket = bytesPerSample2;
+    c32fFmt.mBytesPerFrame = bytesPerSample2;
+    c32fFmt.mBitsPerChannel = 8 * bytesPerSample2;
+    c32fFmt.mChannelsPerFrame = 2;
     
-    AudioUnitSetProperty(_c16iTo32fUnit,
-                         kAudioUnitProperty_StreamFormat,
-                         kAudioUnitScope_Output,
-                         0,
-                         &_clientFormat32float,
-                         sizeof(_clientFormat32float));
+    status = AudioUnitSetProperty(_c32fTo16iUnit,
+                                  kAudioUnitProperty_StreamFormat,
+                                  kAudioUnitScope_Output,
+                                  0,
+                                  &c16iFmt,
+                                  sizeof(c16iFmt));
+    CheckStatus(status, @"Float32 to SInt16 output", YES);
+    
+    status = AudioUnitSetProperty(_c32fTo16iUnit,
+                                  kAudioUnitProperty_StreamFormat,
+                                  kAudioUnitScope_Input,
+                                  0,
+                                  &c32fFmt,
+                                  sizeof(c32fFmt));
+    CheckStatus(status, @"Float32 to SInt16 input", YES);
+    
+    status = AudioUnitSetProperty(_c16iTo32fUnit,
+                                  kAudioUnitProperty_StreamFormat,
+                                  kAudioUnitScope_Output,
+                                  0,
+                                  &c32fFmt,
+                                  sizeof(c32fFmt));
+    CheckStatus(status, @"SInt16 to Float32 output", YES);
+    
+    status = AudioUnitSetProperty(_c16iTo32fUnit,
+                                  kAudioUnitProperty_StreamFormat,
+                                  kAudioUnitScope_Input,
+                                  0,
+                                  &c16iFmt,
+                                  sizeof(c16iFmt));
+    CheckStatus(status, @"SInt16 to Float32 output", YES);
+    
     
     status = AudioUnitAddRenderNotify(_c32fTo16iUnit,
                              &mixerRenderNotify,
@@ -377,7 +403,6 @@ static OSStatus renderCallback(void *inRefCon,
                     0,
                     inNumberFrames,
                     ioData);
-    
 
     //写文件操作
     /*result = ExtAudioFileWriteAsync(recorder->finalAudioFile,
@@ -396,19 +421,21 @@ static OSStatus mixerRenderNotify(void *inRefCon,
                                   AudioBufferList * __nullable ioData){
     OSStatus status = noErr;
     
-    __unsafe_unretained AudioUnitInput *recorder = (__bridge AudioUnitInput *)inRefCon;
-    NSLog(@"--------- mixerRenderNotify --------");
+    if (*ioActionFlags == kAudioUnitRenderAction_PostRender) {
+        //__unsafe_unretained AudioUnitInput *recorder = (__bridge AudioUnitInput *)inRefCon;
+        NSLog(@"--------- mixerRenderNotify --------");
+        /*AudioBuffer buffer = ioData->mBuffers[0];
+        int sampleCount = buffer.mDataByteSize/2;
+        short *packetBuffer = new short[sampleCount];
+        memcpy(packetBuffer, buffer.mData, buffer.mDataByteSize);
+        
+        AudioPacket *audioPacket = new AudioPacket();
+        audioPacket->buffer = packetBuffer;
+        audioPacket->size = buffer.mDataByteSize / 2;
+        recorder->packetPool->put(audioPacket);*/
+    }
     
-    /*
-    AudioBuffer buffer = ioData->mBuffers[0];
-    int sampleCount = buffer.mDataByteSize/2;
-    short *packetBuffer = new short[sampleCount];
-    memcpy(packetBuffer, buffer.mData, buffer.mDataByteSize);
     
-    AudioPacket *audioPacket = new AudioPacket();
-    audioPacket->buffer = packetBuffer;
-    audioPacket->size = buffer.mDataByteSize / 2;
-    recorder->packetPool->put(audioPacket);*/
     return status;
 } 
 
@@ -452,27 +479,34 @@ static OSStatus mixerRenderNotify(void *inRefCon,
                                      _mixerNode,
                                      1);
     CheckStatus(status, @"Could not connect file node input to mixer node input", YES);
-    
-    
+
     AURenderCallbackStruct finalRenderCallback;
     finalRenderCallback.inputProc = &renderCallback;
     finalRenderCallback.inputProcRefCon = (__bridge void *)self;
 
     status = AUGraphSetNodeInputCallback(_auGraph,
-                                         _c32fTo16iNode,
+                                         _ioNode,
                                          0,
                                          &finalRenderCallback);
     CheckStatus(status, @"Could not set InputCallback For IONode", YES);
     
-    
-//    status = AUGraphConnectNodeInput(_auGraph,
-//                                     _mixerNode,
-//                                     0,
-//                                     _c32fTo16iNode,
-//                                     0);
-//    CheckStatus(status, @"could not set mixernode to c32fto16iNode", YES);
-    
+    /*
     status = AUGraphConnectNodeInput(_auGraph,
+                                     _mixerNode,
+                                     0,
+                                     _c32fTo16iNode,
+                                     1);
+    CheckStatus(status, @"could not set mixerNode and c32To16iNode", YES);
+    */
+    
+    
+    /**
+     * RenderNotify 和 InputCallback 是不一样的
+     * InputCallback是当下一级节点需要数据的时候将会调用的方法，让配置的这个方法来填充数据
+     *
+     * RenderNotify是不同的调用机制，RenderNotify是在这个节点从它的上一级节点获取到数据之后才会调用该函数，可以让开发者做一些额外的操作(比如音频处理或者编码文件等)
+     */
+    /*status = AUGraphConnectNodeInput(_auGraph,
                                      _c32fTo16iNode,
                                      0,
                                      _c16iTo32fNode,
@@ -484,14 +518,7 @@ static OSStatus mixerRenderNotify(void *inRefCon,
                                      0,
                                      _ioNode,
                                      0);
-    CheckStatus(status, @"could not set _c16iTo32fNode", YES);
-    
-    /**
-     * RenderNotify 和 InputCallback 是不一样的
-     * InputCallback是当下一级节点需要数据的时候将会调用的方法，让配置的这个方法来填充数据
-     *
-     * RenderNotify是不同的调用机制，RenderNotify是在这个节点从它的上一级节点获取到数据之后才会调用该函数，可以让开发者做一些额外的操作(比如音频处理或者编码文件等)
-     */
+    CheckStatus(status, @"could not set _c16iTo32fNode", YES);*/
 }
 
 //下面的代码一定是要在AUGraphInitialize之后设置，否则不生效
