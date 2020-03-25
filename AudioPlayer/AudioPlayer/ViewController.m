@@ -24,7 +24,7 @@
 
 - (IBAction)playAction:(UIButton *)sender { //开始播放
     NSLog(@"play music");
-    NSString *filtPath = [CommonUtil bundlePath:@"music" type:@"aac"];
+    NSString *filtPath = [CommonUtil bundlePath:@"test" type:@"m4a"];
     _audioPlayer = [[AudioPlayer alloc] initWithFilePath:filtPath];
     [_audioPlayer start];
 }

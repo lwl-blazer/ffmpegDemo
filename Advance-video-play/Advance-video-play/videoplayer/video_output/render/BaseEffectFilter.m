@@ -53,7 +53,7 @@
     
 exit:
     
-    if (vertexShader) {
+    if (vertShader) {
         glDeleteShader(vertShader);
     }
     

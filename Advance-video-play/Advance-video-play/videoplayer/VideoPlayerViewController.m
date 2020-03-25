@@ -260,5 +260,8 @@
     return 1;
 }
 
+- (void)dealloc{
+    NSLog(@"%s", __func__);
+}
 
 @end

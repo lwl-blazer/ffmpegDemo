@@ -155,7 +155,7 @@
 - (BOOL)createDisplayFrameBuffer{
     BOOL ret = TRUE;
     //创建
-    glGenRenderbuffers(1, &_displayFramebuffer);
+    glGenFramebuffers(1, &_displayFramebuffer);
     glGenRenderbuffers(1, &_renderBuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, self.displayFramebuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, self.renderBuffer);

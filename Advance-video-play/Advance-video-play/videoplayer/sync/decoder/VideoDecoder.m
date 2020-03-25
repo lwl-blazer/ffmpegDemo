@@ -246,7 +246,7 @@ static int interrupt_callback(void *ctx){
                 break;
             }
             retryTimes --;
-            videoHeight = [self frameWidth];
+            videoWidth = [self frameWidth];
             videoHeight = [self frameHeight];
         }
     }

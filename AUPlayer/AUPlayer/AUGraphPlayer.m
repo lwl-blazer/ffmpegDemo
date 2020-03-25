@@ -235,7 +235,7 @@
                                   &mixerElementCount,
                                   sizeof(mixerElementCount));
     
-    [self setInputSource:NO];
+    [self setInputSource:YES];
     
     //6连接起来Node    AUGraphConnectNodeInput 将一个节点的输出连接到另一个节点的输入
     status = AUGraphConnectNodeInput(mPlayerGraph, mPlayerNode, 0, mSplitterNode, 0);
@@ -295,7 +295,7 @@
                                        kMultiChannelMixerParam_Volume,
                                        kAudioUnitScope_Input,
                                        0, //输出
-                                       0.1,
+                                       1,
                                        0);
         CheckStatus(status, @"set parameter fail", YES);
         status = AudioUnitSetParameter(mAccMixerUnit,
@@ -318,7 +318,7 @@
                                        kMultiChannelMixerParam_Volume,
                                        kAudioUnitScope_Input,
                                        1, //输入
-                                       0.1,
+                                       1,
                                        0);
         CheckStatus(status, @"set parameter fail", YES);
     }

@@ -126,6 +126,7 @@ void DecoderAction::decodePacket(){
     int packetBufferSize = (int)((accompanyByteCountPerSec / 2) * 0.2);
     
     while (true) {
+
         short *samples = new short[packetBufferSize];
         int stereoSampleSize = readSamples(samples, packetBufferSize);
         if (stereoSampleSize <= 0) {

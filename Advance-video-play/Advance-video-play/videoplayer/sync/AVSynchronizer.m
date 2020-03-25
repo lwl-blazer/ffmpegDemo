@@ -156,6 +156,7 @@ static void *runDecoderThread(void *ptr){
     BOOL good = YES;
     while (good) {
         good = NO;
+        
         @autoreleasepool {
             if (_decoder &&(_decoder.validAudio || _decoder.validVideo)) {
                 NSArray *frames = [_decoder decodeFrames:duration
