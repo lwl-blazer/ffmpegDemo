@@ -28,7 +28,8 @@ const NSTimeInterval AUSAudioSessionLatency_LowLatency = 0.0058;
 {
     self = [super init];
     if (self) {
-        self.perferredSampleRate = 44100.0;
+        self.perferredSampleRate = _currentSampleRate = 44100.0;
+        _currentSampleRate = 44100.0;
         self.audioSession = [AVAudioSession sharedInstance];
     }
     return self;
@@ -44,6 +45,17 @@ const NSTimeInterval AUSAudioSessionLatency_LowLatency = 0.0058;
     
     if (error) {
         NSLog(@"Could note set category on audio session:%@", error.localizedDescription);
+    }
+}
+
+- (void)setCategoryOptions:(AVAudioSessionCategoryOptions)categoryOptions{
+    if (self.category != nil) {
+        NSError *error = nil;
+        if (![self.audioSession setCategory:self.category
+                                withOptions:categoryOptions
+                                      error:&error]) {
+            NSLog(@"Could note set category options on audio session: %@", error.localizedDescription);
+        }
     }
 }
 
@@ -91,23 +103,34 @@ const NSTimeInterval AUSAudioSessionLatency_LowLatency = 0.0058;
 }
 
 - (void)onNotificationAudioRouteChange:(NSNotification *)sender{
+    NSLog(@"%@", sender.userInfo);
+    AVAudioSessionRouteChangeReason reason = [[sender.userInfo objectForKey:AVAudioSessionRouteChangeReasonKey] integerValue];
+    switch (reason) {
+        case AVAudioSessionRouteChangeReasonNewDeviceAvailable:{
+            NSLog(@"新设备可用");
+            AVAudioSession *session = [AVAudioSession sharedInstance];
+            for (AVAudioSessionPortDescription *desc in session.currentRoute.outputs) {
+                NSLog(@"portType:%@---%@", desc.portType, desc.portName);
+            }
+        }
+            break;
+        case AVAudioSessionRouteChangeReasonOldDeviceUnavailable:{
+            NSLog(@"旧设备不可用");
+            AVAudioSessionRouteDescription *previous = [sender.userInfo objectForKey:AVAudioSessionRouteChangePreviousRouteKey];
+            for (AVAudioSessionPortDescription *desc in previous.outputs) {
+                NSLog(@"portType:%@---%@", desc.portType, desc.portName);
+            }
+        }
+            break;
+        default:
+            NSLog(@"其它");
+            break;
+    }
     [self adjustOnRouteChange];
 }
 
 - (void)adjustOnRouteChange{
-    AVAudioSessionRouteDescription *currentRoute = [[AVAudioSession sharedInstance] currentRoute];
-    if (currentRoute) {
-        if ([[AVAudioSession sharedInstance] usingWiredMicrophone]) {
-            
-        } else {
-            if ([[AVAudioSession sharedInstance] usingBlueTooth]) {
-                
-            } else {
-                [[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker
-                                                                   error:nil];
-            }
-        }
-    }
+
 }
 
 @end

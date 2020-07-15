@@ -13,7 +13,8 @@
 - (BOOL)usingBlueTooth{
     //输入
     NSArray *inputs = self.currentRoute.inputs;
-    NSArray *blueToothInputRoutes = @[AVAudioSessionPortBluetoothHFP];
+    NSArray *blueToothInputRoutes = @[AVAudioSessionPortBluetoothHFP,
+                                      AVAudioSessionPortBluetoothA2DP];
     for (AVAudioSessionPortDescription *desc in inputs) {
         if ([blueToothInputRoutes containsObject:desc.portType]) {
             return YES;
@@ -44,7 +45,8 @@
     }
     
     NSArray *outputs = self.currentRoute.outputs;
-    NSArray *headSetoutputRoutes = @[AVAudioSessionPortHeadphones, AVAudioSessionPortUSBAudio];
+    NSArray *headSetoutputRoutes = @[AVAudioSessionPortHeadphones,
+                                     AVAudioSessionPortUSBAudio];
     for (AVAudioSessionPortDescription *desc in outputs) {
         if ([headSetoutputRoutes containsObject:desc.portType]) {
             return YES;

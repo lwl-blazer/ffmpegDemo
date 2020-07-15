@@ -60,7 +60,6 @@
     } else {
         [_videoScheduler stopEncode];
     }
-    
 }
 
 - (void)onEncoderInitialFailed{

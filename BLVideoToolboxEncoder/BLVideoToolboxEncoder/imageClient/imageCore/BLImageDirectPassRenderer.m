@@ -58,7 +58,6 @@ NSString *const directPassFragmentShaderString = SHADER_STRING
             ret = TRUE;
         }
     }
-
     return ret;
 }
 

@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <AVFoundation/AVFoundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -22,6 +23,7 @@ extern const NSTimeInterval AUSAudioSessionLatency_LowLatency;
 
 @property(nonatomic, assign) NSTimeInterval preferredLatency;
 @property(nonatomic, assign) BOOL active;
+@property(nonatomic, assign) AVAudioSessionCategoryOptions categoryOptions;
 @property(nonatomic, copy) NSString *category;
 
 @property(nonatomic, assign, readonly) Float64 currentSampleRate;

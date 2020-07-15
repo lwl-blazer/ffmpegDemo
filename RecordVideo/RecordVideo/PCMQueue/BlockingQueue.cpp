@@ -91,7 +91,6 @@ void BlockingQueue::flush(){
         if (audioPacket != nullptr) {
             delete audioPacket;
         }
-        
         delete pkt;
         pkt = nullptr;
     }
