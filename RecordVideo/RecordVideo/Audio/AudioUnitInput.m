@@ -44,7 +44,6 @@ static const AudioUnitElement inputElement = 1;
 @property(nonatomic, assign) AUNode convertNode;
 @property(nonatomic, assign) AudioUnit convertUnit;
 
-
 @property(nonatomic, assign) AUNode mPlayerNode;
 @property(nonatomic, assign) AudioUnit mPlayerUnit;
  
@@ -396,7 +395,6 @@ static OSStatus renderCallback(void *inRefCon,
                                AudioBufferList *ioData) {
     OSStatus result = noErr;
     __unsafe_unretained AudioUnitInput *recorder = (__bridge AudioUnitInput *)inRefCon;
-    NSLog(@"--------- renderCallback --------");
     AudioUnitRender(recorder->_mixerUnit,
                     ioActionFlags,
                     inTimeStamp,
@@ -420,10 +418,10 @@ static OSStatus mixerRenderNotify(void *inRefCon,
                                   UInt32 inNumberFrames,
                                   AudioBufferList * __nullable ioData){
     OSStatus status = noErr;
-    
+    NSLog(@"--------- mixerRenderNotify --------");
     if (*ioActionFlags == kAudioUnitRenderAction_PostRender) {
         //__unsafe_unretained AudioUnitInput *recorder = (__bridge AudioUnitInput *)inRefCon;
-        NSLog(@"--------- mixerRenderNotify --------");
+        
         /*AudioBuffer buffer = ioData->mBuffers[0];
         int sampleCount = buffer.mDataByteSize/2;
         short *packetBuffer = new short[sampleCount];

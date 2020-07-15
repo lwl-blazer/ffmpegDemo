@@ -10,7 +10,6 @@
 #import "AudioUnitInput.h"
 #import "CommonUtil.h"
 
-
 @interface ViewController ()
 
 @property(nonatomic, strong) AudioUnitInput *recoder;
