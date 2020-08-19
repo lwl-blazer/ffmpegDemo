@@ -95,7 +95,7 @@ static const AudioUnitElement inputElement = 1;
     
     [self getUnitsFromNodes];
     [self setAudioUnitProperties];
-    [self makeNodeConnections];
+    [self makeNodeConnections2];
     
     CAShow(_auGraph);
     status = AUGraphInitialize(_auGraph);
@@ -137,7 +137,6 @@ static const AudioUnitElement inputElement = 1;
                             &_mixerNode);
     CheckStatus(status, @"Create mixer node faile", YES);
     
-    
     //伴奏
     AudioComponentDescription playerDescription;
     bzero(&playerDescription, sizeof(playerDescription));
@@ -149,7 +148,7 @@ static const AudioUnitElement inputElement = 1;
                    &_mPlayerNode);
     CheckStatus(status, @"Create file Player node faile", YES);
     
-    //转换2
+    //Float32 Convert to SInt16
     AudioComponentDescription convertDesc2;
     bzero(&convertDesc2, sizeof(convertDesc2));
     convertDesc2.componentManufacturer = kAudioUnitManufacturer_Apple;
@@ -160,7 +159,7 @@ static const AudioUnitElement inputElement = 1;
                    &_c32fTo16iNode);
     CheckStatus(status, @"create c32to16 convert node faile", YES);
     
-    //转换3
+    //SInt16 Convert to Float32
     AudioComponentDescription convertDesc3;
     bzero(&convertDesc3, sizeof(convertDesc3));
     convertDesc3.componentManufacturer = kAudioUnitManufacturer_Apple;
@@ -322,69 +321,50 @@ static const AudioUnitElement inputElement = 1;
                          0,
                          &_clientFormat32float,
                          sizeof(_clientFormat32float));
-    
-    //设置SInt16的ASBD
-    UInt32 bytesPerSample1 = sizeof(SInt16);
-    AudioStreamBasicDescription c16iFmt;
-    bzero(&c16iFmt, sizeof(bytesPerSample1));
-    c16iFmt.mSampleRate = _sampleRate;
-    c16iFmt.mFormatID = kAudioFormatLinearPCM;
-    c16iFmt.mFormatFlags = kAudioFormatFlagIsSignedInteger | kAudioFormatFlagsNativeEndian | kAudioFormatFlagIsPacked | kAudioFormatFlagIsNonInterleaved;
-    c16iFmt.mFramesPerPacket = 1;
-    c16iFmt.mBytesPerPacket = bytesPerSample1;
-    c16iFmt.mBytesPerFrame = bytesPerSample1;
-    c16iFmt.mBitsPerChannel = 8 * bytesPerSample1;
-    c16iFmt.mChannelsPerFrame = 2;
 
-    //设置Float32的ASBD
-    UInt32 bytesPerSample2 = sizeof(Float32);
-    AudioStreamBasicDescription c32fFmt;
-    bzero(&c32fFmt, sizeof(bytesPerSample2));
-    c32fFmt.mSampleRate = _sampleRate;
-    c32fFmt.mFormatID = kAudioFormatFlagsNativeFloatPacked | kAudioFormatFlagIsNonInterleaved;
-    c32fFmt.mFramesPerPacket = 1;
-    c32fFmt.mBytesPerPacket = bytesPerSample2;
-    c32fFmt.mBytesPerFrame = bytesPerSample2;
-    c32fFmt.mBitsPerChannel = 8 * bytesPerSample2;
-    c32fFmt.mChannelsPerFrame = 2;
-    
+    //设置SInt16的ASBD
+    bytesPerSample = sizeof(SInt16);
+    AudioStreamBasicDescription _c16iFmt;
+    bzero(&_c16iFmt, sizeof(bytesPerSample));
+    _c16iFmt.mFormatID = kAudioFormatLinearPCM;
+    _c16iFmt.mFormatFlags = kAudioFormatFlagIsSignedInteger | kAudioFormatFlagIsNonInterleaved;
+    _c16iFmt.mBytesPerPacket = bytesPerSample;
+    _c16iFmt.mFramesPerPacket = 1;
+    _c16iFmt.mBytesPerFrame = bytesPerSample;
+    _c16iFmt.mChannelsPerFrame = 2;
+    _c16iFmt.mBitsPerChannel = 8 * bytesPerSample;
+    _c16iFmt.mSampleRate = _sampleRate;
     status = AudioUnitSetProperty(_c32fTo16iUnit,
                                   kAudioUnitProperty_StreamFormat,
                                   kAudioUnitScope_Output,
                                   0,
-                                  &c16iFmt,
-                                  sizeof(c16iFmt));
+                                  &_c16iFmt,
+                                  sizeof(_c16iFmt));
     CheckStatus(status, @"Float32 to SInt16 output", YES);
-    
+
     status = AudioUnitSetProperty(_c32fTo16iUnit,
                                   kAudioUnitProperty_StreamFormat,
                                   kAudioUnitScope_Input,
                                   0,
-                                  &c32fFmt,
-                                  sizeof(c32fFmt));
+                                  &_clientFormat32float,
+                                  sizeof(_clientFormat32float));
     CheckStatus(status, @"Float32 to SInt16 input", YES);
     
     status = AudioUnitSetProperty(_c16iTo32fUnit,
                                   kAudioUnitProperty_StreamFormat,
                                   kAudioUnitScope_Output,
                                   0,
-                                  &c32fFmt,
-                                  sizeof(c32fFmt));
+                                  &_clientFormat32float,
+                                  sizeof(_clientFormat32float));
     CheckStatus(status, @"SInt16 to Float32 output", YES);
     
     status = AudioUnitSetProperty(_c16iTo32fUnit,
                                   kAudioUnitProperty_StreamFormat,
                                   kAudioUnitScope_Input,
                                   0,
-                                  &c16iFmt,
-                                  sizeof(c16iFmt));
-    CheckStatus(status, @"SInt16 to Float32 output", YES);
-    
-    
-    status = AudioUnitAddRenderNotify(_c32fTo16iUnit,
-                             &mixerRenderNotify,
-                             (__bridge void *)self);
-    CheckStatus(status, @"Could not set _c32fto16iUnit renderNotify", YES);
+                                  &_c16iFmt,
+                                  sizeof(_c16iFmt));
+    CheckStatus(status, @"SInt16 to Float32 input", YES);
 }
 
 static OSStatus renderCallback(void *inRefCon,
@@ -487,16 +467,40 @@ static OSStatus mixerRenderNotify(void *inRefCon,
                                          0,
                                          &finalRenderCallback);
     CheckStatus(status, @"Could not set InputCallback For IONode", YES);
-    
-    /*
+}
+
+- (void)makeNodeConnections2{
+    OSStatus status = noErr;
     status = AUGraphConnectNodeInput(_auGraph,
-                                     _mixerNode,
+                                     _c16iTo32fNode,
                                      0,
-                                     _c32fTo16iNode,
-                                     1);
-    CheckStatus(status, @"could not set mixerNode and c32To16iNode", YES);
-    */
+                                     _ioNode,
+                                     0);
+    CheckStatus(status, @"Could not connect I/O node input to convert node input", YES);
     
+    status = AUGraphConnectNodeInput(_auGraph,
+                            _c32fTo16iNode,
+                            0,
+                            _c16iTo32fNode,
+                            0);
+    CheckStatus(status, @"convert node output", YES);
+    
+    status = AUGraphConnectNodeInput(_auGraph,
+                                     _mPlayerNode,
+                                     0,
+                                     _mixerNode,
+                                     1);
+    CheckStatus(status, @"Could not connect file node input to mixer node input", YES);
+
+    AURenderCallbackStruct finalRenderCallback;
+    finalRenderCallback.inputProc = &renderCallback;
+    finalRenderCallback.inputProcRefCon = (__bridge void *)self;
+
+    status = AUGraphSetNodeInputCallback(_auGraph,
+                                         _ioNode,
+                                         0,
+                                         &finalRenderCallback);
+    CheckStatus(status, @"Could not set InputCallback For IONode", YES);
     
     /**
      * RenderNotify 和 InputCallback 是不一样的
@@ -504,20 +508,12 @@ static OSStatus mixerRenderNotify(void *inRefCon,
      *
      * RenderNotify是不同的调用机制，RenderNotify是在这个节点从它的上一级节点获取到数据之后才会调用该函数，可以让开发者做一些额外的操作(比如音频处理或者编码文件等)
      */
-    /*status = AUGraphConnectNodeInput(_auGraph,
-                                     _c32fTo16iNode,
-                                     0,
-                                     _c16iTo32fNode,
-                                     0);
-    CheckStatus(status, @"Could not set _c32fto16iNode", YES);
-    
-    status = AUGraphConnectNodeInput(_auGraph,
-                                     _c16iTo32fNode,
-                                     0,
-                                     _ioNode,
-                                     0);
-    CheckStatus(status, @"could not set _c16iTo32fNode", YES);*/
+    status = AudioUnitAddRenderNotify(_c32fTo16iUnit,
+                             &mixerRenderNotify,
+                             (__bridge void * _Nullable)(self));
+    CheckStatus(status, @"Could not set RenderNotify For c32fTo16iUnit", YES);
 }
+
 
 //下面的代码一定是要在AUGraphInitialize之后设置，否则不生效
 - (void)prepareWriteAccompanyFile:(NSString *)path{
